@@ -62,6 +62,7 @@
       opacity:0;
       z-index:999;
       transition:opacity 0.3s ease;
+      display:none; /* Hidden by default - only shown for developer role */
     }
     .hidden-theme-btn:hover{
       opacity:0.1;
@@ -726,29 +727,63 @@
     </div>
     <button class="btn" type="submit" style="width:100%;margin-top:12px">Login</button>
     <div class="err" id="err"></div>
+    <div style="margin-top:1.5rem;padding:1rem;background:rgba(99,102,241,0.05);border-radius:8px;border:1px solid rgba(99,102,241,0.2);font-size:0.85rem;color:var(--muted);">
+      <div style="margin-bottom:0.5rem;"><strong>👤 User Access:</strong> View dashboard only</div>
+      <div><strong>👨‍💻 Developer Access:</strong> Full theme customization</div>
+    </div>
   </form>
 </div>
 
 <script>
   const CSV_URL = './data.csv';
 
-  // Login
-  const VALID_USER = 'digicides';
-  const VALID_PASS = 'coro@cpc';
+  // Login - Multi-User with Role-Based Access
+  const USERS = {
+    'digicides': { password: 'coro@cpc', role: 'user', name: 'Regular User' },
+    'developer': { password: 'de^el0per', role: 'developer', name: 'Developer' }
+  };
+  
   const overlay = document.getElementById('loginOverlay');
   const form = document.getElementById('loginForm');
   const errEl = document.getElementById('err');
   const LS_KEY = 'cpc_login_ok';
+  const LS_ROLE_KEY = 'cpc_user_role';
+  const LS_USERNAME_KEY = 'cpc_username';
 
-  function unlock(){ overlay.style.display='none'; }
-  if(localStorage.getItem(LS_KEY)==='1'){ unlock(); }
+  function unlock(){ 
+    overlay.style.display='none';
+    // Show/hide theme controller button based on role
+    const userRole = localStorage.getItem(LS_ROLE_KEY);
+    const themeBtn = document.querySelector('.hidden-theme-btn');
+    if(themeBtn) {
+      if(userRole === 'developer') {
+        themeBtn.style.display = 'block';
+      } else {
+        themeBtn.style.display = 'none';
+      }
+    }
+  }
+  
+  // Check if already logged in
+  if(localStorage.getItem(LS_KEY)==='1'){ 
+    unlock();
+  }
   
   form.addEventListener('submit', (e)=>{
     e.preventDefault();
     const u = document.getElementById('u').value.trim();
     const p = document.getElementById('p').value;
-    if(u===VALID_USER && p===VALID_PASS){
+    
+    // Check if user exists and password matches
+    if(USERS[u] && USERS[u].password === p){
+      // Store login credentials and role
       localStorage.setItem(LS_KEY,'1');
+      localStorage.setItem(LS_ROLE_KEY, USERS[u].role);
+      localStorage.setItem(LS_USERNAME_KEY, u);
+      
+      // Show success message with role
+      console.log('✅ Logged in as:', USERS[u].name, '(Role:', USERS[u].role + ')');
+      
       unlock();
     } else {
       errEl.textContent = 'Invalid credentials. Please try again.';
@@ -758,7 +793,10 @@
   // Logout
   document.getElementById('logoutBtn').addEventListener('click', ()=>{
     if(confirm('Are you sure you want to logout?')){
+      // Clear all login-related data
       localStorage.removeItem(LS_KEY);
+      localStorage.removeItem(LS_ROLE_KEY);
+      localStorage.removeItem(LS_USERNAME_KEY);
       location.reload();
     }
   });
