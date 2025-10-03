@@ -769,11 +769,14 @@
         <button class="btn btn-secondary" onclick="resetToDefaults()">
           🔄 Reset
         </button>
-        <button class="btn btn-success" onclick="applyToDashboard()">
-          ✨ Apply to Dashboard
+        <button class="btn btn-success" id="liveUpdateBtn" onclick="toggleLiveUpdate()">
+          <span id="liveUpdateIcon">⚡</span> <span id="liveUpdateText">Enable Live Update</span>
         </button>
-        <button class="btn btn-primary" onclick="exportTheme()">
-          💾 Export Theme
+        <button class="btn btn-primary" onclick="applyToDashboard()">
+          ✨ Apply Now
+        </button>
+        <button class="btn btn-secondary" onclick="downloadUpdatedDashboard()">
+          💾 Download HTML
         </button>
         <button class="btn btn-secondary" onclick="window.open('index.html', '_blank')">
           🚀 View Dashboard
@@ -796,8 +799,8 @@
         <div class="stat-label">Variables</div>
       </div>
       <div class="stat-item">
-        <div class="stat-value">∞</div>
-        <div class="stat-label">Possibilities</div>
+        <div class="stat-value" id="liveStatus" style="color: var(--text-muted);">OFF</div>
+        <div class="stat-label">Live Update</div>
       </div>
     </div>
 
@@ -1710,6 +1713,11 @@
       preview.style.setProperty('--preview-border', currentTheme.border);
       preview.style.setProperty('--preview-font-body', currentTheme.fontBody);
       preview.style.setProperty('--preview-font-headings', currentTheme.fontHeadings);
+      
+      // If live update is enabled, apply to dashboard in real-time
+      if (liveUpdateEnabled) {
+        applyToDashboard();
+      }
     }
 
     // Apply preset
@@ -1798,15 +1806,93 @@
       showNotification('Current dashboard theme imported!', 'success');
     }
 
+    // Live update mode
+    let liveUpdateEnabled = false;
+
+    // Toggle live update
+    function toggleLiveUpdate() {
+      liveUpdateEnabled = !liveUpdateEnabled;
+      
+      const btn = document.getElementById('liveUpdateBtn');
+      const icon = document.getElementById('liveUpdateIcon');
+      const text = document.getElementById('liveUpdateText');
+      const status = document.getElementById('liveStatus');
+      
+      if (liveUpdateEnabled) {
+        btn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+        icon.textContent = '🔴';
+        text.textContent = 'Live Update ON';
+        status.textContent = 'ON';
+        status.style.color = 'var(--accent)';
+        
+        // Apply current theme immediately
+        applyToDashboard();
+        showNotification('Live Update enabled! Changes will auto-apply to your dashboard.', 'success');
+      } else {
+        btn.style.background = '';
+        icon.textContent = '⚡';
+        text.textContent = 'Enable Live Update';
+        status.textContent = 'OFF';
+        status.style.color = 'var(--text-muted)';
+        
+        // Remove active theme from localStorage
+        localStorage.removeItem('dashboardThemeActive');
+        showNotification('Live Update disabled', 'success');
+      }
+    }
+
     // Apply to dashboard
     function applyToDashboard() {
-      // Generate CSS
-      const css = generateCSS();
-      
       // Save to localStorage for dashboard to pick up
-      localStorage.setItem('dashboardTheme', JSON.stringify(currentTheme));
+      localStorage.setItem('dashboardThemeActive', JSON.stringify(currentTheme));
       
-      showNotification('Theme ready! Open your dashboard and it will auto-apply. Or copy the CSS from Export.', 'success');
+      if (!liveUpdateEnabled) {
+        showNotification('✅ Theme applied! Refresh your dashboard to see changes.', 'success');
+      }
+    }
+
+    // Download updated index.html
+    function downloadUpdatedDashboard() {
+      fetch('index.html')
+        .then(response => response.text())
+        .then(html => {
+          // Replace the :root CSS variables
+          const cssVars = `    :root{
+      --bg:${currentTheme.bg};
+      --panel:${currentTheme.panel};
+      --card:${currentTheme.card};
+      --card-hover:${currentTheme.cardHover};
+      --muted:${currentTheme.muted};
+      --text:${currentTheme.text};
+      --acc1:${currentTheme.acc1};
+      --acc2:${currentTheme.acc2};
+      --acc3:${currentTheme.acc3};
+      --acc4:${currentTheme.acc4};
+      --acc5:${currentTheme.acc5};
+      --ring:${currentTheme.ring};
+      --border:${currentTheme.border};
+      --shadow:${currentTheme.shadow};
+      --shadow-lg:${currentTheme.shadowLg};
+    }`;
+          
+          // Find and replace the :root block
+          const regex = /:root\{[^}]+\}/;
+          const updatedHtml = html.replace(regex, cssVars);
+          
+          // Download the file
+          const blob = new Blob([updatedHtml], { type: 'text/html' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'index.html';
+          a.click();
+          URL.revokeObjectURL(url);
+          
+          showNotification('📥 index.html downloaded with your theme!', 'success');
+        })
+        .catch(err => {
+          showNotification('❌ Could not download file: ' + err.message, 'error');
+        });
     }
 
     // Reset to defaults
