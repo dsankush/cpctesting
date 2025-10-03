@@ -748,9 +748,189 @@
       font-size: 0.85rem;
       margin-top: 0.25rem;
     }
+
+    /* Access Control Overlay */
+    .access-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #0f0f23 100%);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .access-overlay.hidden {
+      display: none;
+    }
+
+    .access-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 3rem;
+      max-width: 450px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      animation: slideUp 0.4s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .access-icon {
+      font-size: 4rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .access-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .access-subtitle {
+      text-align: center;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+
+    .access-input {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      background: var(--surface-light);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .access-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+    }
+
+    .access-input.error {
+      border-color: #ef4444;
+      animation: shake 0.3s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    .access-btn {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .access-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+    }
+
+    .access-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .access-hint {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: var(--surface-light);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+
+    .access-error {
+      color: #ef4444;
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .access-error.show {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
   </style>
 </head>
 <body>
+  
+  <!-- Access Control Overlay -->
+  <div id="accessOverlay" class="access-overlay">
+    <div class="access-card">
+      <div class="access-icon">🔐</div>
+      <h2 class="access-title">Theme Controller Access</h2>
+      <p class="access-subtitle">Enter the secret key to continue</p>
+      
+      <input 
+        type="password" 
+        id="accessKey" 
+        class="access-input" 
+        placeholder="Enter secret key..."
+        autocomplete="off"
+        onkeypress="if(event.key==='Enter') checkAccess()"
+      >
+      
+      <button class="access-btn" onclick="checkAccess()">
+        🔓 Unlock Theme Controller
+      </button>
+      
+      <div id="accessError" class="access-error">
+        ❌ Invalid access key. Please try again.
+      </div>
+      
+      <div class="access-hint">
+        💡 <strong>Hint:</strong> Default key is <code>theme2025</code><br>
+        <small>(Change this in the code for production)</small>
+      </div>
+    </div>
+  </div>
   
   <div class="container">
     <!-- Header -->
@@ -2068,8 +2248,105 @@ body {
       }
     });
 
-    // Initialize on load
-    init();
+    // ========================================
+    // ACCESS CONTROL CONFIGURATION
+    // ========================================
+    // IMPORTANT: Change these values for production!
+    // 
+    // 1. Change SECRET_KEY to your own secure password
+    // 2. Update the same key in index.html (hidden button onclick)
+    // 3. Update the hint text in the access overlay (line ~929)
+    //
+    // Example:
+    //   const SECRET_KEY = 'MySecureKey2025!@#';
+    //
+    // Then in index.html, update line ~524:
+    //   window.location.href='theme-controller.html?key=MySecureKey2025!@#'
+    // ========================================
+    
+    const SECRET_KEY = 'theme2025'; // 🔒 CHANGE THIS TO YOUR SECRET KEY!
+    const ACCESS_TOKEN_KEY = 'themeControllerAccess';
+    const ACCESS_DURATION = 24 * 60 * 60 * 1000; // 24 hours (adjust as needed)
+
+    // Check access on page load
+    function initAccessControl() {
+      // Check URL parameter for automatic access
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlKey = urlParams.get('key');
+      
+      if (urlKey === SECRET_KEY) {
+        grantAccess();
+        // Clean URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+      }
+
+      // Check stored access token
+      const storedAccess = localStorage.getItem(ACCESS_TOKEN_KEY);
+      if (storedAccess) {
+        const accessData = JSON.parse(storedAccess);
+        const now = new Date().getTime();
+        
+        if (now - accessData.timestamp < ACCESS_DURATION) {
+          // Access still valid
+          grantAccess();
+          return;
+        } else {
+          // Access expired
+          localStorage.removeItem(ACCESS_TOKEN_KEY);
+        }
+      }
+
+      // Show access overlay
+      document.getElementById('accessOverlay').classList.remove('hidden');
+      document.getElementById('accessKey').focus();
+    }
+
+    // Check access key
+    function checkAccess() {
+      const input = document.getElementById('accessKey');
+      const errorDiv = document.getElementById('accessError');
+      const key = input.value.trim();
+
+      if (key === SECRET_KEY) {
+        // Store access token
+        const accessData = {
+          timestamp: new Date().getTime()
+        };
+        localStorage.setItem(ACCESS_TOKEN_KEY, JSON.stringify(accessData));
+        
+        // Grant access
+        grantAccess();
+        showNotification('🔓 Access granted! Welcome to Theme Controller', 'success');
+      } else {
+        // Show error
+        input.classList.add('error');
+        errorDiv.classList.add('show');
+        
+        setTimeout(() => {
+          input.classList.remove('error');
+          errorDiv.classList.remove('show');
+        }, 2000);
+        
+        input.value = '';
+        input.focus();
+      }
+    }
+
+    // Grant access
+    function grantAccess() {
+      document.getElementById('accessOverlay').classList.add('hidden');
+      init();
+    }
+
+    // Logout function (optional - can be called from console or button)
+    function logoutThemeController() {
+      localStorage.removeItem(ACCESS_TOKEN_KEY);
+      location.reload();
+    }
+
+    // Initialize access control on load
+    initAccessControl();
   </script>
 
 </body>
