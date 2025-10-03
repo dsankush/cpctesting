@@ -6,7 +6,7 @@
   <title>Coromandel CPC — Campaign Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -16,20 +16,18 @@
 
   <style>
     :root{
-      --bg:#f8fafc;
-      --panel:#ffffff;
-      --card:#ffffff;
-      --muted:#64748b;
-      --text:#0f172a;
       --primary:#6366f1;
       --secondary:#ec4899;
       --accent:#10b981;
       --warning:#f59e0b;
       --danger:#ef4444;
-      --ring:#e2e8f0;
-      --border:#cbd5e1;
-      --shadow:rgba(0,0,0,0.04);
-      --shadow-lg:rgba(0,0,0,0.1);
+      --bg:#f8fafc;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e2e8f0;
+      --shadow:rgba(0,0,0,0.05);
+      --shadow-lg:rgba(0,0,0,0.12);
     }
     
     *{box-sizing:border-box;margin:0;padding:0}
@@ -37,358 +35,291 @@
     
     body{
       font-family:'Outfit',sans-serif;
-      background:#f8fafc;
+      background:var(--bg);
       color:var(--text);
-      position:relative;
     }
     
-    /* Subtle animated background */
-    body::before{
-      content:'';
-      position:fixed;
-      top:-50%;left:-50%;
-      width:200%;height:200%;
-      background:
-        radial-gradient(circle at 20% 50%, rgba(99,102,241,0.06) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(236,72,153,0.06) 0%, transparent 50%),
-        radial-gradient(circle at 40% 80%, rgba(16,185,129,0.06) 0%, transparent 50%);
-      animation:bgRotate 20s linear infinite;
-      z-index:0;
+    .app{
+      display:grid;
+      grid-template-rows:auto 1fr auto;
+      min-height:100vh;
     }
-    
-    @keyframes bgRotate{
-      0%{transform:rotate(0deg)}
-      100%{transform:rotate(360deg)}
-    }
-    
-    .app{position:relative;z-index:1;display:grid;grid-template-rows:auto 1fr auto;min-height:100vh}
     
     /* Header */
     header{
-      position:sticky;top:0;z-index:30;
-      backdrop-filter:saturate(180%) blur(20px);
-      background:rgba(255,255,255,0.95);
-      border-bottom:2px solid var(--ring);
-      box-shadow:0 4px 20px var(--shadow);
+      position:sticky;
+      top:0;
+      z-index:30;
+      background:white;
+      border-bottom:1px solid var(--border);
+      box-shadow:0 2px 8px var(--shadow);
     }
     
-    .bar{display:flex;align-items:center;gap:20px;padding:20px 32px;flex-wrap:wrap}
+    .bar{
+      display:flex;
+      align-items:center;
+      gap:20px;
+      padding:20px 40px;
+      flex-wrap:wrap;
+    }
     
     .logo{
-      display:flex;align-items:center;gap:16px;
-      padding:12px 24px;
-      border-radius:16px;
-      background:rgba(255,255,255,0.5);
-      backdrop-filter:blur(12px);
-      box-shadow:0 8px 24px rgba(99,102,241,0.15);
-      border:2px solid rgba(99,102,241,0.1);
-    }
-    
-    .dot{
-      width:20px;height:20px;border-radius:50%;
-      background:linear-gradient(135deg,var(--primary),var(--secondary));
-      box-shadow:0 4px 12px rgba(99,102,241,0.4);
-      animation:pulse 2s ease-in-out infinite;
-    }
-    
-    @keyframes pulse{
-      0%,100%{transform:scale(1);opacity:1}
-      50%{transform:scale(1.15);opacity:0.8}
-    }
-    
-    .title{
-      font-size:1.75rem;
-      margin:0;
-      color:var(--text);
-      letter-spacing:0.5px;
-      font-weight:800;
+      display:flex;
+      align-items:center;
+      gap:16px;
       font-family:'Space Grotesk',sans-serif;
+      font-size:22px;
+      font-weight:800;
       background:linear-gradient(135deg,var(--primary),var(--secondary));
       -webkit-background-clip:text;
       -webkit-text-fill-color:transparent;
       background-clip:text;
     }
     
-    .header-actions{margin-left:auto;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .logo-icon{
+      width:40px;
+      height:40px;
+      background:linear-gradient(135deg,var(--primary),var(--secondary));
+      border-radius:10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:20px;
+      box-shadow:0 4px 12px rgba(99,102,241,0.3);
+    }
+    
+    .header-actions{
+      margin-left:auto;
+      display:flex;
+      gap:12px;
+    }
     
     .btn{
-      display:inline-flex;align-items:center;justify-content:center;gap:8px;
-      padding:12px 24px;border-radius:12px;border:none;
-      background:linear-gradient(135deg,var(--primary),#7c3aed);
-      color:white;font-weight:700;cursor:pointer;font-size:14px;
-      transition:all 0.3s ease;white-space:nowrap;
-      box-shadow:0 4px 16px rgba(99,102,241,0.25);
+      padding:10px 24px;
+      border-radius:10px;
+      border:none;
+      background:linear-gradient(135deg,var(--primary),#8b5cf6);
+      color:white;
+      font-weight:700;
+      font-size:14px;
+      cursor:pointer;
+      transition:all 0.3s;
+      box-shadow:0 4px 12px rgba(99,102,241,0.25);
     }
     
     .btn:hover{
       transform:translateY(-2px);
-      box-shadow:0 8px 28px rgba(99,102,241,0.4);
+      box-shadow:0 6px 20px rgba(99,102,241,0.35);
     }
     
     .btn-logout{
       background:linear-gradient(135deg,var(--danger),#dc2626);
-      box-shadow:0 4px 16px rgba(239,68,68,0.25);
+      box-shadow:0 4px 12px rgba(239,68,68,0.25);
     }
     
     .btn-logout:hover{
-      box-shadow:0 8px 28px rgba(239,68,68,0.4);
-    }
-
-    /* Layout */
-    .main{display:flex;flex-direction:column;gap:28px;padding:32px;max-width:100%;margin:0}
-    
-    .panel{
-      background:var(--panel);
-      border:2px solid var(--ring);
-      border-radius:20px;
-      padding:24px;
-      box-shadow:0 4px 20px var(--shadow);
-      transition:all 0.3s ease;
+      box-shadow:0 6px 20px rgba(239,68,68,0.35);
     }
     
-    .panel:hover{
-      border-color:var(--primary);
-      box-shadow:0 8px 32px var(--shadow-lg);
-    }
-
-    /* Filters */
-    .filters-horizontal{
-      background:var(--panel);
-      border:2px solid var(--ring);
-      border-radius:20px;
-      padding:24px 28px;
-      box-shadow:0 4px 20px var(--shadow);
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-      gap:18px;
-      align-items:end;
-    }
-    
-    .filters-horizontal .group{display:flex;flex-direction:column;gap:8px}
-    
-    .filters-horizontal label{
-      font-size:11px;
-      color:var(--muted);
-      font-weight:700;
-      text-transform:uppercase;
-      letter-spacing:1px;
-    }
-    
-    .filters-horizontal select,.filters-horizontal input{
-      width:100%;
-      padding:12px 14px;
-      border-radius:12px;
-      border:2px solid var(--ring);
-      background:white;
-      color:var(--text);
-      outline:none;
-      font-size:13px;
-      font-weight:500;
-      transition:all 0.2s ease;
-    }
-    
-    .filters-horizontal select:hover,.filters-horizontal input:hover{
-      border-color:var(--primary);
-    }
-    
-    .filters-horizontal select:focus,.filters-horizontal input:focus{
-      border-color:var(--primary);
-      box-shadow:0 0 0 4px rgba(99,102,241,0.1);
-    }
-    
-    .filters-horizontal .btn{padding:12px 24px;font-size:13px}
-
-    /* Content Grid */
-    .content{display:grid;grid-template-columns:repeat(12,1fr);gap:28px}
-    
-    .card{
-      background:var(--card);
-      border:2px solid var(--ring);
-      border-radius:20px;
-      padding:28px;
-      min-height:180px;
+    /* Main */
+    .main{
+      padding:32px 40px;
       display:flex;
       flex-direction:column;
-      box-shadow:0 4px 20px var(--shadow);
-      transition:all 0.3s ease;
-      position:relative;
-      overflow:hidden;
+      gap:28px;
     }
     
-    .card::before{
-      content:'';
-      position:absolute;
-      top:0;left:0;right:0;
-      height:4px;
-      background:linear-gradient(90deg,var(--primary),var(--secondary),var(--accent));
-      opacity:0;
-      transition:opacity 0.3s;
+    /* Cards */
+    .card{
+      background:white;
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:28px;
+      box-shadow:0 2px 8px var(--shadow);
+      transition:all 0.3s;
     }
     
     .card:hover{
-      border-color:var(--primary);
-      transform:translateY(-4px);
-      box-shadow:0 12px 40px var(--shadow-lg);
+      box-shadow:0 4px 16px var(--shadow-lg);
+      transform:translateY(-2px);
     }
-    
-    .card:hover::before{opacity:1}
     
     .card h3{
-      margin:0 0 16px;
-      font-size:13px;
-      color:var(--muted);
+      font-size:14px;
       font-weight:800;
       text-transform:uppercase;
-      letter-spacing:1.5px;
+      letter-spacing:1px;
+      color:var(--primary);
+      margin-bottom:20px;
     }
     
-    /* KPI Cards */
-    .kpi-hero{display:grid;grid-template-columns:240px 1fr;gap:40px;align-items:center}
+    /* Filters */
+    .filters{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+      gap:16px;
+      align-items:end;
+    }
     
-    .kpi-main-circle{
-      width:240px;height:240px;
+    .filter-group{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    
+    .filter-group label{
+      font-size:12px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:0.5px;
+      color:var(--muted);
+    }
+    
+    .filter-group select,
+    .filter-group input{
+      padding:12px;
+      border-radius:10px;
+      border:2px solid var(--border);
+      background:white;
+      color:var(--text);
+      font-size:14px;
+      font-weight:500;
+      outline:none;
+      transition:all 0.2s;
+    }
+    
+    .filter-group select:focus,
+    .filter-group input:focus{
+      border-color:var(--primary);
+      box-shadow:0 0 0 3px rgba(99,102,241,0.1);
+    }
+    
+    /* KPI Section */
+    .kpi-hero{
+      display:grid;
+      grid-template-columns:240px 1fr;
+      gap:32px;
+      align-items:center;
+    }
+    
+    .kpi-main{
+      width:240px;
+      height:240px;
       border-radius:50%;
-      display:flex;flex-direction:column;align-items:center;justify-content:center;
       background:linear-gradient(135deg,rgba(99,102,241,0.1),rgba(236,72,153,0.1));
-      border:5px solid var(--primary);
-      box-shadow:0 12px 48px rgba(99,102,241,0.25);
-      position:relative;
-    }
-    
-    .kpi-main-circle::after{
-      content:'';
-      position:absolute;
-      inset:-12px;
-      border-radius:50%;
-      background:linear-gradient(135deg,var(--primary),var(--secondary));
-      opacity:0.1;
-      z-index:-1;
-      animation:pulseRing 3s ease-in-out infinite;
-    }
-    
-    @keyframes pulseRing{
-      0%,100%{transform:scale(0.95);opacity:0.1}
-      50%{transform:scale(1.05);opacity:0.2}
+      border:4px solid var(--primary);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      box-shadow:0 8px 32px rgba(99,102,241,0.2);
     }
     
     .kpi-main-label{
       font-size:13px;
-      color:var(--muted);
       font-weight:800;
       text-transform:uppercase;
       letter-spacing:1.5px;
+      color:var(--muted);
       margin-bottom:12px;
     }
     
     .kpi-main-value{
       font-size:72px;
       font-weight:900;
-      line-height:1;
       font-family:'Space Grotesk',sans-serif;
       background:linear-gradient(135deg,var(--primary),var(--secondary));
       -webkit-background-clip:text;
       -webkit-text-fill-color:transparent;
       background-clip:text;
+      line-height:1;
     }
     
-    .kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:18px}
+    .kpi-grid{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:16px;
+    }
     
     .kpi-item{
       background:white;
-      border:2px solid var(--ring);
-      border-radius:18px;
+      border:2px solid var(--border);
+      border-radius:14px;
       padding:24px;
       text-align:center;
-      transition:all 0.3s ease;
-      position:relative;
-      box-shadow:0 4px 16px var(--shadow);
-    }
-    
-    .kpi-item::before{
-      content:'';
-      position:absolute;
-      top:0;left:0;right:0;
-      height:3px;
-      opacity:0;
-      transition:opacity 0.3s;
-      border-radius:18px 18px 0 0;
+      transition:all 0.3s;
     }
     
     .kpi-item:hover{
-      transform:translateY(-6px) scale(1.02);
-      box-shadow:0 12px 40px var(--shadow-lg);
+      transform:translateY(-4px);
+      box-shadow:0 8px 24px var(--shadow-lg);
       border-color:var(--kpi-color);
     }
     
-    .kpi-item:hover::before{opacity:1}
-    
     .kpi-item:nth-child(1){--kpi-color:var(--accent)}
-    .kpi-item:nth-child(1)::before{background:var(--accent)}
-    .kpi-item:nth-child(1) .kpi-value{color:var(--accent)}
-    
     .kpi-item:nth-child(2){--kpi-color:var(--danger)}
-    .kpi-item:nth-child(2)::before{background:var(--danger)}
-    .kpi-item:nth-child(2) .kpi-value{color:var(--danger)}
-    
-    .kpi-item:nth-child(3){--kpi-color:#7c3aed}
-    .kpi-item:nth-child(3)::before{background:#7c3aed}
-    .kpi-item:nth-child(3) .kpi-value{color:#7c3aed}
-    
+    .kpi-item:nth-child(3){--kpi-color:#8b5cf6}
     .kpi-item:nth-child(4){--kpi-color:#3b82f6}
-    .kpi-item:nth-child(4)::before{background:#3b82f6}
-    .kpi-item:nth-child(4) .kpi-value{color:#3b82f6}
-    
     .kpi-item:nth-child(5){--kpi-color:var(--secondary)}
-    .kpi-item:nth-child(5)::before{background:var(--secondary)}
-    .kpi-item:nth-child(5) .kpi-value{color:var(--secondary)}
     
     .kpi-label{
       font-size:11px;
-      color:var(--muted);
+      font-weight:800;
       text-transform:uppercase;
       letter-spacing:1px;
-      font-weight:800;
-      margin-bottom:14px;
+      color:var(--muted);
+      margin-bottom:12px;
     }
     
     .kpi-value{
-      font-size:40px;
+      font-size:44px;
       font-weight:900;
       font-family:'Space Grotesk',sans-serif;
+      color:var(--kpi-color);
       margin-bottom:10px;
       line-height:1;
     }
     
-    .kpi-percent{font-size:13px;color:var(--muted);font-weight:700}
-
-    /* India Map */
-    #indiaMapContainer{
-      width:100%;
-      height:700px;
-      position:relative;
-      border-radius:20px;
-      overflow:hidden;
-      border:2px solid var(--ring);
+    .kpi-subtitle{
+      font-size:12px;
+      font-weight:600;
+      color:var(--muted);
     }
     
-    #indiaMap{width:100%;height:100%;z-index:1}
-    
-    .leaflet-container{
-      background:#f8fafc;
-      font-family:'Outfit',sans-serif;
+    /* Grid */
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(12,1fr);
+      gap:28px;
     }
     
-    .leaflet-popup-content-wrapper{
-      background:white;
-      border-radius:18px;
-      box-shadow:0 16px 64px rgba(99,102,241,0.3);
-      border:3px solid var(--primary);
+    .span-4{grid-column:span 4}
+    .span-6{grid-column:span 6}
+    .span-8{grid-column:span 8}
+    .span-12{grid-column:span 12}
+    
+    /* States Table */
+    .states-table{
+      max-height:380px;
+      overflow-y:auto;
     }
     
-    .leaflet-popup-content{margin:24px;font-size:14px;color:var(--text)}
-    .leaflet-popup-tip{background:white;border:3px solid var(--primary)}
+    .state-item{
+      margin-bottom:20px;
+    }
     
-    .map-popup-state{
+    .state-header{
+      display:flex;
+      justify-content:space-between;
+      margin-bottom:8px;
+    }
+    
+    .state-name{
+      font-weight:700;
+      font-size:15px;
+    }
+    
+    .state-value{
       font-size:20px;
       font-weight:900;
       font-family:'Space Grotesk',sans-serif;
@@ -396,154 +327,131 @@
       -webkit-background-clip:text;
       -webkit-text-fill-color:transparent;
       background-clip:text;
-      margin-bottom:16px;
-      padding-bottom:12px;
-      border-bottom:2px solid var(--ring);
     }
     
-    .map-popup-row{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin:12px 0;
-      padding:10px 0;
+    .state-bar{
+      width:100%;
+      height:8px;
+      background:var(--border);
+      border-radius:4px;
+      overflow:hidden;
     }
     
-    .map-popup-label{
-      font-size:12px;
-      color:var(--muted);
-      text-transform:uppercase;
-      letter-spacing:0.6px;
-      font-weight:700;
+    .state-bar-fill{
+      height:100%;
+      background:linear-gradient(90deg,var(--primary),var(--secondary));
+      border-radius:4px;
+      transition:width 0.5s;
     }
     
-    .map-popup-value{
-      font-size:22px;
-      font-weight:900;
-      font-family:'Space Grotesk',sans-serif;
-      color:var(--text);
+    /* Map */
+    .map-container{
+      position:relative;
+      height:700px;
+      border-radius:16px;
+      overflow:hidden;
+      border:1px solid var(--border);
     }
     
-    .map-popup-success{color:var(--accent)!important}
-    .map-popup-pending{color:#7c3aed!important}
-    .map-popup-rejected{color:var(--danger)!important}
-    
-    .state-marker-pin{position:relative;width:60px;height:60px;display:flex;align-items:center;justify-content:center}
-    
-    .state-marker-inner{
-      position:relative;z-index:2;
-      background:white;
-      border-radius:14px;
-      padding:10px 14px;
-      box-shadow:0 10px 32px rgba(99,102,241,0.3);
-      border:3px solid;
-      font-weight:900;
-      font-size:15px;
-      text-align:center;
-      min-width:90px;
-      transition:all 0.3s ease;
-      cursor:pointer;
-    }
-    
-    .state-marker-inner:hover{
-      transform:translateY(-6px) scale(1.08);
-      box-shadow:0 16px 48px rgba(99,102,241,0.5);
-    }
-    
-    .state-marker-name{
-      font-size:10px;
-      color:var(--muted);
-      text-transform:uppercase;
-      letter-spacing:0.6px;
-      margin-bottom:5px;
-    }
-    
-    .state-marker-count{
-      font-size:19px;
-      font-weight:900;
-      font-family:'Space Grotesk',sans-serif;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:5px;
-    }
-    
-    .marker-ripple{
-      position:absolute;
+    #indiaMap{
       width:100%;
       height:100%;
-      border-radius:50%;
-      background:radial-gradient(circle, rgba(99,102,241,0.3) 0%, rgba(99,102,241,0) 70%);
-      animation:ripple 2.5s ease-in-out infinite;
-      z-index:1;
     }
     
-    @keyframes ripple{
-      0%{transform:scale(0.8);opacity:0.7}
-      50%{transform:scale(1.3);opacity:0.3}
-      100%{transform:scale(0.8);opacity:0.7}
+    .leaflet-popup-content-wrapper{
+      background:white;
+      border:2px solid var(--primary);
+      border-radius:12px;
+      box-shadow:0 8px 32px var(--shadow-lg);
     }
     
-    .state-marker-level-1{border-color:var(--accent)}
-    .state-marker-level-1 .state-marker-count{color:var(--accent)}
-    .state-marker-level-2{border-color:#22c55e}
-    .state-marker-level-2 .state-marker-count{color:#22c55e}
-    .state-marker-level-3{border-color:var(--warning)}
-    .state-marker-level-3 .state-marker-count{color:var(--warning)}
-    .state-marker-level-4{border-color:#f97316}
-    .state-marker-level-4 .state-marker-count{color:#f97316}
-    .state-marker-level-5{border-color:var(--danger)}
-    .state-marker-level-5 .state-marker-count{color:var(--danger)}
+    .leaflet-popup-content{
+      margin:20px;
+      font-size:14px;
+    }
+    
+    .leaflet-popup-tip{
+      background:white;
+      border:2px solid var(--primary);
+    }
+    
+    .popup-state{
+      font-size:20px;
+      font-weight:900;
+      color:var(--primary);
+      margin-bottom:16px;
+      padding-bottom:12px;
+      border-bottom:2px solid var(--border);
+    }
+    
+    .popup-row{
+      display:flex;
+      justify-content:space-between;
+      padding:10px 0;
+      border-bottom:1px solid var(--border);
+    }
+    
+    .popup-label{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:700;
+      text-transform:uppercase;
+    }
+    
+    .popup-value{
+      font-size:18px;
+      font-weight:900;
+      font-family:'Space Grotesk',sans-serif;
+    }
     
     .legend{
       position:absolute;
-      bottom:24px;
-      right:24px;
-      background:rgba(255,255,255,0.98);
-      backdrop-filter:blur(20px);
-      padding:24px;
-      border-radius:18px;
-      box-shadow:0 12px 40px var(--shadow-lg);
-      border:2px solid var(--ring);
+      bottom:20px;
+      right:20px;
+      background:white;
+      padding:20px;
+      border-radius:12px;
+      box-shadow:0 4px 16px var(--shadow-lg);
+      border:1px solid var(--border);
       z-index:1000;
     }
     
     .legend-title{
-      font-size:14px;
-      font-weight:900;
-      color:var(--text);
-      margin-bottom:16px;
+      font-size:13px;
+      font-weight:800;
       text-transform:uppercase;
-      letter-spacing:1.2px;
+      letter-spacing:1px;
+      color:var(--primary);
+      margin-bottom:12px;
     }
     
     .legend-item{
       display:flex;
       align-items:center;
-      gap:12px;
-      margin:10px 0;
-      font-size:13px;
-      font-weight:700;
+      gap:10px;
+      margin:8px 0;
+      font-size:12px;
+      font-weight:600;
     }
     
     .legend-color{
       width:32px;
-      height:22px;
-      border-radius:8px;
-      border:2px solid var(--border);
-      box-shadow:0 3px 10px var(--shadow);
+      height:20px;
+      border-radius:6px;
+      border:1px solid var(--border);
     }
-
+    
+    /* Footer */
     .footer{
-      padding:20px 32px;
-      color:var(--muted);
-      border-top:2px solid var(--ring);
+      padding:20px 40px;
+      border-top:1px solid var(--border);
       text-align:center;
+      color:var(--muted);
       font-size:14px;
-      background:var(--panel);
-      font-weight:600;
+      font-weight:500;
+      background:white;
     }
-
+    
     /* Login */
     .overlay{
       position:fixed;
@@ -551,27 +459,18 @@
       background:linear-gradient(135deg,rgba(99,102,241,0.95),rgba(236,72,153,0.95));
       display:grid;
       place-items:center;
-      z-index:100;
-      backdrop-filter:blur(20px);
+      z-index:200;
     }
     
     .login{
-      width:min(92vw,460px);
+      width:min(90vw,460px);
       background:white;
-      border:3px solid rgba(255,255,255,0.5);
-      border-radius:28px;
-      padding:48px;
-      box-shadow:0 32px 96px rgba(0,0,0,0.3);
-      animation:slideIn 0.6s ease;
-    }
-    
-    @keyframes slideIn{
-      from{opacity:0;transform:translateY(30px)}
-      to{opacity:1;transform:translateY(0)}
+      border-radius:24px;
+      padding:40px;
+      box-shadow:0 24px 80px rgba(0,0,0,0.3);
     }
     
     .login h2{
-      margin:0 0 10px;
       font-size:32px;
       font-weight:900;
       font-family:'Space Grotesk',sans-serif;
@@ -579,53 +478,63 @@
       -webkit-background-clip:text;
       -webkit-text-fill-color:transparent;
       background-clip:text;
+      margin-bottom:8px;
     }
     
-    .login p{margin:0 0 28px;color:var(--muted);font-size:15px;font-weight:500}
+    .login p{
+      color:var(--muted);
+      margin-bottom:28px;
+      font-size:14px;
+    }
     
-    .field{display:flex;flex-direction:column;gap:10px;margin:18px 0}
+    .field{
+      margin-bottom:20px;
+    }
     
     .field label{
+      display:block;
       font-size:13px;
-      color:var(--text);
       font-weight:700;
+      color:var(--text);
+      margin-bottom:6px;
+      text-transform:uppercase;
       letter-spacing:0.5px;
     }
     
     .field input{
-      padding:16px;
-      border-radius:12px;
-      border:2px solid var(--ring);
-      background:white;
-      color:var(--text);
-      font-size:15px;
-      transition:all 0.2s ease;
+      width:100%;
+      padding:14px;
+      border-radius:10px;
+      border:2px solid var(--border);
+      font-size:14px;
+      outline:none;
+      transition:all 0.2s;
     }
     
     .field input:focus{
-      outline:none;
       border-color:var(--primary);
-      box-shadow:0 0 0 4px rgba(99,102,241,0.1);
+      box-shadow:0 0 0 3px rgba(99,102,241,0.1);
     }
     
-    .err{color:var(--danger);font-size:14px;min-height:20px;margin-top:10px;font-weight:600}
-
-    @media (max-width: 1100px){
+    .err{
+      color:var(--danger);
+      font-size:13px;
+      font-weight:600;
+      margin-top:12px;
+      min-height:18px;
+    }
+    
+    @media (max-width:1200px){
       .kpi-hero{grid-template-columns:1fr}
-      .kpi-main-circle{margin:0 auto}
-      .kpi-grid{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
-      .filters-horizontal{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
-      #indiaMapContainer{height:500px}
+      .kpi-main{margin:0 auto}
+      .kpi-grid{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+      .span-4,.span-6,.span-8,.span-12{grid-column:span 12}
     }
     
-    @media (max-width: 640px){
-      .bar{padding:16px 20px}
-      .main{padding:20px;gap:20px}
-      .kpi-grid{grid-template-columns:1fr}
-      .header-actions{width:100%;justify-content:flex-start}
-      #indiaMapContainer{height:400px}
-      .filters-horizontal{grid-template-columns:1fr}
-      .title{font-size:1.5rem}
+    @media (max-width:768px){
+      .bar,.main{padding:20px}
+      .filters{grid-template-columns:1fr}
+      .map-container{height:500px}
     }
   </style>
 </head>
@@ -634,178 +543,190 @@
   <header>
     <div class="bar">
       <div class="logo">
-        <span class="dot"></span>
-        <h1 class="title">Coromandel CPC Campaign Dashboard</h1>
+        <div class="logo-icon">📊</div>
+        <span>Coromandel CPC Dashboard</span>
       </div>
       <div class="header-actions">
-        <button class="btn" id="downloadBtn">📥 Download Data</button>
-        <button class="btn btn-logout" id="logoutBtn">🔒 Logout</button>
+        <button class="btn" id="downloadBtn">Download Data</button>
+        <button class="btn btn-logout" id="logoutBtn">Logout</button>
       </div>
     </div>
   </header>
 
   <main class="main">
-    <!-- Horizontal Filters -->
-    <div class="filters-horizontal">
-      <div class="group">
-        <label for="dateRange">📅 Date Range</label>
-        <input id="dateRange" placeholder="Select range" />
-      </div>
+    <!-- Filters -->
+    <div class="card">
+      <div class="filters">
+        <div class="filter-group">
+          <label>📅 Date Range</label>
+          <input id="dateRange" placeholder="Select range" />
+        </div>
+        
+        <div class="filter-group" style="display:none">
+          <input id="dateFrom" type="date" />
+          <input id="dateTo" type="date" />
+        </div>
 
-      <div class="group" style="display:none">
-        <label for="dateFrom">Date From</label>
-        <input id="dateFrom" type="date" />
-      </div>
-      <div class="group" style="display:none">
-        <label for="dateTo">Date To</label>
-        <input id="dateTo" type="date" />
-      </div>
+        <div class="filter-group">
+          <label>State</label>
+          <select id="state"></select>
+        </div>
 
-      <div class="group">
-        <label for="state">🌍 State</label>
-        <select id="state"></select>
-      </div>
-      <div class="group">
-        <label for="district">📍 District</label>
-        <select id="district"></select>
-      </div>
-      <div class="group">
-        <label for="retailer">🏪 Retailer</label>
-        <select id="retailer"></select>
-      </div>
-      <div class="group">
-        <label for="product">📦 Product</label>
-        <select id="product"></select>
-      </div>
+        <div class="filter-group">
+          <label>District</label>
+          <select id="district"></select>
+        </div>
 
-      <div class="group">
-        <label for="unit">📏 Quantity Unit</label>
-        <select id="unit"></select>
-      </div>
+        <div class="filter-group">
+          <label>Retailer</label>
+          <select id="retailer"></select>
+        </div>
 
-      <div class="group">
-        <label for="qtyMin">🔢 Quantity (≥)</label>
-        <input id="qtyMin" type="number" min="0" step="1" placeholder="0" />
-      </div>
-      <div class="group">
-        <label for="status">✅ Status</label>
-        <select id="status"></select>
-      </div>
-      <div class="group" style="display:flex;align-items:flex-end">
-        <button class="btn" id="resetBtn" style="width:100%">🔄 Reset</button>
+        <div class="filter-group">
+          <label>Product</label>
+          <select id="product"></select>
+        </div>
+
+        <div class="filter-group">
+          <label>Unit</label>
+          <select id="unit"></select>
+        </div>
+
+        <div class="filter-group">
+          <label>Min Qty</label>
+          <input id="qtyMin" type="number" min="0" placeholder="0" />
+        </div>
+
+        <div class="filter-group">
+          <label>Status</label>
+          <select id="status"></select>
+        </div>
+
+        <div class="filter-group">
+          <button class="btn" id="resetBtn" style="width:100%">Reset</button>
+        </div>
       </div>
     </div>
 
-    <section class="content">
-      <!-- Total Scans with Hero Design -->
-      <div class="card" style="grid-column: span 12">
-        <h3>📊 Campaign Performance Overview</h3>
-        <div class="kpi-hero">
-          <div class="kpi-main-circle">
-            <div class="kpi-main-label">Total Scans</div>
-            <div class="kpi-main-value" id="kpiTotalBig">0</div>
+    <!-- KPIs -->
+    <div class="card">
+      <h3>Campaign Performance Overview</h3>
+      <div class="kpi-hero">
+        <div class="kpi-main">
+          <div class="kpi-main-label">Total Scans</div>
+          <div class="kpi-main-value" id="kpiTotal">0</div>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-item">
+            <div class="kpi-label">Approved</div>
+            <div class="kpi-value" id="kpiApproved">0</div>
+            <div class="kpi-subtitle" id="kpiApprovedPct">0%</div>
           </div>
-          <div class="kpi-grid">
-            <div class="kpi-item">
-              <div class="kpi-label">✅ Approved</div>
-              <div class="kpi-value" id="kpiYes">0</div>
-              <div class="kpi-percent" id="kpiYesPct">0%</div>
-            </div>
-            <div class="kpi-item">
-              <div class="kpi-label">❌ Rejected</div>
-              <div class="kpi-value" id="kpiNo">0</div>
-              <div class="kpi-percent" id="kpiNoPct">0%</div>
-            </div>
-            <div class="kpi-item">
-              <div class="kpi-label">⏳ Pending</div>
-              <div class="kpi-value" id="kpiPending">0</div>
-              <div class="kpi-percent" id="kpiPendingPct">0%</div>
-            </div>
-            <div class="kpi-item">
-              <div class="kpi-label">👨‍🌾 Total Farmers</div>
-              <div class="kpi-value" id="kpiTotalFarmers">0</div>
-              <div class="kpi-percent" id="kpiUniqueFarmers">Unique: 0</div>
-            </div>
-            <div class="kpi-item">
-              <div class="kpi-label">🏪 Retailers</div>
-              <div class="kpi-value" id="kpiActiveRetailers">0</div>
-              <div class="kpi-percent" id="kpiTotalRetailers">of 0 total</div>
-            </div>
+          <div class="kpi-item">
+            <div class="kpi-label">Rejected</div>
+            <div class="kpi-value" id="kpiRejected">0</div>
+            <div class="kpi-subtitle" id="kpiRejectedPct">0%</div>
+          </div>
+          <div class="kpi-item">
+            <div class="kpi-label">Pending</div>
+            <div class="kpi-value" id="kpiPending">0</div>
+            <div class="kpi-subtitle" id="kpiPendingPct">0%</div>
+          </div>
+          <div class="kpi-item">
+            <div class="kpi-label">Farmers</div>
+            <div class="kpi-value" id="kpiFarmers">0</div>
+            <div class="kpi-subtitle" id="kpiFarmersUnique">Unique: 0</div>
+          </div>
+          <div class="kpi-item">
+            <div class="kpi-label">Retailers</div>
+            <div class="kpi-value" id="kpiRetailers">0</div>
+            <div class="kpi-subtitle" id="kpiRetailersTotal">of 0</div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Status Chart -->
-      <div class="card" style="grid-column: span 4">
-        <h3>📈 Order Approval Status</h3>
+    <!-- Charts -->
+    <div class="grid">
+      <div class="card span-4">
+        <h3>Approval Status</h3>
         <canvas id="statusChart" height="280"></canvas>
       </div>
 
-      <!-- Trend Chart -->
-      <div class="card" style="grid-column: span 8">
-        <h3>📅 Time Trend (Scans per Day)</h3>
+      <div class="card span-8">
+        <h3>Daily Trend</h3>
         <canvas id="trendChart" height="280"></canvas>
       </div>
 
-      <!-- Top States Table -->
-      <div class="card" style="grid-column: span 6">
-        <h3>🌍 States by Scans</h3>
-        <div id="statesTable" style="overflow-y:auto;max-height:380px;margin-top:12px"></div>
+      <div class="card span-6">
+        <h3>Top States</h3>
+        <div class="states-table" id="statesTable"></div>
       </div>
 
-      <!-- Retailer Performance -->
-      <div class="card" style="grid-column: span 6">
-        <h3>🏪 Retailer Performance</h3>
+      <div class="card span-6">
+        <h3>Retailer Performance</h3>
         <canvas id="retailerChart" height="240"></canvas>
       </div>
 
-      <!-- District Scans -->
-      <div class="card" style="grid-column: span 6">
-        <h3>📍 District-wise Scans</h3>
-        <canvas id="districtChart" height="180"></canvas>
+      <div class="card span-6">
+        <h3>District Analysis</h3>
+        <canvas id="districtChart" height="200"></canvas>
       </div>
 
-      <!-- Product Basket -->
-      <div class="card" style="grid-column: span 6">
-        <h3>📦 Product Basket</h3>
-        <canvas id="productChart" height="180"></canvas>
+      <div class="card span-6">
+        <h3>Product Mix</h3>
+        <canvas id="productChart" height="200"></canvas>
       </div>
 
-      <!-- India Map -->
-      <div class="card" style="grid-column: span 12">
-        <h3>🗺️ India - State-wise Distribution</h3>
-        <div id="indiaMapContainer">
+      <div class="card span-12">
+        <h3>India - State-wise Distribution</h3>
+        <div class="map-container">
           <div id="indiaMap"></div>
           <div class="legend">
             <div class="legend-title">Approval Levels</div>
-            <div class="legend-item"><div class="legend-color" style="background:#10b981;border-color:#10b981"></div><span>Elite (1000+)</span></div>
-            <div class="legend-item"><div class="legend-color" style="background:#22c55e;border-color:#22c55e"></div><span>High (500-999)</span></div>
-            <div class="legend-item"><div class="legend-color" style="background:#f59e0b;border-color:#f59e0b"></div><span>Medium (250-499)</span></div>
-            <div class="legend-item"><div class="legend-color" style="background:#f97316;border-color:#f97316"></div><span>Growing (100-249)</span></div>
-            <div class="legend-item"><div class="legend-color" style="background:#ef4444;border-color:#ef4444"></div><span>Emerging (1-99)</span></div>
+            <div class="legend-item">
+              <div class="legend-color" style="background:#10b981"></div>
+              <span>Elite (1000+)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background:#22c55e"></div>
+              <span>High (500-999)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background:#f59e0b"></div>
+              <span>Medium (250-499)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background:#f97316"></div>
+              <span>Growing (100-249)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background:#ef4444"></div>
+              <span>Emerging (1-99)</span>
+            </div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
   </main>
 
   <div class="footer">
-    ✨ © 2025 Coromandel CPC — Empowering Agriculture through Innovation ✨
+    © 2025 Coromandel CPC — Campaign Analytics Dashboard
   </div>
 </div>
 
-<!-- Login Overlay -->
+<!-- Login -->
 <div class="overlay" id="loginOverlay">
   <form class="login" id="loginForm">
     <h2>🔐 Secure Access</h2>
-    <p>Please authenticate to view the campaign dashboard.</p>
+    <p>Please authenticate to view the dashboard</p>
     <div class="field">
-      <label>👤 Username</label>
-      <input id="u" autocomplete="username" placeholder="Enter username" />
+      <label>Username</label>
+      <input id="username" autocomplete="username" placeholder="Enter username" />
     </div>
     <div class="field">
-      <label>🔑 Password</label>
-      <input id="p" type="password" autocomplete="current-password" placeholder="Enter password" />
+      <label>Password</label>
+      <input id="password" type="password" autocomplete="current-password" placeholder="Enter password" />
     </div>
     <button class="btn" type="submit" style="width:100%;margin-top:12px">Login</button>
     <div class="err" id="err"></div>
@@ -814,22 +735,22 @@
 
 <script>
   const CSV_URL = './data.csv';
-
-  // Login
   const VALID_USER = 'digicides';
   const VALID_PASS = 'coro@cpc';
+  const LS_KEY = 'cpc_login_ok';
+
+  // Login
   const overlay = document.getElementById('loginOverlay');
   const form = document.getElementById('loginForm');
   const errEl = document.getElementById('err');
-  const LS_KEY = 'cpc_login_ok';
 
   function unlock(){ overlay.style.display='none'; }
   if(localStorage.getItem(LS_KEY)==='1'){ unlock(); }
-  
+
   form.addEventListener('submit', (e)=>{
     e.preventDefault();
-    const u = document.getElementById('u').value.trim();
-    const p = document.getElementById('p').value;
+    const u = document.getElementById('username').value.trim();
+    const p = document.getElementById('password').value;
     if(u===VALID_USER && p===VALID_PASS){
       localStorage.setItem(LS_KEY,'1');
       unlock();
@@ -838,7 +759,6 @@
     }
   });
 
-  // Logout
   document.getElementById('logoutBtn').addEventListener('click', ()=>{
     if(confirm('Are you sure you want to logout?')){
       localStorage.removeItem(LS_KEY);
@@ -905,7 +825,7 @@
   const selUnit = document.getElementById('unit');
   const inpQtyMin = document.getElementById('qtyMin');
   const selStatus = document.getElementById('status');
-  
+
   flatpickr("#dateRange",{
     mode:"range",
     dateFormat:"Y-m-d",
@@ -930,7 +850,6 @@
     render();
   });
 
-  // Download CSV
   document.getElementById('downloadBtn').addEventListener('click', ()=>{
     const filtered = applyFilters(RAW);
     if(filtered.length === 0){ alert('No data to download!'); return; }
@@ -939,7 +858,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'cpc_data_export_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.download = 'cpc_export_' + new Date().toISOString().slice(0,10) + '.csv';
     a.click();
     URL.revokeObjectURL(url);
   });
@@ -957,13 +876,13 @@
     charts[id] = new Chart(ctx, { type, data, options: opts });
     return charts[id];
   }
+
+  const chartColors = ['#6366f1','#ec4899','#10b981','#f59e0b','#3b82f6','#8b5cf6','#14b8a6','#f97316'];
   function palette(n){
-    const base = ['#6366f1','#ec4899','#10b981','#f59e0b','#3b82f6','#8b5cf6','#14b8a6','#f97316'];
-    const arr = []; for(let i=0;i<n;i++) arr.push(base[i%base.length]);
+    const arr = []; for(let i=0;i<n;i++) arr.push(chartColors[i%chartColors.length]);
     return arr;
   }
 
-  // Apply Filters
   function applyFilters(rows){
     const f = FILTERS;
     return rows.filter(r=>{
@@ -1006,15 +925,13 @@
     const yes = rows.filter(r=>/^yes$/i.test(trim(r['Submission Status']))).length;
     const pending = rows.filter(r=>/^pending$/i.test(trim(r['Submission Status']))).length;
     const no = rows.filter(r=>/^no$/i.test(trim(r['Submission Status']))).length;
-    
+
     const allPhones = rows.map(r=>trim(r['Phone Number'])).filter(p=>p);
     const uniquePhones = new Set(allPhones);
-    const totalFarmers = allPhones.length;
-    const uniqueFarmers = uniquePhones.size;
-    
+
     const activeRINs = new Set(rows.map(r=>trim(r['RIN'])).filter(rin=>rin));
     const activeRetailers = activeRINs.size;
-    
+
     const STATE_RETAILER_TOTALS = {
       'West Bengal': 183,
       'Maharashtra': 616,
@@ -1032,23 +949,23 @@
         totalRetailers = stateRetailerRINs.size;
       }
     }
-    
-    document.getElementById('kpiTotalBig').textContent = total.toLocaleString();
-    document.getElementById('kpiYes').textContent = yes.toLocaleString();
-    document.getElementById('kpiNo').textContent = no.toLocaleString();
+
+    document.getElementById('kpiTotal').textContent = total.toLocaleString();
+    document.getElementById('kpiApproved').textContent = yes.toLocaleString();
+    document.getElementById('kpiRejected').textContent = no.toLocaleString();
     document.getElementById('kpiPending').textContent = pending.toLocaleString();
-    document.getElementById('kpiTotalFarmers').textContent = totalFarmers.toLocaleString();
-    document.getElementById('kpiUniqueFarmers').textContent = `Unique: ${uniqueFarmers.toLocaleString()}`;
-    document.getElementById('kpiActiveRetailers').textContent = activeRetailers.toLocaleString();
-    document.getElementById('kpiTotalRetailers').textContent = `of ${totalRetailers.toLocaleString()} total`;
-    
+    document.getElementById('kpiFarmers').textContent = allPhones.length.toLocaleString();
+    document.getElementById('kpiFarmersUnique').textContent = `Unique: ${uniquePhones.size.toLocaleString()}`;
+    document.getElementById('kpiRetailers').textContent = activeRetailers.toLocaleString();
+    document.getElementById('kpiRetailersTotal').textContent = `of ${totalRetailers.toLocaleString()}`;
+
     const yesPct = total > 0 ? ((yes / total) * 100).toFixed(1) : '0.0';
     const noPct = total > 0 ? ((no / total) * 100).toFixed(1) : '0.0';
     const pendingPct = total > 0 ? ((pending / total) * 100).toFixed(1) : '0.0';
-    
-    document.getElementById('kpiYesPct').textContent = `${yesPct}% of total`;
-    document.getElementById('kpiNoPct').textContent = `${noPct}% of total`;
-    document.getElementById('kpiPendingPct').textContent = `${pendingPct}% of total`;
+
+    document.getElementById('kpiApprovedPct').textContent = `${yesPct}%`;
+    document.getElementById('kpiRejectedPct').textContent = `${noPct}%`;
+    document.getElementById('kpiPendingPct').textContent = `${pendingPct}%`;
   }
 
   function buildCounts(rows, key){
@@ -1062,22 +979,19 @@
 
   function renderStatesTable(rows){
     const states = buildCounts(rows, 'State').slice(0, 10);
-    let html = '<div style="font-size:13px">';
+    let html = '';
     states.forEach((s, i)=>{
       const bar = Math.round((s[1] / (states[0][1] || 1)) * 100);
-      const colors = ['#6366f1','#ec4899','#10b981','#f59e0b','#3b82f6','#8b5cf6','#14b8a6','#f97316'];
-      const color = colors[i % colors.length];
-      html += `<div style="margin-bottom:18px">
-        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
-          <span style="font-weight:700;color:var(--text)">${i+1}. ${s[0]}</span>
-          <span style="color:${color};font-weight:800;font-family:'Space Grotesk',sans-serif">${s[1].toLocaleString()}</span>
+      html += `<div class="state-item">
+        <div class="state-header">
+          <span class="state-name">${i+1}. ${s[0]}</span>
+          <span class="state-value">${s[1].toLocaleString()}</span>
         </div>
-        <div style="width:100%;height:10px;background:var(--bg);border-radius:6px;overflow:hidden;border:1px solid var(--ring)">
-          <div style="width:${bar}%;height:100%;background:${color};border-radius:6px;transition:width .3s ease"></div>
+        <div class="state-bar">
+          <div class="state-bar-fill" style="width:${bar}%"></div>
         </div>
       </div>`;
     });
-    html += '</div>';
     document.getElementById('statesTable').innerHTML = html;
   }
 
@@ -1085,6 +999,7 @@
     const sYes = rows.filter(r=>/^yes$/i.test(trim(r['Submission Status']))).length;
     const sNo = rows.filter(r=>/^no$/i.test(trim(r['Submission Status']))).length;
     const sPending = rows.filter(r=>/^pending$/i.test(trim(r['Submission Status']))).length;
+    
     makeChart('statusChart','doughnut',{
       labels:['Approved','Rejected','Pending'],
       datasets:[{ 
@@ -1092,7 +1007,7 @@
         backgroundColor:['#10b981','#ef4444','#f59e0b'], 
         borderWidth: 4,
         borderColor: '#fff',
-        hoverOffset: 10
+        hoverOffset: 8
       }]
     },{
       plugins:{ 
@@ -1101,39 +1016,9 @@
           position: 'bottom',
           labels:{ 
             color: '#0f172a', 
-            padding: 20, 
-            font:{ size: 13, weight: '800' },
-            usePointStyle: true,
-            pointStyle: 'circle',
-            generateLabels: function(chart) {
-              const data = chart.data;
-              if (data.labels.length && data.datasets.length) {
-                return data.labels.map((label, i) => {
-                  const value = data.datasets[0].data[i];
-                  const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
-                  const percent = ((value / total) * 100).toFixed(1);
-                  return {
-                    text: `${label}: ${value.toLocaleString()} (${percent}%)`,
-                    fillStyle: data.datasets[0].backgroundColor[i],
-                    hidden: false,
-                    index: i
-                  };
-                });
-              }
-              return [];
-            }
+            padding: 16, 
+            font:{ size: 12, weight: '700' }
           } 
-        },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              const label = context.label || '';
-              const value = context.parsed || 0;
-              const total = context.dataset.data.reduce((a, b) => a + b, 0);
-              const percent = ((value / total) * 100).toFixed(1);
-              return `${label}: ${value.toLocaleString()} (${percent}%)`;
-            }
-          }
         }
       },
       cutout:'65%'
@@ -1147,20 +1032,20 @@
       datasets:[{ 
         data: trend.map(x=>x[1]), 
         borderColor:'#6366f1',
-        backgroundColor:'rgba(99,102,241,0.15)',
+        backgroundColor:'rgba(99,102,241,0.1)',
         borderWidth:3, 
         tension:.4,
         fill:true,
         pointRadius:4,
-        pointHoverRadius:7,
+        pointHoverRadius:6,
         pointBackgroundColor:'#6366f1',
         pointBorderColor:'#fff',
         pointBorderWidth:2
       }]
     },{ 
       scales:{ 
-        x:{ ticks:{ color:'#64748b', maxRotation:45, font:{weight:'600'} }, grid:{color:'#e2e8f0'} }, 
-        y:{ ticks:{ color:'#64748b', font:{weight:'600'} }, grid:{ color:'#e2e8f0' } } 
+        x:{ ticks:{ color:'#64748b' }, grid:{color:'#e2e8f0'} }, 
+        y:{ ticks:{ color:'#64748b' }, grid:{ color:'#e2e8f0' } } 
       }, 
       plugins:{ legend:{ display:false } } 
     });
@@ -1173,38 +1058,15 @@
     makeChart('retailerChart','bar',{
       labels: retailers.map(x=>x[0]),
       datasets:[
-        { label: 'Approved', data: retailerApproved, backgroundColor: '#10b981', borderRadius: 10, barThickness: 22 },
-        { label: 'Pending',  data: retailerPending,  backgroundColor: '#f59e0b', borderRadius: 10, barThickness: 22 },
-        { label: 'Rejected', data: retailerRejected, backgroundColor: '#ef4444', borderRadius: 10, barThickness: 22 }
+        { label: 'Approved', data: retailerApproved, backgroundColor: '#10b981', borderRadius: 8 },
+        { label: 'Pending',  data: retailerPending,  backgroundColor: '#f59e0b', borderRadius: 8 },
+        { label: 'Rejected', data: retailerRejected, backgroundColor: '#ef4444', borderRadius: 8 }
       ]
     },{ 
-      plugins: { 
-        legend: { 
-          display: true, 
-          position: 'top', 
-          labels: { 
-            color: '#0f172a', 
-            padding: 16, 
-            font: { size: 13, weight: '700' }, 
-            usePointStyle: true, 
-            pointStyle: 'circle' 
-          } 
-        } 
-      }, 
+      plugins: { legend: { display: true, position: 'top', labels: { color: '#0f172a', font:{size:12,weight:'700'} } } }, 
       scales: { 
-        x: { 
-          ticks: { 
-            color: '#0f172a', 
-            maxRotation: 45, 
-            minRotation: 25, 
-            font: { size: 11, weight: '700' } 
-          }, 
-          grid: { display: false } 
-        }, 
-        y: { 
-          ticks: { color: '#64748b', font: { weight: '600' } }, 
-          grid: { color: '#e2e8f0' } 
-        } 
+        x: { ticks: { color: '#64748b', maxRotation: 45 }, grid: { display: false } }, 
+        y: { ticks: { color: '#64748b' }, grid: { color: '#e2e8f0' } } 
       } 
     });
 
@@ -1221,7 +1083,7 @@
       indexAxis:'y', 
       plugins:{ legend:{ display:false } }, 
       scales:{ 
-        x:{ ticks:{ color:'#64748b', font:{weight:'600'} }, grid:{color:'#e2e8f0'} }, 
+        x:{ ticks:{ color:'#64748b' }, grid:{color:'#e2e8f0'} }, 
         y:{ ticks:{ color:'#0f172a',font:{size:11,weight:'700'} }, grid:{display:false} } 
       } 
     });
@@ -1231,7 +1093,7 @@
       const m = parseProducts(r['Cart Items']);
       for(const [name,qty] of m){ pMap.set(name,(pMap.get(name)||0)+qty); }
     }
-    const pArr = [...pMap.entries()].sort((a,b)=>b[1]-a[1]).slice(0,16);
+    const pArr = [...pMap.entries()].sort((a,b)=>b[1]-a[1]).slice(0,12);
     makeChart('productChart','bar',{
       labels: pArr.map(x=>x[0]),
       datasets:[{ 
@@ -1243,19 +1105,8 @@
     },{ 
       plugins:{ legend:{ display:false } }, 
       scales:{ 
-        x:{ 
-          ticks:{ 
-            color:'#0f172a', 
-            maxRotation:45, 
-            minRotation:20, 
-            font:{size:11,weight:'700'} 
-          }, 
-          grid:{display:false} 
-        }, 
-        y:{ 
-          ticks:{ color:'#64748b', font:{weight:'600'} }, 
-          grid:{color:'#e2e8f0'} 
-        } 
+        x:{ ticks:{ color:'#0f172a', maxRotation:45, font:{size:10,weight:'700'} }, grid:{display:false} }, 
+        y:{ ticks:{ color:'#64748b' }, grid:{color:'#e2e8f0'} } 
       } 
     });
   }
@@ -1265,43 +1116,21 @@
   let mapLayer = null;
 
   const stateCoordinates = {
-    'Andhra Pradesh': [15.9129, 79.7400],
-    'Arunachal Pradesh': [28.2180, 94.7278],
-    'Assam': [26.2006, 92.9376],
-    'Bihar': [25.0961, 85.3131],
-    'Chhattisgarh': [21.2787, 81.8661],
-    'Goa': [15.2993, 74.1240],
-    'Gujarat': [22.2587, 71.1924],
-    'Haryana': [29.0588, 76.0856],
-    'Himachal Pradesh': [31.1048, 77.1734],
-    'Jharkhand': [23.6102, 85.2799],
-    'Karnataka': [15.3173, 75.7139],
-    'Kerala': [10.8505, 76.2711],
-    'Madhya Pradesh': [22.9734, 78.6569],
-    'Maharashtra': [19.7515, 75.7139],
-    'Manipur': [24.6637, 93.9063],
-    'Meghalaya': [25.4670, 91.3662],
-    'Mizoram': [23.1645, 92.9376],
-    'Nagaland': [26.1584, 94.5624],
-    'Odisha': [20.9517, 85.0985],
-    'Punjab': [31.1471, 75.3412],
-    'Rajasthan': [27.0238, 74.2179],
-    'Sikkim': [27.5330, 88.5122],
-    'Tamil Nadu': [11.1271, 78.6569],
-    'Telangana': [18.1124, 79.0193],
-    'Tripura': [23.9408, 91.9882],
-    'Uttar Pradesh': [26.8467, 80.9462],
-    'Uttarakhand': [30.0668, 79.0193],
-    'West Bengal': [22.9868, 87.8550],
-    'Andaman and Nicobar Islands': [11.7401, 92.6586],
-    'Chandigarh': [30.7333, 76.7794],
-    'Dadra and Nagar Haveli': [20.1809, 73.0169],
-    'Daman and Diu': [20.4283, 72.8397],
-    'Lakshadweep': [10.5667, 72.6417],
-    'Delhi': [28.7041, 77.1025],
-    'Puducherry': [11.9416, 79.8083],
-    'Jammu and Kashmir': [33.7782, 76.5762],
-    'Ladakh': [34.1526, 77.5771]
+    'Andhra Pradesh': [15.9129, 79.7400],'Arunachal Pradesh': [28.2180, 94.7278],
+    'Assam': [26.2006, 92.9376],'Bihar': [25.0961, 85.3131],'Chhattisgarh': [21.2787, 81.8661],
+    'Goa': [15.2993, 74.1240],'Gujarat': [22.2587, 71.1924],'Haryana': [29.0588, 76.0856],
+    'Himachal Pradesh': [31.1048, 77.1734],'Jharkhand': [23.6102, 85.2799],
+    'Karnataka': [15.3173, 75.7139],'Kerala': [10.8505, 76.2711],'Madhya Pradesh': [22.9734, 78.6569],
+    'Maharashtra': [19.7515, 75.7139],'Manipur': [24.6637, 93.9063],'Meghalaya': [25.4670, 91.3662],
+    'Mizoram': [23.1645, 92.9376],'Nagaland': [26.1584, 94.5624],'Odisha': [20.9517, 85.0985],
+    'Punjab': [31.1471, 75.3412],'Rajasthan': [27.0238, 74.2179],'Sikkim': [27.5330, 88.5122],
+    'Tamil Nadu': [11.1271, 78.6569],'Telangana': [18.1124, 79.0193],'Tripura': [23.9408, 91.9882],
+    'Uttar Pradesh': [26.8467, 80.9462],'Uttarakhand': [30.0668, 79.0193],
+    'West Bengal': [22.9868, 87.8550],'Andaman and Nicobar Islands': [11.7401, 92.6586],
+    'Chandigarh': [30.7333, 76.7794],'Dadra and Nagar Haveli': [20.1809, 73.0169],
+    'Daman and Diu': [20.4283, 72.8397],'Lakshadweep': [10.5667, 72.6417],
+    'Delhi': [28.7041, 77.1025],'Puducherry': [11.9416, 79.8083],
+    'Jammu and Kashmir': [33.7782, 76.5762],'Ladakh': [34.1526, 77.5771]
   };
 
   function getMarkerLevel(approved) {
@@ -1313,35 +1142,25 @@
   }
 
   function getMarkerIcon(state, approved) {
+    const colors = ['#10b981','#22c55e','#f59e0b','#f97316','#ef4444'];
     const level = getMarkerLevel(approved);
-    const shortName = state.length > 12 ? state.substring(0, 10) + '.' : state;
+    const color = colors[level-1];
     
     return L.divIcon({
-      className: 'state-marker-pin',
-      html: `
-        <div class="marker-ripple"></div>
-        <div class="state-marker-inner state-marker-level-${level}">
-          <div class="state-marker-name">${shortName}</div>
-          <div class="state-marker-count">
-            <span>✓</span>
-            <span>${approved.toLocaleString()}</span>
-          </div>
-        </div>
-      `,
+      className: '',
+      html: `<div style="background:white;border:3px solid ${color};color:${color};border-radius:12px;padding:8px 12px;font-weight:900;font-size:14px;box-shadow:0 4px 16px rgba(0,0,0,0.15);cursor:pointer;min-width:80px;text-align:center">
+        <div style="font-size:10px;color:#64748b;margin-bottom:4px">${state.length>12?state.substr(0,10)+'...':state}</div>
+        <div>✓ ${approved.toLocaleString()}</div>
+      </div>`,
       iconSize: [null, null],
-      iconAnchor: [45, 40]
+      iconAnchor: [40, 30]
     });
-  }
-
-  function getApprovalRate(approved, total) {
-    if (total === 0) return 0;
-    return (approved / total * 100).toFixed(1);
   }
 
   function initMap() {
     if (indiaMap) return;
-    indiaMap = L.map('indiaMap', { center: [22.5, 82.5], zoom: 5, minZoom: 4, maxZoom: 8, zoomControl: true });
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors', maxZoom: 19 }).addTo(indiaMap);
+    indiaMap = L.map('indiaMap', { center: [22.5, 82.5], zoom: 5, minZoom: 4, maxZoom: 8 });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(indiaMap);
   }
 
   function renderIndiaMap(rows) {
@@ -1367,19 +1186,29 @@
       const data = stateData.get(state);
       if (!data || data.approved === 0) continue;
 
-      const approvalRate = getApprovalRate(data.approved, data.total);
       const marker = L.marker(coords, { icon: getMarkerIcon(state, data.approved) });
 
       const popupContent = `
-        <div class="map-popup-state">📍 ${state}</div>
-        <div class="map-popup-row"><span class="map-popup-label">✅ Approved</span><span class="map-popup-value map-popup-success">${data.approved.toLocaleString()}</span></div>
-        <div class="map-popup-row"><span class="map-popup-label">⏳ Pending</span><span class="map-popup-value map-popup-pending">${data.pending.toLocaleString()}</span></div>
-        <div class="map-popup-row"><span class="map-popup-label">❌ Rejected</span><span class="map-popup-value map-popup-rejected">${data.rejected.toLocaleString()}</span></div>
-        <div class="map-popup-row" style="border-top:2px solid var(--ring);margin-top:12px;padding-top:12px"><span class="map-popup-label">📊 Total Scans</span><span class="map-popup-value">${data.total.toLocaleString()}</span></div>
-        <div class="map-popup-row"><span class="map-popup-label">🎯 Approval Rate</span><span class="map-popup-value map-popup-success">${approvalRate}%</span></div>
+        <div class="popup-state">📍 ${state}</div>
+        <div class="popup-row">
+          <span class="popup-label">Approved</span>
+          <span class="popup-value" style="color:#10b981">${data.approved.toLocaleString()}</span>
+        </div>
+        <div class="popup-row">
+          <span class="popup-label">Pending</span>
+          <span class="popup-value" style="color:#f59e0b">${data.pending.toLocaleString()}</span>
+        </div>
+        <div class="popup-row">
+          <span class="popup-label">Rejected</span>
+          <span class="popup-value" style="color:#ef4444">${data.rejected.toLocaleString()}</span>
+        </div>
+        <div class="popup-row" style="border-top:2px solid #e2e8f0;margin-top:8px;padding-top:8px">
+          <span class="popup-label">Total</span>
+          <span class="popup-value">${data.total.toLocaleString()}</span>
+        </div>
       `;
 
-      marker.bindPopup(popupContent, { closeButton: true, maxWidth: 360, className: 'custom-popup' });
+      marker.bindPopup(popupContent, { maxWidth: 320 });
       marker.on('click', () => { FILTERS.state = state; selState.value = state; render(); });
       marker.addTo(mapLayer);
     }
@@ -1490,7 +1319,7 @@
   }
 
   function normalizeRow(r){
-    const obj = {
+    return {
       'User ID': r['User ID']||r['UserID']||r['id']||'',
       'Phone Number': r['Phone Number']||r['Phone']||r['phone']||'',
       'First Name': r['First Name']||r['FirstName']||'',
@@ -1509,7 +1338,6 @@
       'Coupon Code': r['Coupon Code']||'',
       'Submission Status': r['Submission Status']||r['Approved Status']||''
     };
-    return obj;
   }
 
   Papa.parse(CSV_URL, {
@@ -1525,7 +1353,7 @@
     },
     error: (err)=>{
       console.error('CSV load error', err);
-      alert('Failed to load data.csv. Ensure the file exists at '+CSV_URL);
+      alert('Failed to load data.csv');
     }
   });
 </script>
