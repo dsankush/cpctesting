@@ -549,10 +549,10 @@
     <!-- Enhanced Professional Spinning Wheel -->
     <div id="wheelContainer" class="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 hidden">
       <button id="wheelButton" class="relative">
+        <!-- Wheel Pointer (outside spinning element) -->
+        <div class="wheel-pointer"></div>
+        
         <div id="wheelImage" class="fantastic-wheel">
-          <!-- Wheel Pointer -->
-          <div class="wheel-pointer"></div>
-          
           <!-- Wheel Segments -->
           <div class="wheel-segments">
             <div class="wheel-segment">
@@ -761,6 +761,7 @@
         wheelContainer.classList.add("hidden");
         carouselContainer.classList.remove("hidden");
         updateCarousel(currentIndex, 'right', true); // Mark as initial entry
+        createConfettiBurst(); // Add confetti on carousel entry
         hasSpun = true;
       }, 4000);
     });
@@ -778,6 +779,8 @@
     closeCarousel.addEventListener("click", () => {
       carouselContainer.classList.add("hidden");
       initialButtonContainer.classList.remove("hidden");
+      // Reset the flag so confetti shows on next carousel entry
+      isFirstCarouselEntry = true;
     });
   </script>
 </body>
