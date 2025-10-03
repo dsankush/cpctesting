@@ -838,21 +838,25 @@
     const totalFarmers = allPhones.length;
     const uniqueFarmers = uniquePhones.size;
     
-    // Calculate ACTIVE retailers from current filtered data
+    // Calculate ACTIVE retailers from current FILTERED data (all filters applied)
     const activeRINs = new Set(rows.map(r=>trim(r['RIN'])).filter(rin=>rin));
     const activeRetailers = activeRINs.size;
     
-    // Calculate TOTAL retailers:
-    // - If NO state filter: count ALL unique retailers from entire dataset (1,903)
-    // - If state filter IS applied: count unique retailers ONLY in that state
-    //   (e.g., West Bengal=183, Maharashtra=616, Telangana=161, etc.)
-    let totalRetailersDataset = RAW; // Start with entire dataset
+    // Calculate TOTAL retailers from RAW data (ignoring all filters except state):
+    // - If NO state filter: count ALL unique retailers in entire RAW dataset (1,903)
+    // - If state filter applied: count ALL unique retailers in that state from RAW
+    //   (West Bengal=183, Maharashtra=616, Telangana=161, Andhra Pradesh=307, Karnataka=636)
+    let totalRetailers = 0;
     if(FILTERS.state){
-      // Filter to get only retailers from the selected state
-      totalRetailersDataset = RAW.filter(r=>trim(r.State)===FILTERS.state);
+      // Count unique retailers ONLY in the selected state from RAW data
+      const stateRetailers = RAW.filter(r=>trim(r.State)===FILTERS.state);
+      const stateRetailerRINs = new Set(stateRetailers.map(r=>trim(r['RIN'])).filter(rin=>rin));
+      totalRetailers = stateRetailerRINs.size;
+    } else {
+      // Count ALL unique retailers across entire RAW dataset
+      const allRetailerRINs = new Set(RAW.map(r=>trim(r['RIN'])).filter(rin=>rin));
+      totalRetailers = allRetailerRINs.size;
     }
-    const totalRetailerRINs = new Set(totalRetailersDataset.map(r=>trim(r['RIN'])).filter(rin=>rin));
-    const totalRetailers = totalRetailerRINs.size;
     
     document.getElementById('kpiTotalBig').textContent = total.toLocaleString();
     document.getElementById('kpiYes').textContent = yes.toLocaleString();
