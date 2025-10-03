@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎨 Dashboard Theme Controller</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #0f0f23;
+      --surface: #1a1a2e;
+      --surface-light: #25254a;
+      --primary: #8b5cf6;
+      --secondary: #ec4899;
+      --accent: #10b981;
+      --text: #ffffff;
+      --text-muted: #94a3b8;
+      --border: #ffffff15;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #0f0f23 100%);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .logo {
+      font-size: 3rem;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .header-title h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.25rem;
+    }
+
+    .header-title p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--surface-light);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface);
+      border-color: var(--primary);
+    }
+
+    /* Main Grid */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 350px 1fr 400px;
+      gap: 2rem;
+    }
+
+    /* Panel Base */
+    .panel {
+      background: var(--surface);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      padding: 2rem;
+    }
+
+    .panel-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Left Panel - Presets */
+    .presets-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .preset-card {
+      background: var(--surface-light);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .preset-card:hover {
+      border-color: var(--primary);
+      transform: translateX(5px);
+    }
+
+    .preset-card.active {
+      border-color: var(--secondary);
+      background: linear-gradient(135deg, var(--primary)15, var(--secondary)15);
+    }
+
+    .preset-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .preset-name {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .preset-colors {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .preset-color {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      border: 2px solid var(--border);
+    }
+
+    .preset-desc {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    /* Center Panel - Controls */
+    .controls-section {
+      margin-bottom: 2rem;
+    }
+
+    .section-header {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .control-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .control-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .control-label {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .color-input-wrapper {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    input[type="color"] {
+      width: 60px;
+      height: 40px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      background: transparent;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      flex: 1;
+      padding: 0.75rem;
+      background: var(--surface-light);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    select {
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer;
+    }
+
+    /* Right Panel - Preview */
+    .preview-panel {
+      position: sticky;
+      top: 2rem;
+      max-height: calc(100vh - 4rem);
+      overflow-y: auto;
+    }
+
+    .preview-container {
+      background: var(--preview-bg, #f8fafc);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .preview-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .preview-kpi {
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .preview-kpi-value {
+      font-size: 2rem;
+      font-weight: 700;
+      font-family: var(--preview-font-numbers, 'Space Grotesk'), sans-serif;
+      color: var(--preview-primary, #8b5cf6);
+      margin-bottom: 0.25rem;
+    }
+
+    .preview-kpi-label {
+      color: var(--preview-text-muted, #64748b);
+      font-size: 0.9rem;
+      font-family: var(--preview-font-body, 'Outfit'), sans-serif;
+    }
+
+    .preview-button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      background: var(--preview-primary, #8b5cf6);
+      color: white;
+      font-family: var(--preview-font-body, 'Outfit'), sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 0.5rem;
+    }
+
+    .preview-filters {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .preview-filter select {
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: 1px solid var(--preview-border, #e2e8f0);
+      background: var(--preview-bg, #f8fafc);
+      color: var(--preview-text, #1e293b);
+      font-family: var(--preview-font-body, 'Outfit'), sans-serif;
+    }
+
+    /* Export Code Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--surface);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      padding: 2rem;
+      max-width: 800px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+
+    .code-block {
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+    }
+
+    .code-block pre {
+      margin: 0;
+      color: var(--accent);
+    }
+
+    .copy-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      margin-top: 1rem;
+    }
+
+    .copy-btn:hover {
+      background: var(--secondary);
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .tab {
+      padding: 0.75rem 1.5rem;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Responsive */
+    @media (max-width: 1400px) {
+      .main-grid {
+        grid-template-columns: 300px 1fr;
+      }
+      .preview-panel {
+        display: none;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--secondary);
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-left">
+        <div class="logo">🎨</div>
+        <div class="header-title">
+          <h1>Dashboard Theme Controller</h1>
+          <p>Customize your dashboard's look and feel in real-time</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" onclick="resetToDefaults()">
+          🔄 Reset
+        </button>
+        <button class="btn btn-primary" onclick="exportTheme()">
+          💾 Export Theme
+        </button>
+        <button class="btn btn-secondary" onclick="window.open('index.html', '_blank')">
+          🚀 View Dashboard
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="main-grid">
+      
+      <!-- Left Panel - Presets -->
+      <div class="panel">
+        <div class="panel-title">✨ Theme Presets</div>
+        <div class="presets-grid">
+          
+          <div class="preset-card" onclick="applyPreset('light')">
+            <div class="preset-header">
+              <div class="preset-name">🌞 Light & Professional</div>
+              <div class="preset-colors">
+                <div class="preset-color" style="background: #f8fafc;"></div>
+                <div class="preset-color" style="background: #8b5cf6;"></div>
+                <div class="preset-color" style="background: #ec4899;"></div>
+              </div>
+            </div>
+            <div class="preset-desc">Clean, bright theme with purple accents</div>
+          </div>
+
+          <div class="preset-card" onclick="applyPreset('dark')">
+            <div class="preset-header">
+              <div class="preset-name">🌙 Dark & Sleek</div>
+              <div class="preset-colors">
+                <div class="preset-color" style="background: #0f172a;"></div>
+                <div class="preset-color" style="background: #3b82f6;"></div>
+                <div class="preset-color" style="background: #06b6d4;"></div>
+              </div>
+            </div>
+            <div class="preset-desc">Modern dark theme with cyan accents</div>
+          </div>
+
+          <div class="preset-card" onclick="applyPreset('vibrant')">
+            <div class="preset-header">
+              <div class="preset-name">🎉 Vibrant & Bold</div>
+              <div class="preset-colors">
+                <div class="preset-color" style="background: #fef3c7;"></div>
+                <div class="preset-color" style="background: #f59e0b;"></div>
+                <div class="preset-color" style="background: #ef4444;"></div>
+              </div>
+            </div>
+            <div class="preset-desc">Energetic orange and red palette</div>
+          </div>
+
+          <div class="preset-card" onclick="applyPreset('forest')">
+            <div class="preset-header">
+              <div class="preset-name">🌲 Forest Green</div>
+              <div class="preset-colors">
+                <div class="preset-color" style="background: #f0fdf4;"></div>
+                <div class="preset-color" style="background: #10b981;"></div>
+                <div class="preset-color" style="background: #059669;"></div>
+              </div>
+            </div>
+            <div class="preset-desc">Calm green theme for nature lovers</div>
+          </div>
+
+          <div class="preset-card" onclick="applyPreset('sunset')">
+            <div class="preset-header">
+              <div class="preset-name">🌅 Sunset Gradient</div>
+              <div class="preset-colors">
+                <div class="preset-color" style="background: #fef2f2;"></div>
+                <div class="preset-color" style="background: #f97316;"></div>
+                <div class="preset-color" style="background: #ec4899;"></div>
+              </div>
+            </div>
+            <div class="preset-desc">Warm gradient from orange to pink</div>
+          </div>
+
+          <div class="preset-card" onclick="applyPreset('midnight')">
+            <div class="preset-header">
+              <div class="preset-name">🌌 Midnight Blue</div>
+              <div class="preset-colors">
+                <div class="preset-color" style="background: #0f0f23;"></div>
+                <div class="preset-color" style="background: #6366f1;"></div>
+                <div class="preset-color" style="background: #8b5cf6;"></div>
+              </div>
+            </div>
+            <div class="preset-desc">Deep blue with purple highlights</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Center Panel - Controls -->
+      <div class="panel">
+        <div class="panel-title">⚙️ Customize Theme</div>
+        
+        <!-- Tabs -->
+        <div class="tabs">
+          <button class="tab active" onclick="switchTab('colors')">🎨 Colors</button>
+          <button class="tab" onclick="switchTab('typography')">🔤 Typography</button>
+          <button class="tab" onclick="switchTab('spacing')">📏 Layout</button>
+        </div>
+
+        <!-- Colors Tab -->
+        <div id="tab-colors" class="tab-content active">
+          
+          <div class="controls-section">
+            <div class="section-header">🎨 Main Colors</div>
+            <div class="control-group">
+              
+              <div class="control-item">
+                <label class="control-label">Background Color</label>
+                <div class="color-input-wrapper">
+                  <input type="color" id="bgColor" value="#f8fafc" onchange="updatePreview()">
+                  <input type="text" id="bgColorText" value="#f8fafc" oninput="syncColorInput('bgColor', this.value)">
+                </div>
+              </div>
+
+              <div class="control-item">
+                <label class="control-label">Card Background</label>
+                <div class="color-input-wrapper">
+                  <input type="color" id="cardBg" value="#ffffff" onchange="updatePreview()">
+                  <input type="text" id="cardBgText" value="#ffffff" oninput="syncColorInput('cardBg', this.value)">
+                </div>
+              </div>
+
+              <div class="control-item">
+                <label class="control-label">Primary Color</label>
+                <div class="color-input-wrapper">
+                  <input type="color" id="primaryColor" value="#8b5cf6" onchange="updatePreview()">
+                  <input type="text" id="primaryColorText" value="#8b5cf6" oninput="syncColorInput('primaryColor', this.value)">
+                </div>
+              </div>
+
+              <div class="control-item">
+                <label class="control-label">Secondary Color</label>
+                <div class="color-input-wrapper">
+                  <input type="color" id="secondaryColor" value="#ec4899" onchange="updatePreview()">
+                  <input type="text" id="secondaryColorText" value="#ec4899" oninput="syncColorInput('secondaryColor', this.value)">
+                </div>
+              </div>
+
+              <div class="control-item">
+                <label class="control-label">Accent 1 (Success)</label>
+                <div class="color-input-wrapper">
+                  <input type="color" id="accent1Color" value="#10b981" onchange="updatePreview()">
+                  <input type="text" id="accent1ColorText" value="#10b981" oninput="syncColorInput('accent1Color', this.value)">
+                </div>
+              </div>
+
+              <div class="control-item">
+                <label class="control-label">Accent 2 (Warning)</label>
+                <div class="color-input-wrapper">
+                  <input type="color" id="accent2Color" value="#f59e0b" onchange="updatePreview()">
+                  <input type="text" id="accent2ColorText" value="#f59e0b" oninput="syncColorInput('accent2Color', this.value)">
+                </div>
+              </div>
+
+              <div class="control-item">
+                <label class="control-label">Accent 3 (Danger)</label>
+                <div class="color-input-wrapper">
+                  <input type="color" id="accent3Color" value="#ef4444" onchange="updatePreview()">
+                  <input type="text" id="accent3ColorText" value="#ef4444" oninput="syncColorInput('accent3Color', this.value)">
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="controls-section">
+            <div class="section-header">✍️ Text Colors</div>
+            <div class="control-group">
+              
+              <div class="control-item">
+                <label class="control-label">Primary Text</label>
+                <div class="color-input-wrapper">
+                  <input type="color" id="textColor" value="#1e293b" onchange="updatePreview()">
+                  <input type="text" id="textColorText" value="#1e293b" oninput="syncColorInput('textColor', this.value)">
+                </div>
+              </div>
+
+              <div class="control-item">
+                <label class="control-label">Muted Text</label>
+                <div class="color-input-wrapper">
+                  <input type="color" id="textMuted" value="#64748b" onchange="updatePreview()">
+                  <input type="text" id="textMutedText" value="#64748b" oninput="syncColorInput('textMuted', this.value)">
+                </div>
+              </div>
+
+              <div class="control-item">
+                <label class="control-label">Border Color</label>
+                <div class="color-input-wrapper">
+                  <input type="color" id="borderColor" value="#e2e8f0" onchange="updatePreview()">
+                  <input type="text" id="borderColorText" value="#e2e8f0" oninput="syncColorInput('borderColor', this.value)">
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Typography Tab -->
+        <div id="tab-typography" class="tab-content">
+          
+          <div class="controls-section">
+            <div class="section-header">🔤 Font Families</div>
+            <div class="control-group">
+              
+              <div class="control-item">
+                <label class="control-label">Body Font</label>
+                <select id="fontBody" onchange="updatePreview()">
+                  <option value="'Outfit', sans-serif">Outfit</option>
+                  <option value="'Inter', sans-serif">Inter</option>
+                  <option value="'Poppins', sans-serif">Poppins</option>
+                  <option value="'Roboto', sans-serif">Roboto</option>
+                  <option value="'DM Sans', sans-serif">DM Sans</option>
+                  <option value="'Manrope', sans-serif">Manrope</option>
+                  <option value="'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans</option>
+                </select>
+              </div>
+
+              <div class="control-item">
+                <label class="control-label">Numbers/Values Font</label>
+                <select id="fontNumbers" onchange="updatePreview()">
+                  <option value="'Space Grotesk', sans-serif">Space Grotesk</option>
+                  <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
+                  <option value="'Fira Code', monospace">Fira Code</option>
+                  <option value="'IBM Plex Mono', monospace">IBM Plex Mono</option>
+                  <option value="'Outfit', sans-serif">Outfit</option>
+                  <option value="'Inter', sans-serif">Inter</option>
+                </select>
+              </div>
+
+              <div class="control-item">
+                <label class="control-label">Headings Font</label>
+                <select id="fontHeadings" onchange="updatePreview()">
+                  <option value="'Outfit', sans-serif">Outfit</option>
+                  <option value="'Space Grotesk', sans-serif">Space Grotesk</option>
+                  <option value="'Poppins', sans-serif">Poppins</option>
+                  <option value="'Inter', sans-serif">Inter</option>
+                  <option value="'DM Sans', sans-serif">DM Sans</option>
+                </select>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="controls-section">
+            <div class="section-header">📐 Font Sizes</div>
+            <div class="control-group">
+              
+              <div class="control-item">
+                <label class="control-label">Base Font Size (px)</label>
+                <input type="number" id="fontSize" value="16" min="12" max="20" onchange="updatePreview()">
+              </div>
+
+              <div class="control-item">
+                <label class="control-label">KPI Large Size (rem)</label>
+                <input type="number" id="kpiFontSize" value="3.5" min="2" max="6" step="0.1" onchange="updatePreview()">
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Layout Tab -->
+        <div id="tab-spacing" class="tab-content">
+          
+          <div class="controls-section">
+            <div class="section-header">📦 Card Styling</div>
+            <div class="control-group">
+              
+              <div class="control-item">
+                <label class="control-label">Border Radius (px)</label>
+                <input type="number" id="borderRadius" value="16" min="0" max="40" onchange="updatePreview()">
+              </div>
+
+              <div class="control-item">
+                <label class="control-label">Card Padding (rem)</label>
+                <input type="number" id="cardPadding" value="1.5" min="0.5" max="3" step="0.1" onchange="updatePreview()">
+              </div>
+
+              <div class="control-item">
+                <label class="control-label">Card Shadow</label>
+                <select id="cardShadow" onchange="updatePreview()">
+                  <option value="0 4px 12px rgba(0,0,0,0.05)">Subtle</option>
+                  <option value="0 8px 20px rgba(0,0,0,0.08)">Medium</option>
+                  <option value="0 12px 30px rgba(0,0,0,0.12)">Strong</option>
+                  <option value="none">None</option>
+                </select>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="controls-section">
+            <div class="section-header">📏 Spacing</div>
+            <div class="control-group">
+              
+              <div class="control-item">
+                <label class="control-label">Grid Gap (rem)</label>
+                <input type="number" id="gridGap" value="1.5" min="0.5" max="3" step="0.1" onchange="updatePreview()">
+              </div>
+
+              <div class="control-item">
+                <label class="control-label">Section Spacing (rem)</label>
+                <input type="number" id="sectionSpacing" value="2" min="1" max="4" step="0.1" onchange="updatePreview()">
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Right Panel - Preview -->
+      <div class="panel preview-panel">
+        <div class="panel-title">👁️ Live Preview</div>
+        <div id="previewContainer" class="preview-container">
+          
+          <div class="preview-card">
+            <h3 style="margin-bottom: 1rem; font-family: var(--preview-font-headings, 'Outfit');">📊 Dashboard Preview</h3>
+            
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+              <div class="preview-kpi">
+                <div class="preview-kpi-value">1,234</div>
+                <div class="preview-kpi-label">Total Scans</div>
+              </div>
+              <div class="preview-kpi">
+                <div class="preview-kpi-value" style="color: var(--preview-accent1, #10b981);">89%</div>
+                <div class="preview-kpi-label">Approval Rate</div>
+              </div>
+            </div>
+
+            <div class="preview-filters">
+              <select>
+                <option>Select State</option>
+                <option>West Bengal</option>
+                <option>Maharashtra</option>
+              </select>
+              <select>
+                <option>Select District</option>
+                <option>District 1</option>
+              </select>
+            </div>
+
+            <div style="margin-top: 1rem;">
+              <button class="preview-button">Apply Filters</button>
+              <button class="preview-button" style="background: var(--preview-secondary, #ec4899);">Download CSV</button>
+            </div>
+          </div>
+
+          <div class="preview-card">
+            <h4 style="margin-bottom: 0.75rem; font-family: var(--preview-font-headings, 'Outfit'); color: var(--preview-text, #1e293b);">
+              Color Palette
+            </h4>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
+              <div style="height: 50px; border-radius: 8px; background: var(--preview-primary, #8b5cf6);"></div>
+              <div style="height: 50px; border-radius: 8px; background: var(--preview-secondary, #ec4899);"></div>
+              <div style="height: 50px; border-radius: 8px; background: var(--preview-accent1, #10b981);"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Export Modal -->
+  <div id="exportModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">💾 Export Theme</div>
+        <button class="close-btn" onclick="closeModal()">✕</button>
+      </div>
+      
+      <div class="tabs">
+        <button class="tab active" onclick="switchExportTab('css')">CSS Variables</button>
+        <button class="tab" onclick="switchExportTab('json')">JSON Config</button>
+        <button class="tab" onclick="switchExportTab('instructions')">📋 Instructions</button>
+      </div>
+
+      <div id="export-css" class="tab-content active">
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">
+          Copy these CSS variables and paste them into the <code>:root</code> section of your dashboard's CSS.
+        </p>
+        <div class="code-block">
+          <pre id="cssOutput"></pre>
+        </div>
+        <button class="copy-btn" onclick="copyToClipboard('cssOutput')">📋 Copy CSS</button>
+      </div>
+
+      <div id="export-json" class="tab-content">
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">
+          Download this JSON configuration for programmatic theme management.
+        </p>
+        <div class="code-block">
+          <pre id="jsonOutput"></pre>
+        </div>
+        <button class="copy-btn" onclick="copyToClipboard('jsonOutput')">📋 Copy JSON</button>
+        <button class="copy-btn" onclick="downloadJSON()" style="margin-left: 0.5rem;">💾 Download JSON</button>
+      </div>
+
+      <div id="export-instructions" class="tab-content">
+        <div style="color: var(--text-muted); line-height: 1.8;">
+          <h3 style="color: var(--text); margin-bottom: 1rem;">How to Apply Your Theme</h3>
+          
+          <h4 style="color: var(--secondary); margin-top: 1.5rem; margin-bottom: 0.5rem;">Method 1: CSS Variables</h4>
+          <ol style="margin-left: 1.5rem;">
+            <li>Open your <code>index.html</code> file</li>
+            <li>Find the <code>&lt;style&gt;</code> section</li>
+            <li>Locate the <code>:root { ... }</code> block</li>
+            <li>Replace the CSS variables with the ones from the "CSS Variables" tab</li>
+            <li>Save and refresh your browser</li>
+          </ol>
+
+          <h4 style="color: var(--secondary); margin-top: 1.5rem; margin-bottom: 0.5rem;">Method 2: Manual Edit</h4>
+          <ol style="margin-left: 1.5rem;">
+            <li>Copy individual values you want to change</li>
+            <li>Find the corresponding CSS variable in your dashboard</li>
+            <li>Replace with your new value</li>
+          </ol>
+
+          <h4 style="color: var(--secondary); margin-top: 1.5rem; margin-bottom: 0.5rem;">Font Setup</h4>
+          <p>If you changed fonts, add this to the <code>&lt;head&gt;</code> section:</p>
+          <div class="code-block">
+            <pre>&lt;link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"&gt;</pre>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Theme Configuration
+    let currentTheme = {
+      bgColor: '#f8fafc',
+      cardBg: '#ffffff',
+      primaryColor: '#8b5cf6',
+      secondaryColor: '#ec4899',
+      accent1Color: '#10b981',
+      accent2Color: '#f59e0b',
+      accent3Color: '#ef4444',
+      textColor: '#1e293b',
+      textMuted: '#64748b',
+      borderColor: '#e2e8f0',
+      fontBody: "'Outfit', sans-serif",
+      fontNumbers: "'Space Grotesk', sans-serif",
+      fontHeadings: "'Outfit', sans-serif",
+      fontSize: '16',
+      kpiFontSize: '3.5',
+      borderRadius: '16',
+      cardPadding: '1.5',
+      cardShadow: '0 4px 12px rgba(0,0,0,0.05)',
+      gridGap: '1.5',
+      sectionSpacing: '2'
+    };
+
+    // Presets
+    const presets = {
+      light: {
+        bgColor: '#f8fafc',
+        cardBg: '#ffffff',
+        primaryColor: '#8b5cf6',
+        secondaryColor: '#ec4899',
+        accent1Color: '#10b981',
+        accent2Color: '#f59e0b',
+        accent3Color: '#ef4444',
+        textColor: '#1e293b',
+        textMuted: '#64748b',
+        borderColor: '#e2e8f0',
+        fontBody: "'Outfit', sans-serif",
+        fontNumbers: "'Space Grotesk', sans-serif",
+        fontHeadings: "'Outfit', sans-serif"
+      },
+      dark: {
+        bgColor: '#0f172a',
+        cardBg: '#1e293b',
+        primaryColor: '#3b82f6',
+        secondaryColor: '#06b6d4',
+        accent1Color: '#10b981',
+        accent2Color: '#f59e0b',
+        accent3Color: '#ef4444',
+        textColor: '#f1f5f9',
+        textMuted: '#94a3b8',
+        borderColor: '#334155',
+        fontBody: "'Poppins', sans-serif",
+        fontNumbers: "'Space Grotesk', sans-serif",
+        fontHeadings: "'Poppins', sans-serif"
+      },
+      vibrant: {
+        bgColor: '#fef3c7',
+        cardBg: '#ffffff',
+        primaryColor: '#f59e0b',
+        secondaryColor: '#ef4444',
+        accent1Color: '#10b981',
+        accent2Color: '#8b5cf6',
+        accent3Color: '#ec4899',
+        textColor: '#78350f',
+        textMuted: '#92400e',
+        borderColor: '#fde68a',
+        fontBody: "'DM Sans', sans-serif",
+        fontNumbers: "'Space Grotesk', sans-serif",
+        fontHeadings: "'DM Sans', sans-serif"
+      },
+      forest: {
+        bgColor: '#f0fdf4',
+        cardBg: '#ffffff',
+        primaryColor: '#10b981',
+        secondaryColor: '#059669',
+        accent1Color: '#34d399',
+        accent2Color: '#0d9488',
+        accent3Color: '#14b8a6',
+        textColor: '#064e3b',
+        textMuted: '#047857',
+        borderColor: '#d1fae5',
+        fontBody: "'Inter', sans-serif",
+        fontNumbers: "'JetBrains Mono', monospace",
+        fontHeadings: "'Inter', sans-serif"
+      },
+      sunset: {
+        bgColor: '#fef2f2',
+        cardBg: '#ffffff',
+        primaryColor: '#f97316',
+        secondaryColor: '#ec4899',
+        accent1Color: '#f59e0b',
+        accent2Color: '#ef4444',
+        accent3Color: '#8b5cf6',
+        textColor: '#7c2d12',
+        textMuted: '#9a3412',
+        borderColor: '#fed7aa',
+        fontBody: "'Manrope', sans-serif",
+        fontNumbers: "'Space Grotesk', sans-serif",
+        fontHeadings: "'Manrope', sans-serif"
+      },
+      midnight: {
+        bgColor: '#0f0f23',
+        cardBg: '#1a1a2e',
+        primaryColor: '#6366f1',
+        secondaryColor: '#8b5cf6',
+        accent1Color: '#a78bfa',
+        accent2Color: '#ec4899',
+        accent3Color: '#06b6d4',
+        textColor: '#e0e7ff',
+        textMuted: '#a5b4fc',
+        borderColor: '#312e81',
+        fontBody: "'Space Grotesk', sans-serif",
+        fontNumbers: "'JetBrains Mono', monospace",
+        fontHeadings: "'Space Grotesk', sans-serif"
+      }
+    };
+
+    // Initialize
+    function init() {
+      updatePreview();
+    }
+
+    // Sync color input
+    function syncColorInput(colorPickerId, hexValue) {
+      if (/^#[0-9A-F]{6}$/i.test(hexValue)) {
+        document.getElementById(colorPickerId).value = hexValue;
+        updatePreview();
+      }
+    }
+
+    // Update preview
+    function updatePreview() {
+      // Get all values
+      currentTheme = {
+        bgColor: document.getElementById('bgColor').value,
+        cardBg: document.getElementById('cardBg').value,
+        primaryColor: document.getElementById('primaryColor').value,
+        secondaryColor: document.getElementById('secondaryColor').value,
+        accent1Color: document.getElementById('accent1Color').value,
+        accent2Color: document.getElementById('accent2Color').value,
+        accent3Color: document.getElementById('accent3Color').value,
+        textColor: document.getElementById('textColor').value,
+        textMuted: document.getElementById('textMuted').value,
+        borderColor: document.getElementById('borderColor').value,
+        fontBody: document.getElementById('fontBody').value,
+        fontNumbers: document.getElementById('fontNumbers').value,
+        fontHeadings: document.getElementById('fontHeadings').value,
+        fontSize: document.getElementById('fontSize').value,
+        kpiFontSize: document.getElementById('kpiFontSize').value,
+        borderRadius: document.getElementById('borderRadius').value,
+        cardPadding: document.getElementById('cardPadding').value,
+        cardShadow: document.getElementById('cardShadow').value,
+        gridGap: document.getElementById('gridGap').value,
+        sectionSpacing: document.getElementById('sectionSpacing').value
+      };
+
+      // Update text inputs
+      document.getElementById('bgColorText').value = currentTheme.bgColor;
+      document.getElementById('cardBgText').value = currentTheme.cardBg;
+      document.getElementById('primaryColorText').value = currentTheme.primaryColor;
+      document.getElementById('secondaryColorText').value = currentTheme.secondaryColor;
+      document.getElementById('accent1ColorText').value = currentTheme.accent1Color;
+      document.getElementById('accent2ColorText').value = currentTheme.accent2Color;
+      document.getElementById('accent3ColorText').value = currentTheme.accent3Color;
+      document.getElementById('textColorText').value = currentTheme.textColor;
+      document.getElementById('textMutedText').value = currentTheme.textMuted;
+      document.getElementById('borderColorText').value = currentTheme.borderColor;
+
+      // Apply to preview
+      const preview = document.getElementById('previewContainer');
+      preview.style.setProperty('--preview-bg', currentTheme.bgColor);
+      preview.style.setProperty('--preview-card-bg', currentTheme.cardBg);
+      preview.style.setProperty('--preview-primary', currentTheme.primaryColor);
+      preview.style.setProperty('--preview-secondary', currentTheme.secondaryColor);
+      preview.style.setProperty('--preview-accent1', currentTheme.accent1Color);
+      preview.style.setProperty('--preview-accent2', currentTheme.accent2Color);
+      preview.style.setProperty('--preview-accent3', currentTheme.accent3Color);
+      preview.style.setProperty('--preview-text', currentTheme.textColor);
+      preview.style.setProperty('--preview-text-muted', currentTheme.textMuted);
+      preview.style.setProperty('--preview-border', currentTheme.borderColor);
+      preview.style.setProperty('--preview-font-body', currentTheme.fontBody);
+      preview.style.setProperty('--preview-font-numbers', currentTheme.fontNumbers);
+      preview.style.setProperty('--preview-font-headings', currentTheme.fontHeadings);
+    }
+
+    // Apply preset
+    function applyPreset(presetName) {
+      const preset = presets[presetName];
+      if (!preset) return;
+
+      // Update all controls
+      Object.keys(preset).forEach(key => {
+        const el = document.getElementById(key);
+        if (el) {
+          el.value = preset[key];
+        }
+      });
+
+      updatePreview();
+
+      // Visual feedback
+      document.querySelectorAll('.preset-card').forEach(card => {
+        card.classList.remove('active');
+      });
+      event.target.closest('.preset-card').classList.add('active');
+    }
+
+    // Reset to defaults
+    function resetToDefaults() {
+      applyPreset('light');
+      document.getElementById('fontSize').value = '16';
+      document.getElementById('kpiFontSize').value = '3.5';
+      document.getElementById('borderRadius').value = '16';
+      document.getElementById('cardPadding').value = '1.5';
+      document.getElementById('cardShadow').value = '0 4px 12px rgba(0,0,0,0.05)';
+      document.getElementById('gridGap').value = '1.5';
+      document.getElementById('sectionSpacing').value = '2';
+      updatePreview();
+    }
+
+    // Switch tab
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      event.target.classList.add('active');
+      document.getElementById('tab-' + tabName).classList.add('active');
+    }
+
+    // Export theme
+    function exportTheme() {
+      // Generate CSS
+      const css = `:root {
+  /* Colors */
+  --bg: ${currentTheme.bgColor};
+  --card-bg: ${currentTheme.cardBg};
+  --primary: ${currentTheme.primaryColor};
+  --secondary: ${currentTheme.secondaryColor};
+  --acc1: ${currentTheme.accent1Color};
+  --acc2: ${currentTheme.accent2Color};
+  --acc3: ${currentTheme.accent3Color};
+  --text: ${currentTheme.textColor};
+  --text-muted: ${currentTheme.textMuted};
+  --border: ${currentTheme.borderColor};
+  
+  /* Typography */
+  --font-body: ${currentTheme.fontBody};
+  --font-numbers: ${currentTheme.fontNumbers};
+  --font-headings: ${currentTheme.fontHeadings};
+  --font-size: ${currentTheme.fontSize}px;
+  --kpi-font-size: ${currentTheme.kpiFontSize}rem;
+  
+  /* Layout */
+  --border-radius: ${currentTheme.borderRadius}px;
+  --card-padding: ${currentTheme.cardPadding}rem;
+  --card-shadow: ${currentTheme.cardShadow};
+  --grid-gap: ${currentTheme.gridGap}rem;
+  --section-spacing: ${currentTheme.sectionSpacing}rem;
+}`;
+
+      document.getElementById('cssOutput').textContent = css;
+
+      // Generate JSON
+      const json = JSON.stringify(currentTheme, null, 2);
+      document.getElementById('jsonOutput').textContent = json;
+
+      // Show modal
+      document.getElementById('exportModal').classList.add('active');
+    }
+
+    // Close modal
+    function closeModal() {
+      document.getElementById('exportModal').classList.remove('active');
+    }
+
+    // Switch export tab
+    function switchExportTab(tabName) {
+      document.querySelectorAll('#exportModal .tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('#exportModal .tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      event.target.classList.add('active');
+      document.getElementById('export-' + tabName).classList.add('active');
+    }
+
+    // Copy to clipboard
+    function copyToClipboard(elementId) {
+      const text = document.getElementById(elementId).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        event.target.textContent = '✅ Copied!';
+        setTimeout(() => {
+          event.target.textContent = event.target.textContent.includes('CSS') ? '📋 Copy CSS' : '📋 Copy JSON';
+        }, 2000);
+      });
+    }
+
+    // Download JSON
+    function downloadJSON() {
+      const json = JSON.stringify(currentTheme, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'dashboard-theme.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Close modal on outside click
+    document.getElementById('exportModal').addEventListener('click', (e) => {
+      if (e.target.id === 'exportModal') {
+        closeModal();
+      }
+    });
+
+    // Initialize on load
+    init();
+  </script>
+
+</body>
+</html>
