@@ -626,24 +626,30 @@
     const carouselItems = ["w1.jpg", "w2.jpg", "w3.jpg", "w4.jpg"];
     let currentIndex = 0;
     let hasSpun = false;
+    let isFirstCarouselEntry = true;
 
-    function updateCarousel(index, direction = 'right') {
-      // Add festive slide out animation
+    function updateCarousel(index, direction = 'right', isInitialEntry = false) {
+      // Add slide out animation
       carouselImage.classList.add(direction === 'left' ? 'slide-out-left' : 'slide-out-right');
       
-      // Add festive sound effect (visual feedback)
-      carouselImage.style.filter = 'hue-rotate(20deg) saturate(1.2)';
+      // Only add festive filter on initial entry
+      if (isInitialEntry) {
+        carouselImage.style.filter = 'hue-rotate(20deg) saturate(1.2)';
+      }
       
       setTimeout(() => {
         carouselImage.src = carouselItems[index];
         carouselImage.classList.remove('slide-out-left', 'slide-out-right', 'loaded');
         carouselImage.style.filter = '';
         
-        // Trigger festive slide in animation
+        // Trigger slide in animation
         setTimeout(() => {
           carouselImage.classList.add('loaded');
-          // Add celebration effect
-          createCelebrationEffect();
+          // Only add celebration effect on first entry
+          if (isInitialEntry && isFirstCarouselEntry) {
+            createCelebrationEffect();
+            isFirstCarouselEntry = false;
+          }
         }, 50);
         
         renderDots();
@@ -706,8 +712,8 @@
 
       if (hasSpun) {
         carouselContainer.classList.remove("hidden");
-        updateCarousel(currentIndex);
-        // Add festive celebration effect
+        updateCarousel(currentIndex, 'right', true); // Mark as initial entry
+        // Add festive celebration effect only on entry
         createConfettiBurst();
       } else {
         wheelContainer.classList.remove("hidden");
@@ -754,7 +760,7 @@
         wheelImage.classList.remove("professional-spin");
         wheelContainer.classList.add("hidden");
         carouselContainer.classList.remove("hidden");
-        updateCarousel(currentIndex);
+        updateCarousel(currentIndex, 'right', true); // Mark as initial entry
         hasSpun = true;
       }, 4000);
     });
