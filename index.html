@@ -838,17 +838,20 @@
     const totalFarmers = allPhones.length;
     const uniqueFarmers = uniquePhones.size;
     
-    // Calculate retailer metrics - ACTIVE retailers from filtered data
+    // Calculate ACTIVE retailers from current filtered data
     const activeRINs = new Set(rows.map(r=>trim(r['RIN'])).filter(rin=>rin));
     const activeRetailers = activeRINs.size;
     
-    // 🔥 NEW: Calculate TOTAL retailers based on state filter
-    let totalRetailersPool = RAW; // Start with all data
+    // Calculate TOTAL retailers:
+    // - If NO state filter: count ALL unique retailers from entire dataset (1,903)
+    // - If state filter IS applied: count unique retailers ONLY in that state
+    //   (e.g., West Bengal=183, Maharashtra=616, Telangana=161, etc.)
+    let totalRetailersDataset = RAW; // Start with entire dataset
     if(FILTERS.state){
-      // Filter to only the selected state to get total retailers in that state
-      totalRetailersPool = RAW.filter(r=>trim(r.State)===FILTERS.state);
+      // Filter to get only retailers from the selected state
+      totalRetailersDataset = RAW.filter(r=>trim(r.State)===FILTERS.state);
     }
-    const totalRetailerRINs = new Set(totalRetailersPool.map(r=>trim(r['RIN'])).filter(rin=>rin));
+    const totalRetailerRINs = new Set(totalRetailersDataset.map(r=>trim(r['RIN'])).filter(rin=>rin));
     const totalRetailers = totalRetailerRINs.size;
     
     document.getElementById('kpiTotalBig').textContent = total.toLocaleString();
