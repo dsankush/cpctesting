@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Coromandel CPC — Campaign Analytics Hub</title>
+  <title>Coromandel CPC — Campaign Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -16,20 +16,20 @@
 
   <style>
     :root{
+      --bg:#f8fafc;
+      --panel:#ffffff;
+      --card:#ffffff;
+      --muted:#64748b;
+      --text:#0f172a;
       --primary:#6366f1;
       --secondary:#ec4899;
       --accent:#10b981;
       --warning:#f59e0b;
       --danger:#ef4444;
-      --info:#3b82f6;
-      --bg:#f8fafc;
-      --card:#ffffff;
-      --text:#0f172a;
-      --muted:#64748b;
-      --border:#e2e8f0;
+      --ring:#e2e8f0;
+      --border:#cbd5e1;
       --shadow:rgba(0,0,0,0.04);
       --shadow-lg:rgba(0,0,0,0.1);
-      --shadow-xl:rgba(0,0,0,0.15);
     }
     
     *{box-sizing:border-box;margin:0;padding:0}
@@ -42,16 +42,16 @@
       position:relative;
     }
     
-    /* Animated Background Gradient */
+    /* Subtle animated background */
     body::before{
       content:'';
       position:fixed;
       top:-50%;left:-50%;
       width:200%;height:200%;
       background:
-        radial-gradient(circle at 20% 50%, rgba(99,102,241,0.08) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(236,72,153,0.08) 0%, transparent 50%),
-        radial-gradient(circle at 40% 80%, rgba(16,185,129,0.08) 0%, transparent 50%);
+        radial-gradient(circle at 20% 50%, rgba(99,102,241,0.06) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(236,72,153,0.06) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(16,185,129,0.06) 0%, transparent 50%);
       animation:bgRotate 20s linear infinite;
       z-index:0;
     }
@@ -61,103 +61,63 @@
       100%{transform:rotate(360deg)}
     }
     
-    .app{
-      position:relative;
-      z-index:1;
-      display:grid;
-      grid-template-rows:auto 1fr auto;
-      min-height:100vh;
-    }
+    .app{position:relative;z-index:1;display:grid;grid-template-rows:auto 1fr auto;min-height:100vh}
     
     /* Header */
     header{
-      position:sticky;
-      top:0;
-      z-index:100;
-      background:rgba(255,255,255,0.9);
+      position:sticky;top:0;z-index:30;
       backdrop-filter:saturate(180%) blur(20px);
-      border-bottom:1px solid var(--border);
-      box-shadow:0 4px 24px var(--shadow);
+      background:rgba(255,255,255,0.95);
+      border-bottom:2px solid var(--ring);
+      box-shadow:0 4px 20px var(--shadow);
     }
     
-    .bar{
-      display:flex;
-      align-items:center;
-      gap:24px;
-      padding:20px 48px;
-      flex-wrap:wrap;
-      max-width:1800px;
-      margin:0 auto;
-    }
+    .bar{display:flex;align-items:center;gap:20px;padding:20px 32px;flex-wrap:wrap}
     
     .logo{
-      display:flex;
-      align-items:center;
-      gap:16px;
-      font-family:'Space Grotesk',sans-serif;
-      font-size:26px;
+      display:flex;align-items:center;gap:16px;
+      padding:12px 24px;
+      border-radius:16px;
+      background:rgba(255,255,255,0.5);
+      backdrop-filter:blur(12px);
+      box-shadow:0 8px 24px rgba(99,102,241,0.15);
+      border:2px solid rgba(99,102,241,0.1);
+    }
+    
+    .dot{
+      width:20px;height:20px;border-radius:50%;
+      background:linear-gradient(135deg,var(--primary),var(--secondary));
+      box-shadow:0 4px 12px rgba(99,102,241,0.4);
+      animation:pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse{
+      0%,100%{transform:scale(1);opacity:1}
+      50%{transform:scale(1.15);opacity:0.8}
+    }
+    
+    .title{
+      font-size:1.75rem;
+      margin:0;
+      color:var(--text);
+      letter-spacing:0.5px;
       font-weight:800;
+      font-family:'Space Grotesk',sans-serif;
       background:linear-gradient(135deg,var(--primary),var(--secondary));
       -webkit-background-clip:text;
       -webkit-text-fill-color:transparent;
       background-clip:text;
-      position:relative;
     }
     
-    .logo-icon{
-      width:48px;
-      height:48px;
-      background:linear-gradient(135deg,var(--primary),var(--secondary));
-      border-radius:14px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:24px;
-      box-shadow:0 8px 24px rgba(99,102,241,0.3);
-      animation:float 3s ease-in-out infinite;
-    }
-    
-    @keyframes float{
-      0%,100%{transform:translateY(0px) rotate(0deg)}
-      50%{transform:translateY(-10px) rotate(5deg)}
-    }
-    
-    .header-actions{
-      margin-left:auto;
-      display:flex;
-      gap:12px;
-      align-items:center;
-    }
+    .header-actions{margin-left:auto;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
     
     .btn{
-      padding:12px 28px;
-      border-radius:12px;
-      border:none;
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      padding:12px 24px;border-radius:12px;border:none;
       background:linear-gradient(135deg,var(--primary),#7c3aed);
-      color:white;
-      font-weight:700;
-      font-size:14px;
-      cursor:pointer;
-      transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+      color:white;font-weight:700;cursor:pointer;font-size:14px;
+      transition:all 0.3s ease;white-space:nowrap;
       box-shadow:0 4px 16px rgba(99,102,241,0.25);
-      position:relative;
-      overflow:hidden;
-    }
-    
-    .btn::before{
-      content:'';
-      position:absolute;
-      top:50%;left:50%;
-      width:0;height:0;
-      border-radius:50%;
-      background:rgba(255,255,255,0.3);
-      transform:translate(-50%,-50%);
-      transition:width 0.6s,height 0.6s;
-    }
-    
-    .btn:hover::before{
-      width:300px;
-      height:300px;
     }
     
     .btn:hover{
@@ -173,26 +133,84 @@
     .btn-logout:hover{
       box-shadow:0 8px 28px rgba(239,68,68,0.4);
     }
+
+    /* Layout */
+    .main{display:flex;flex-direction:column;gap:28px;padding:32px;max-width:100%;margin:0}
     
-    /* Main Content */
-    .main{
-      padding:40px 48px;
-      display:flex;
-      flex-direction:column;
-      gap:32px;
-      max-width:1800px;
-      margin:0 auto;
-      width:100%;
+    .panel{
+      background:var(--panel);
+      border:2px solid var(--ring);
+      border-radius:20px;
+      padding:24px;
+      box-shadow:0 4px 20px var(--shadow);
+      transition:all 0.3s ease;
     }
     
-    /* Modern Cards */
-    .card{
-      background:white;
-      border:1px solid var(--border);
+    .panel:hover{
+      border-color:var(--primary);
+      box-shadow:0 8px 32px var(--shadow-lg);
+    }
+
+    /* Filters */
+    .filters-horizontal{
+      background:var(--panel);
+      border:2px solid var(--ring);
       border-radius:20px;
-      padding:32px;
+      padding:24px 28px;
       box-shadow:0 4px 20px var(--shadow);
-      transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+      gap:18px;
+      align-items:end;
+    }
+    
+    .filters-horizontal .group{display:flex;flex-direction:column;gap:8px}
+    
+    .filters-horizontal label{
+      font-size:11px;
+      color:var(--muted);
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:1px;
+    }
+    
+    .filters-horizontal select,.filters-horizontal input{
+      width:100%;
+      padding:12px 14px;
+      border-radius:12px;
+      border:2px solid var(--ring);
+      background:white;
+      color:var(--text);
+      outline:none;
+      font-size:13px;
+      font-weight:500;
+      transition:all 0.2s ease;
+    }
+    
+    .filters-horizontal select:hover,.filters-horizontal input:hover{
+      border-color:var(--primary);
+    }
+    
+    .filters-horizontal select:focus,.filters-horizontal input:focus{
+      border-color:var(--primary);
+      box-shadow:0 0 0 4px rgba(99,102,241,0.1);
+    }
+    
+    .filters-horizontal .btn{padding:12px 24px;font-size:13px}
+
+    /* Content Grid */
+    .content{display:grid;grid-template-columns:repeat(12,1fr);gap:28px}
+    
+    .card{
+      background:var(--card);
+      border:2px solid var(--ring);
+      border-radius:20px;
+      padding:28px;
+      min-height:180px;
+      display:flex;
+      flex-direction:column;
+      box-shadow:0 4px 20px var(--shadow);
+      transition:all 0.3s ease;
       position:relative;
       overflow:hidden;
     }
@@ -208,510 +226,324 @@
     }
     
     .card:hover{
-      transform:translateY(-4px);
       border-color:var(--primary);
+      transform:translateY(-4px);
       box-shadow:0 12px 40px var(--shadow-lg);
     }
     
-    .card:hover::before{
-      opacity:1;
-    }
+    .card:hover::before{opacity:1}
     
-    .card-title{
-      font-size:16px;
+    .card h3{
+      margin:0 0 16px;
+      font-size:13px;
+      color:var(--muted);
       font-weight:800;
       text-transform:uppercase;
       letter-spacing:1.5px;
-      color:var(--primary);
-      margin-bottom:24px;
-      display:flex;
-      align-items:center;
-      gap:10px;
     }
     
-    /* Filters */
-    .filters{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-      gap:16px;
-      align-items:end;
-    }
+    /* KPI Cards */
+    .kpi-hero{display:grid;grid-template-columns:240px 1fr;gap:40px;align-items:center}
     
-    .filter-group{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-    }
-    
-    .filter-label{
-      font-size:12px;
-      font-weight:700;
-      text-transform:uppercase;
-      letter-spacing:1px;
-      color:var(--muted);
-      display:flex;
-      align-items:center;
-      gap:6px;
-    }
-    
-    .filter-input,.filter-select{
-      padding:14px 16px;
-      border-radius:12px;
-      border:2px solid var(--border);
-      background:white;
-      color:var(--text);
-      font-size:14px;
-      font-weight:500;
-      transition:all 0.3s;
-      outline:none;
-    }
-    
-    .filter-input:hover,.filter-select:hover{
-      border-color:var(--primary);
-    }
-    
-    .filter-input:focus,.filter-select:focus{
-      border-color:var(--primary);
-      box-shadow:0 0 0 4px rgba(99,102,241,0.1);
-    }
-    
-    /* KPI Section */
-    .kpi-section{
-      display:grid;
-      grid-template-columns:280px 1fr;
-      gap:40px;
-      align-items:center;
-    }
-    
-    .kpi-hero{
-      width:280px;
-      height:280px;
+    .kpi-main-circle{
+      width:240px;height:240px;
       border-radius:50%;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
       background:linear-gradient(135deg,rgba(99,102,241,0.1),rgba(236,72,153,0.1));
       border:5px solid var(--primary);
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      position:relative;
       box-shadow:0 12px 48px rgba(99,102,241,0.25);
-      animation:heroGlow 3s ease-in-out infinite;
+      position:relative;
     }
     
-    @keyframes heroGlow{
-      0%,100%{box-shadow:0 12px 48px rgba(99,102,241,0.25)}
-      50%{box-shadow:0 16px 64px rgba(99,102,241,0.4)}
-    }
-    
-    .kpi-hero::before{
+    .kpi-main-circle::after{
       content:'';
       position:absolute;
-      inset:-8px;
+      inset:-12px;
       border-radius:50%;
       background:linear-gradient(135deg,var(--primary),var(--secondary));
       opacity:0.1;
       z-index:-1;
-      animation:rotate360 10s linear infinite;
+      animation:pulseRing 3s ease-in-out infinite;
     }
     
-    @keyframes rotate360{
-      from{transform:rotate(0deg)}
-      to{transform:rotate(360deg)}
+    @keyframes pulseRing{
+      0%,100%{transform:scale(0.95);opacity:0.1}
+      50%{transform:scale(1.05);opacity:0.2}
     }
     
-    .kpi-hero-label{
-      font-size:14px;
+    .kpi-main-label{
+      font-size:13px;
+      color:var(--muted);
       font-weight:800;
       text-transform:uppercase;
-      letter-spacing:2px;
-      color:var(--muted);
-      margin-bottom:16px;
+      letter-spacing:1.5px;
+      margin-bottom:12px;
     }
     
-    .kpi-hero-value{
-      font-size:80px;
+    .kpi-main-value{
+      font-size:72px;
       font-weight:900;
+      line-height:1;
       font-family:'Space Grotesk',sans-serif;
       background:linear-gradient(135deg,var(--primary),var(--secondary));
       -webkit-background-clip:text;
       -webkit-text-fill-color:transparent;
       background-clip:text;
-      line-height:1;
     }
     
-    .kpi-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-      gap:20px;
-    }
+    .kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:18px}
     
-    .kpi-card{
+    .kpi-item{
       background:white;
-      border:2px solid var(--border);
+      border:2px solid var(--ring);
       border-radius:18px;
-      padding:28px;
+      padding:24px;
       text-align:center;
-      transition:all 0.3s;
+      transition:all 0.3s ease;
       position:relative;
       box-shadow:0 4px 16px var(--shadow);
     }
     
-    .kpi-card::before{
+    .kpi-item::before{
       content:'';
       position:absolute;
       top:0;left:0;right:0;
-      height:4px;
-      background:var(--kpi-color);
-      border-radius:18px 18px 0 0;
+      height:3px;
       opacity:0;
       transition:opacity 0.3s;
+      border-radius:18px 18px 0 0;
     }
     
-    .kpi-card:hover{
-      transform:translateY(-8px) scale(1.02);
-      box-shadow:0 16px 48px var(--shadow-lg);
+    .kpi-item:hover{
+      transform:translateY(-6px) scale(1.02);
+      box-shadow:0 12px 40px var(--shadow-lg);
       border-color:var(--kpi-color);
     }
     
-    .kpi-card:hover::before{
-      opacity:1;
-    }
+    .kpi-item:hover::before{opacity:1}
     
-    .kpi-card:nth-child(1){--kpi-color:var(--accent)}
-    .kpi-card:nth-child(2){--kpi-color:var(--danger)}
-    .kpi-card:nth-child(3){--kpi-color:#7c3aed}
-    .kpi-card:nth-child(4){--kpi-color:var(--info)}
-    .kpi-card:nth-child(5){--kpi-color:var(--secondary)}
+    .kpi-item:nth-child(1){--kpi-color:var(--accent)}
+    .kpi-item:nth-child(1)::before{background:var(--accent)}
+    .kpi-item:nth-child(1) .kpi-value{color:var(--accent)}
+    
+    .kpi-item:nth-child(2){--kpi-color:var(--danger)}
+    .kpi-item:nth-child(2)::before{background:var(--danger)}
+    .kpi-item:nth-child(2) .kpi-value{color:var(--danger)}
+    
+    .kpi-item:nth-child(3){--kpi-color:#7c3aed}
+    .kpi-item:nth-child(3)::before{background:#7c3aed}
+    .kpi-item:nth-child(3) .kpi-value{color:#7c3aed}
+    
+    .kpi-item:nth-child(4){--kpi-color:#3b82f6}
+    .kpi-item:nth-child(4)::before{background:#3b82f6}
+    .kpi-item:nth-child(4) .kpi-value{color:#3b82f6}
+    
+    .kpi-item:nth-child(5){--kpi-color:var(--secondary)}
+    .kpi-item:nth-child(5)::before{background:var(--secondary)}
+    .kpi-item:nth-child(5) .kpi-value{color:var(--secondary)}
     
     .kpi-label{
-      font-size:12px;
-      font-weight:800;
+      font-size:11px;
+      color:var(--muted);
       text-transform:uppercase;
       letter-spacing:1px;
-      color:var(--muted);
-      margin-bottom:16px;
+      font-weight:800;
+      margin-bottom:14px;
     }
     
     .kpi-value{
-      font-size:48px;
+      font-size:40px;
       font-weight:900;
       font-family:'Space Grotesk',sans-serif;
-      color:var(--kpi-color);
-      margin-bottom:12px;
+      margin-bottom:10px;
       line-height:1;
     }
     
-    .kpi-subtitle{
-      font-size:13px;
-      font-weight:600;
-      color:var(--muted);
-    }
-    
-    /* Content Grid */
-    .content-grid{
-      display:grid;
-      grid-template-columns:repeat(12,1fr);
-      gap:28px;
-    }
-    
-    .span-4{grid-column:span 4}
-    .span-6{grid-column:span 6}
-    .span-8{grid-column:span 8}
-    .span-12{grid-column:span 12}
-    
-    /* States Table */
-    .states-table{
-      overflow-y:auto;
-      max-height:400px;
-      margin-top:16px;
-    }
-    
-    .state-row{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:24px;
-    }
-    
-    .state-info{
-      display:flex;
-      align-items:center;
-      gap:16px;
-    }
-    
-    .state-rank{
-      width:40px;
-      height:40px;
-      border-radius:12px;
-      background:linear-gradient(135deg,var(--primary),var(--secondary));
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:900;
-      font-size:16px;
-      color:white;
-      box-shadow:0 4px 12px rgba(99,102,241,0.3);
-    }
-    
-    .state-name-text{
-      font-weight:700;
-      font-size:16px;
-      color:var(--text);
-    }
-    
-    .state-value{
-      font-size:24px;
-      font-weight:900;
-      font-family:'Space Grotesk',sans-serif;
-      background:linear-gradient(135deg,var(--primary),var(--secondary));
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-      background-clip:text;
-    }
-    
-    .state-bar{
+    .kpi-percent{font-size:13px;color:var(--muted);font-weight:700}
+
+    /* India Map */
+    #indiaMapContainer{
       width:100%;
-      height:10px;
-      background:var(--bg);
-      border-radius:6px;
-      overflow:hidden;
-      margin-top:12px;
-      border:1px solid var(--border);
-    }
-    
-    .state-bar-fill{
-      height:100%;
-      border-radius:6px;
-      transition:width 0.8s cubic-bezier(0.4,0,0.2,1);
-    }
-    
-    /* Map Container */
-    .map-container{
+      height:700px;
       position:relative;
-      height:800px;
       border-radius:20px;
       overflow:hidden;
-      border:2px solid var(--border);
-      background:white;
-      box-shadow:0 8px 32px var(--shadow-lg);
+      border:2px solid var(--ring);
     }
     
-    #indiaMap{
-      width:100%;
-      height:100%;
-    }
+    #indiaMap{width:100%;height:100%;z-index:1}
     
     .leaflet-container{
       background:#f8fafc;
       font-family:'Outfit',sans-serif;
     }
     
-    /* Map Stats Panel */
-    .map-stats{
-      position:absolute;
-      top:20px;
-      right:20px;
-      z-index:1000;
-      background:rgba(255,255,255,0.98);
-      backdrop-filter:blur(20px);
-      border:2px solid var(--border);
-      border-radius:20px;
-      padding:28px;
-      min-width:300px;
-      box-shadow:0 12px 48px var(--shadow-xl);
-    }
-    
-    .map-stats-title{
-      font-size:16px;
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:1.5px;
-      background:linear-gradient(135deg,var(--primary),var(--secondary));
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-      background-clip:text;
-      margin-bottom:20px;
-      padding-bottom:16px;
-      border-bottom:2px solid var(--border);
-    }
-    
-    .map-stat-item{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding:16px 0;
-      border-bottom:1px solid var(--border);
-    }
-    
-    .map-stat-label{
-      font-size:13px;
-      color:var(--muted);
-      font-weight:700;
-      text-transform:uppercase;
-      letter-spacing:0.5px;
-    }
-    
-    .map-stat-value{
-      font-size:24px;
-      font-weight:900;
-      font-family:'Space Grotesk',sans-serif;
-    }
-    
-    .stat-success{color:var(--accent)}
-    .stat-danger{color:var(--danger)}
-    .stat-warning{color:var(--warning)}
-    .stat-primary{color:var(--primary)}
-    
-    /* Map Legend */
-    .map-legend{
-      position:absolute;
-      bottom:20px;
-      right:20px;
-      z-index:1000;
-      background:rgba(255,255,255,0.98);
-      backdrop-filter:blur(20px);
-      border:2px solid var(--border);
-      border-radius:20px;
-      padding:24px;
-      box-shadow:0 12px 48px var(--shadow-xl);
-    }
-    
-    .legend-title{
-      font-size:14px;
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:1.5px;
-      color:var(--primary);
-      margin-bottom:16px;
-    }
-    
-    .legend-item{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      margin:12px 0;
-      font-size:13px;
-      font-weight:700;
-      color:var(--text);
-    }
-    
-    .legend-color{
-      width:36px;
-      height:24px;
-      border-radius:8px;
-      box-shadow:0 4px 12px var(--shadow);
-      border:2px solid white;
-    }
-    
-    /* State Markers */
-    .state-marker{
-      background:rgba(255,255,255,0.98);
-      backdrop-filter:blur(10px);
-      border:3px solid;
-      border-radius:16px;
-      padding:12px 18px;
-      box-shadow:0 8px 32px rgba(0,0,0,0.15);
-      transition:all 0.3s;
-      cursor:pointer;
-      min-width:110px;
-      text-align:center;
-    }
-    
-    .state-marker:hover{
-      transform:translateY(-8px) scale(1.1);
-      box-shadow:0 20px 60px rgba(0,0,0,0.25);
-    }
-    
-    .state-name{
-      font-size:11px;
-      font-weight:800;
-      text-transform:uppercase;
-      letter-spacing:1px;
-      color:var(--muted);
-      margin-bottom:8px;
-    }
-    
-    .state-count{
-      font-size:24px;
-      font-weight:900;
-      font-family:'Space Grotesk',sans-serif;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:6px;
-    }
-    
-    .marker-level-1{border-color:#10b981;color:#10b981}
-    .marker-level-2{border-color:#22c55e;color:#22c55e}
-    .marker-level-3{border-color:#f59e0b;color:#f59e0b}
-    .marker-level-4{border-color:#f97316;color:#f97316}
-    .marker-level-5{border-color:#ef4444;color:#ef4444}
-    
-    /* Map Popup */
     .leaflet-popup-content-wrapper{
       background:white;
-      border:3px solid var(--primary);
-      border-radius:20px;
-      box-shadow:0 16px 64px var(--shadow-xl);
-    }
-    
-    .leaflet-popup-content{
-      margin:28px;
-      color:var(--text);
-      font-size:14px;
-    }
-    
-    .leaflet-popup-tip{
-      background:white;
+      border-radius:18px;
+      box-shadow:0 16px 64px rgba(99,102,241,0.3);
       border:3px solid var(--primary);
     }
     
-    .popup-state{
-      font-size:24px;
+    .leaflet-popup-content{margin:24px;font-size:14px;color:var(--text)}
+    .leaflet-popup-tip{background:white;border:3px solid var(--primary)}
+    
+    .map-popup-state{
+      font-size:20px;
       font-weight:900;
+      font-family:'Space Grotesk',sans-serif;
       background:linear-gradient(135deg,var(--primary),var(--secondary));
       -webkit-background-clip:text;
       -webkit-text-fill-color:transparent;
       background-clip:text;
-      margin-bottom:20px;
-      padding-bottom:16px;
-      border-bottom:2px solid var(--border);
+      margin-bottom:16px;
+      padding-bottom:12px;
+      border-bottom:2px solid var(--ring);
     }
     
-    .popup-row{
+    .map-popup-row{
       display:flex;
       justify-content:space-between;
       align-items:center;
-      padding:14px 0;
-      border-bottom:1px solid var(--border);
+      margin:12px 0;
+      padding:10px 0;
     }
     
-    .popup-label{
+    .map-popup-label{
       font-size:12px;
       color:var(--muted);
-      font-weight:700;
       text-transform:uppercase;
-      letter-spacing:0.5px;
+      letter-spacing:0.6px;
+      font-weight:700;
     }
     
-    .popup-value{
+    .map-popup-value{
       font-size:22px;
       font-weight:900;
       font-family:'Space Grotesk',sans-serif;
       color:var(--text);
     }
     
-    /* Footer */
-    .footer{
-      padding:24px 48px;
-      border-top:1px solid var(--border);
-      text-align:center;
-      color:var(--muted);
-      font-size:14px;
-      font-weight:600;
+    .map-popup-success{color:var(--accent)!important}
+    .map-popup-pending{color:#7c3aed!important}
+    .map-popup-rejected{color:var(--danger)!important}
+    
+    .state-marker-pin{position:relative;width:60px;height:60px;display:flex;align-items:center;justify-content:center}
+    
+    .state-marker-inner{
+      position:relative;z-index:2;
       background:white;
+      border-radius:14px;
+      padding:10px 14px;
+      box-shadow:0 10px 32px rgba(99,102,241,0.3);
+      border:3px solid;
+      font-weight:900;
+      font-size:15px;
+      text-align:center;
+      min-width:90px;
+      transition:all 0.3s ease;
+      cursor:pointer;
     }
     
+    .state-marker-inner:hover{
+      transform:translateY(-6px) scale(1.08);
+      box-shadow:0 16px 48px rgba(99,102,241,0.5);
+    }
+    
+    .state-marker-name{
+      font-size:10px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:0.6px;
+      margin-bottom:5px;
+    }
+    
+    .state-marker-count{
+      font-size:19px;
+      font-weight:900;
+      font-family:'Space Grotesk',sans-serif;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:5px;
+    }
+    
+    .marker-ripple{
+      position:absolute;
+      width:100%;
+      height:100%;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(99,102,241,0.3) 0%, rgba(99,102,241,0) 70%);
+      animation:ripple 2.5s ease-in-out infinite;
+      z-index:1;
+    }
+    
+    @keyframes ripple{
+      0%{transform:scale(0.8);opacity:0.7}
+      50%{transform:scale(1.3);opacity:0.3}
+      100%{transform:scale(0.8);opacity:0.7}
+    }
+    
+    .state-marker-level-1{border-color:var(--accent)}
+    .state-marker-level-1 .state-marker-count{color:var(--accent)}
+    .state-marker-level-2{border-color:#22c55e}
+    .state-marker-level-2 .state-marker-count{color:#22c55e}
+    .state-marker-level-3{border-color:var(--warning)}
+    .state-marker-level-3 .state-marker-count{color:var(--warning)}
+    .state-marker-level-4{border-color:#f97316}
+    .state-marker-level-4 .state-marker-count{color:#f97316}
+    .state-marker-level-5{border-color:var(--danger)}
+    .state-marker-level-5 .state-marker-count{color:var(--danger)}
+    
+    .legend{
+      position:absolute;
+      bottom:24px;
+      right:24px;
+      background:rgba(255,255,255,0.98);
+      backdrop-filter:blur(20px);
+      padding:24px;
+      border-radius:18px;
+      box-shadow:0 12px 40px var(--shadow-lg);
+      border:2px solid var(--ring);
+      z-index:1000;
+    }
+    
+    .legend-title{
+      font-size:14px;
+      font-weight:900;
+      color:var(--text);
+      margin-bottom:16px;
+      text-transform:uppercase;
+      letter-spacing:1.2px;
+    }
+    
+    .legend-item{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin:10px 0;
+      font-size:13px;
+      font-weight:700;
+    }
+    
+    .legend-color{
+      width:32px;
+      height:22px;
+      border-radius:8px;
+      border:2px solid var(--border);
+      box-shadow:0 3px 10px var(--shadow);
+    }
+
+    .footer{
+      padding:20px 32px;
+      color:var(--muted);
+      border-top:2px solid var(--ring);
+      text-align:center;
+      font-size:14px;
+      background:var(--panel);
+      font-weight:600;
+    }
+
     /* Login */
     .overlay{
       position:fixed;
@@ -719,93 +551,81 @@
       background:linear-gradient(135deg,rgba(99,102,241,0.95),rgba(236,72,153,0.95));
       display:grid;
       place-items:center;
-      z-index:200;
+      z-index:100;
       backdrop-filter:blur(20px);
     }
     
-    .login-card{
-      width:min(90vw,500px);
+    .login{
+      width:min(92vw,460px);
       background:white;
       border:3px solid rgba(255,255,255,0.5);
-      border-radius:32px;
+      border-radius:28px;
       padding:48px;
       box-shadow:0 32px 96px rgba(0,0,0,0.3);
-      animation:slideUp 0.6s cubic-bezier(0.4,0,0.2,1);
+      animation:slideIn 0.6s ease;
     }
     
-    @keyframes slideUp{
-      from{opacity:0;transform:translateY(50px) scale(0.95)}
-      to{opacity:1;transform:translateY(0) scale(1)}
+    @keyframes slideIn{
+      from{opacity:0;transform:translateY(30px)}
+      to{opacity:1;transform:translateY(0)}
     }
     
-    .login-title{
-      font-size:36px;
+    .login h2{
+      margin:0 0 10px;
+      font-size:32px;
       font-weight:900;
       font-family:'Space Grotesk',sans-serif;
       background:linear-gradient(135deg,var(--primary),var(--secondary));
       -webkit-background-clip:text;
       -webkit-text-fill-color:transparent;
       background-clip:text;
-      margin-bottom:12px;
     }
     
-    .login-subtitle{
-      color:var(--muted);
-      margin-bottom:32px;
-      font-size:15px;
-      font-weight:500;
-    }
+    .login p{margin:0 0 28px;color:var(--muted);font-size:15px;font-weight:500}
     
-    .login-field{
-      margin-bottom:24px;
-    }
+    .field{display:flex;flex-direction:column;gap:10px;margin:18px 0}
     
-    .login-label{
-      display:block;
+    .field label{
       font-size:13px;
-      font-weight:700;
       color:var(--text);
-      margin-bottom:8px;
-      text-transform:uppercase;
-      letter-spacing:1px;
+      font-weight:700;
+      letter-spacing:0.5px;
     }
     
-    .login-input{
-      width:100%;
+    .field input{
       padding:16px;
       border-radius:12px;
-      border:2px solid var(--border);
+      border:2px solid var(--ring);
       background:white;
       color:var(--text);
       font-size:15px;
-      transition:all 0.3s;
-      outline:none;
+      transition:all 0.2s ease;
     }
     
-    .login-input:focus{
+    .field input:focus{
+      outline:none;
       border-color:var(--primary);
       box-shadow:0 0 0 4px rgba(99,102,241,0.1);
     }
     
-    .login-error{
-      color:var(--danger);
-      font-size:14px;
-      font-weight:700;
-      margin-top:16px;
-      min-height:20px;
+    .err{color:var(--danger);font-size:14px;min-height:20px;margin-top:10px;font-weight:600}
+
+    @media (max-width: 1100px){
+      .kpi-hero{grid-template-columns:1fr}
+      .kpi-main-circle{margin:0 auto}
+      .kpi-grid{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+      .filters-horizontal{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+      #indiaMapContainer{height:500px}
     }
     
-    @media (max-width:1200px){
-      .kpi-section{grid-template-columns:1fr}
-      .kpi-hero{margin:0 auto}
-      .span-4,.span-6,.span-8,.span-12{grid-column:span 12}
-    }
-    
-    @media (max-width:768px){
-      .bar,.main{padding:16px 24px}
-      .filters{grid-template-columns:1fr}
-      .map-container{height:500px}
-      .map-stats,.map-legend{position:relative;top:auto;right:auto;bottom:auto;left:auto;margin-top:16px}
+    @media (max-width: 640px){
+      .bar{padding:16px 20px}
+      .main{padding:20px;gap:20px}
+      .kpi-grid{grid-template-columns:1fr}
+      .header-actions{width:100%;justify-content:flex-start}
+      #indiaMapContainer{height:400px}
+      .filters-horizontal{grid-template-columns:1fr}
+      .title{font-size:1.5rem}
     }
   </style>
 </head>
@@ -814,246 +634,211 @@
   <header>
     <div class="bar">
       <div class="logo">
-        <div class="logo-icon">📊</div>
-        <span>Coromandel CPC Analytics</span>
+        <span class="dot"></span>
+        <h1 class="title">Coromandel CPC Campaign Dashboard</h1>
       </div>
       <div class="header-actions">
-        <button class="btn" id="downloadBtn">📥 Export Data</button>
-        <button class="btn btn-logout" id="logoutBtn">🚪 Logout</button>
+        <button class="btn" id="downloadBtn">📥 Download Data</button>
+        <button class="btn btn-logout" id="logoutBtn">🔒 Logout</button>
       </div>
     </div>
   </header>
 
   <main class="main">
-    <!-- Filters -->
-    <div class="card">
-      <div class="filters">
-        <div class="filter-group">
-          <label class="filter-label">📅 Date Range</label>
-          <input id="dateRange" class="filter-input" placeholder="Select date range" />
-        </div>
-        
-        <div class="filter-group" style="display:none">
-          <input id="dateFrom" type="date" />
-          <input id="dateTo" type="date" />
-        </div>
+    <!-- Horizontal Filters -->
+    <div class="filters-horizontal">
+      <div class="group">
+        <label for="dateRange">📅 Date Range</label>
+        <input id="dateRange" placeholder="Select range" />
+      </div>
 
-        <div class="filter-group">
-          <label class="filter-label">🌍 State</label>
-          <select id="state" class="filter-select"></select>
-        </div>
+      <div class="group" style="display:none">
+        <label for="dateFrom">Date From</label>
+        <input id="dateFrom" type="date" />
+      </div>
+      <div class="group" style="display:none">
+        <label for="dateTo">Date To</label>
+        <input id="dateTo" type="date" />
+      </div>
 
-        <div class="filter-group">
-          <label class="filter-label">📍 District</label>
-          <select id="district" class="filter-select"></select>
-        </div>
+      <div class="group">
+        <label for="state">🌍 State</label>
+        <select id="state"></select>
+      </div>
+      <div class="group">
+        <label for="district">📍 District</label>
+        <select id="district"></select>
+      </div>
+      <div class="group">
+        <label for="retailer">🏪 Retailer</label>
+        <select id="retailer"></select>
+      </div>
+      <div class="group">
+        <label for="product">📦 Product</label>
+        <select id="product"></select>
+      </div>
 
-        <div class="filter-group">
-          <label class="filter-label">🏪 Retailer</label>
-          <select id="retailer" class="filter-select"></select>
-        </div>
+      <div class="group">
+        <label for="unit">📏 Quantity Unit</label>
+        <select id="unit"></select>
+      </div>
 
-        <div class="filter-group">
-          <label class="filter-label">📦 Product</label>
-          <select id="product" class="filter-select"></select>
-        </div>
-
-        <div class="filter-group">
-          <label class="filter-label">📏 Unit</label>
-          <select id="unit" class="filter-select"></select>
-        </div>
-
-        <div class="filter-group">
-          <label class="filter-label">🔢 Min Qty</label>
-          <input id="qtyMin" class="filter-input" type="number" min="0" placeholder="0" />
-        </div>
-
-        <div class="filter-group">
-          <label class="filter-label">✅ Status</label>
-          <select id="status" class="filter-select"></select>
-        </div>
-
-        <div class="filter-group">
-          <button class="btn" id="resetBtn" style="width:100%">🔄 Reset All</button>
-        </div>
+      <div class="group">
+        <label for="qtyMin">🔢 Quantity (≥)</label>
+        <input id="qtyMin" type="number" min="0" step="1" placeholder="0" />
+      </div>
+      <div class="group">
+        <label for="status">✅ Status</label>
+        <select id="status"></select>
+      </div>
+      <div class="group" style="display:flex;align-items:flex-end">
+        <button class="btn" id="resetBtn" style="width:100%">🔄 Reset</button>
       </div>
     </div>
 
-    <!-- KPIs -->
-    <div class="card">
-      <h2 class="card-title">📊 Performance Overview</h2>
-      <div class="kpi-section">
+    <section class="content">
+      <!-- Total Scans with Hero Design -->
+      <div class="card" style="grid-column: span 12">
+        <h3>📊 Campaign Performance Overview</h3>
         <div class="kpi-hero">
-          <div class="kpi-hero-label">Total Scans</div>
-          <div class="kpi-hero-value" id="kpiTotal">0</div>
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi-card">
-            <div class="kpi-label">✅ Approved</div>
-            <div class="kpi-value" id="kpiApproved">0</div>
-            <div class="kpi-subtitle" id="kpiApprovedPct">0%</div>
+          <div class="kpi-main-circle">
+            <div class="kpi-main-label">Total Scans</div>
+            <div class="kpi-main-value" id="kpiTotalBig">0</div>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-label">❌ Rejected</div>
-            <div class="kpi-value" id="kpiRejected">0</div>
-            <div class="kpi-subtitle" id="kpiRejectedPct">0%</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">⏳ Pending</div>
-            <div class="kpi-value" id="kpiPending">0</div>
-            <div class="kpi-subtitle" id="kpiPendingPct">0%</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">👨‍🌾 Farmers</div>
-            <div class="kpi-value" id="kpiFarmers">0</div>
-            <div class="kpi-subtitle" id="kpiFarmersUnique">Unique: 0</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">🏪 Retailers</div>
-            <div class="kpi-value" id="kpiRetailers">0</div>
-            <div class="kpi-subtitle" id="kpiRetailersTotal">of 0</div>
+          <div class="kpi-grid">
+            <div class="kpi-item">
+              <div class="kpi-label">✅ Approved</div>
+              <div class="kpi-value" id="kpiYes">0</div>
+              <div class="kpi-percent" id="kpiYesPct">0%</div>
+            </div>
+            <div class="kpi-item">
+              <div class="kpi-label">❌ Rejected</div>
+              <div class="kpi-value" id="kpiNo">0</div>
+              <div class="kpi-percent" id="kpiNoPct">0%</div>
+            </div>
+            <div class="kpi-item">
+              <div class="kpi-label">⏳ Pending</div>
+              <div class="kpi-value" id="kpiPending">0</div>
+              <div class="kpi-percent" id="kpiPendingPct">0%</div>
+            </div>
+            <div class="kpi-item">
+              <div class="kpi-label">👨‍🌾 Total Farmers</div>
+              <div class="kpi-value" id="kpiTotalFarmers">0</div>
+              <div class="kpi-percent" id="kpiUniqueFarmers">Unique: 0</div>
+            </div>
+            <div class="kpi-item">
+              <div class="kpi-label">🏪 Retailers</div>
+              <div class="kpi-value" id="kpiActiveRetailers">0</div>
+              <div class="kpi-percent" id="kpiTotalRetailers">of 0 total</div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Charts Grid -->
-    <div class="content-grid">
-      <div class="card span-4">
-        <h3 class="card-title">📈 Approval Status</h3>
+      <!-- Status Chart -->
+      <div class="card" style="grid-column: span 4">
+        <h3>📈 Order Approval Status</h3>
         <canvas id="statusChart" height="280"></canvas>
       </div>
 
-      <div class="card span-8">
-        <h3 class="card-title">📅 Daily Trend</h3>
+      <!-- Trend Chart -->
+      <div class="card" style="grid-column: span 8">
+        <h3>📅 Time Trend (Scans per Day)</h3>
         <canvas id="trendChart" height="280"></canvas>
       </div>
 
-      <div class="card span-6">
-        <h3 class="card-title">🌍 Top States</h3>
-        <div class="states-table" id="statesTable"></div>
+      <!-- Top States Table -->
+      <div class="card" style="grid-column: span 6">
+        <h3>🌍 States by Scans</h3>
+        <div id="statesTable" style="overflow-y:auto;max-height:380px;margin-top:12px"></div>
       </div>
 
-      <div class="card span-6">
-        <h3 class="card-title">🏪 Retailer Performance</h3>
+      <!-- Retailer Performance -->
+      <div class="card" style="grid-column: span 6">
+        <h3>🏪 Retailer Performance</h3>
         <canvas id="retailerChart" height="240"></canvas>
       </div>
 
-      <div class="card span-6">
-        <h3 class="card-title">📍 District Analysis</h3>
-        <canvas id="districtChart" height="200"></canvas>
+      <!-- District Scans -->
+      <div class="card" style="grid-column: span 6">
+        <h3>📍 District-wise Scans</h3>
+        <canvas id="districtChart" height="180"></canvas>
       </div>
 
-      <div class="card span-6">
-        <h3 class="card-title">📦 Product Mix</h3>
-        <canvas id="productChart" height="200"></canvas>
+      <!-- Product Basket -->
+      <div class="card" style="grid-column: span 6">
+        <h3>📦 Product Basket</h3>
+        <canvas id="productChart" height="180"></canvas>
       </div>
 
       <!-- India Map -->
-      <div class="card span-12">
-        <h3 class="card-title">🗺️ Geographic Distribution</h3>
-        <div class="map-container">
+      <div class="card" style="grid-column: span 12">
+        <h3>🗺️ India - State-wise Distribution</h3>
+        <div id="indiaMapContainer">
           <div id="indiaMap"></div>
-          
-          <!-- Map Stats Panel -->
-          <div class="map-stats">
-            <div class="map-stats-title">Live Statistics</div>
-            <div class="map-stat-item">
-              <span class="map-stat-label">🌍 Active States</span>
-              <span class="map-stat-value stat-primary" id="mapActiveStates">0</span>
-            </div>
-            <div class="map-stat-item">
-              <span class="map-stat-label">✅ Approved</span>
-              <span class="map-stat-value stat-success" id="mapApproved">0</span>
-            </div>
-            <div class="map-stat-item">
-              <span class="map-stat-label">⏳ Pending</span>
-              <span class="map-stat-value stat-warning" id="mapPending">0</span>
-            </div>
-            <div class="map-stat-item">
-              <span class="map-stat-label">❌ Rejected</span>
-              <span class="map-stat-value stat-danger" id="mapRejected">0</span>
-            </div>
-          </div>
-
-          <!-- Legend -->
-          <div class="map-legend">
-            <div class="legend-title">Approval Tiers</div>
-            <div class="legend-item">
-              <div class="legend-color" style="background:#10b981"></div>
-              <span>Elite (1000+)</span>
-            </div>
-            <div class="legend-item">
-              <div class="legend-color" style="background:#22c55e"></div>
-              <span>High (500-999)</span>
-            </div>
-            <div class="legend-item">
-              <div class="legend-color" style="background:#f59e0b"></div>
-              <span>Medium (250-499)</span>
-            </div>
-            <div class="legend-item">
-              <div class="legend-color" style="background:#f97316"></div>
-              <span>Growing (100-249)</span>
-            </div>
-            <div class="legend-item">
-              <div class="legend-color" style="background:#ef4444"></div>
-              <span>Emerging (1-99)</span>
-            </div>
+          <div class="legend">
+            <div class="legend-title">Approval Levels</div>
+            <div class="legend-item"><div class="legend-color" style="background:#10b981;border-color:#10b981"></div><span>Elite (1000+)</span></div>
+            <div class="legend-item"><div class="legend-color" style="background:#22c55e;border-color:#22c55e"></div><span>High (500-999)</span></div>
+            <div class="legend-item"><div class="legend-color" style="background:#f59e0b;border-color:#f59e0b"></div><span>Medium (250-499)</span></div>
+            <div class="legend-item"><div class="legend-color" style="background:#f97316;border-color:#f97316"></div><span>Growing (100-249)</span></div>
+            <div class="legend-item"><div class="legend-color" style="background:#ef4444;border-color:#ef4444"></div><span>Emerging (1-99)</span></div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   </main>
 
   <div class="footer">
-    ⚡ Powered by Coromandel CPC Analytics Engine • Real-time Campaign Intelligence
+    ✨ © 2025 Coromandel CPC — Empowering Agriculture through Innovation ✨
   </div>
 </div>
 
-<!-- Login -->
+<!-- Login Overlay -->
 <div class="overlay" id="loginOverlay">
-  <form class="login-card" id="loginForm">
-    <h2 class="login-title">🔐 Secure Access</h2>
-    <p class="login-subtitle">Enter your credentials to access the analytics hub</p>
-    <div class="login-field">
-      <label class="login-label">Username</label>
-      <input id="username" class="login-input" autocomplete="username" placeholder="Enter username" />
+  <form class="login" id="loginForm">
+    <h2>🔐 Secure Access</h2>
+    <p>Please authenticate to view the campaign dashboard.</p>
+    <div class="field">
+      <label>👤 Username</label>
+      <input id="u" autocomplete="username" placeholder="Enter username" />
     </div>
-    <div class="login-field">
-      <label class="login-label">Password</label>
-      <input id="password" class="login-input" type="password" autocomplete="current-password" placeholder="Enter password" />
+    <div class="field">
+      <label>🔑 Password</label>
+      <input id="p" type="password" autocomplete="current-password" placeholder="Enter password" />
     </div>
-    <button class="btn" type="submit" style="width:100%;margin-top:8px">Login to Dashboard</button>
-    <div class="login-error" id="loginError"></div>
+    <button class="btn" type="submit" style="width:100%;margin-top:12px">Login</button>
+    <div class="err" id="err"></div>
   </form>
 </div>
 
 <script>
   const CSV_URL = './data.csv';
-  const VALID_USER = 'digicides';
-  const VALID_PASS = 'coro@cpc';
-  const LS_KEY = 'cpc_login_ok';
 
   // Login
+  const VALID_USER = 'digicides';
+  const VALID_PASS = 'coro@cpc';
   const overlay = document.getElementById('loginOverlay');
-  const loginForm = document.getElementById('loginForm');
-  const loginError = document.getElementById('loginError');
+  const form = document.getElementById('loginForm');
+  const errEl = document.getElementById('err');
+  const LS_KEY = 'cpc_login_ok';
 
   function unlock(){ overlay.style.display='none'; }
   if(localStorage.getItem(LS_KEY)==='1'){ unlock(); }
-
-  loginForm.addEventListener('submit', (e)=>{
+  
+  form.addEventListener('submit', (e)=>{
     e.preventDefault();
-    const u = document.getElementById('username').value.trim();
-    const p = document.getElementById('password').value;
+    const u = document.getElementById('u').value.trim();
+    const p = document.getElementById('p').value;
     if(u===VALID_USER && p===VALID_PASS){
       localStorage.setItem(LS_KEY,'1');
       unlock();
     } else {
-      loginError.textContent = '❌ Invalid credentials. Please try again.';
+      errEl.textContent = 'Invalid credentials. Please try again.';
     }
   });
 
+  // Logout
   document.getElementById('logoutBtn').addEventListener('click', ()=>{
     if(confirm('Are you sure you want to logout?')){
       localStorage.removeItem(LS_KEY);
@@ -1120,7 +905,7 @@
   const selUnit = document.getElementById('unit');
   const inpQtyMin = document.getElementById('qtyMin');
   const selStatus = document.getElementById('status');
-
+  
   flatpickr("#dateRange",{
     mode:"range",
     dateFormat:"Y-m-d",
@@ -1145,6 +930,7 @@
     render();
   });
 
+  // Download CSV
   document.getElementById('downloadBtn').addEventListener('click', ()=>{
     const filtered = applyFilters(RAW);
     if(filtered.length === 0){ alert('No data to download!'); return; }
@@ -1153,7 +939,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'cpc_export_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.download = 'cpc_data_export_' + new Date().toISOString().slice(0,10) + '.csv';
     a.click();
     URL.revokeObjectURL(url);
   });
@@ -1171,13 +957,13 @@
     charts[id] = new Chart(ctx, { type, data, options: opts });
     return charts[id];
   }
-
-  const chartColors = ['#6366f1','#ec4899','#10b981','#f59e0b','#3b82f6','#8b5cf6','#14b8a6','#f97316'];
   function palette(n){
-    const arr = []; for(let i=0;i<n;i++) arr.push(chartColors[i%chartColors.length]);
+    const base = ['#6366f1','#ec4899','#10b981','#f59e0b','#3b82f6','#8b5cf6','#14b8a6','#f97316'];
+    const arr = []; for(let i=0;i<n;i++) arr.push(base[i%base.length]);
     return arr;
   }
 
+  // Apply Filters
   function applyFilters(rows){
     const f = FILTERS;
     return rows.filter(r=>{
@@ -1220,13 +1006,15 @@
     const yes = rows.filter(r=>/^yes$/i.test(trim(r['Submission Status']))).length;
     const pending = rows.filter(r=>/^pending$/i.test(trim(r['Submission Status']))).length;
     const no = rows.filter(r=>/^no$/i.test(trim(r['Submission Status']))).length;
-
+    
     const allPhones = rows.map(r=>trim(r['Phone Number'])).filter(p=>p);
     const uniquePhones = new Set(allPhones);
-
+    const totalFarmers = allPhones.length;
+    const uniqueFarmers = uniquePhones.size;
+    
     const activeRINs = new Set(rows.map(r=>trim(r['RIN'])).filter(rin=>rin));
     const activeRetailers = activeRINs.size;
-
+    
     const STATE_RETAILER_TOTALS = {
       'West Bengal': 183,
       'Maharashtra': 616,
@@ -1244,22 +1032,22 @@
         totalRetailers = stateRetailerRINs.size;
       }
     }
-
-    document.getElementById('kpiTotal').textContent = total.toLocaleString();
-    document.getElementById('kpiApproved').textContent = yes.toLocaleString();
-    document.getElementById('kpiRejected').textContent = no.toLocaleString();
+    
+    document.getElementById('kpiTotalBig').textContent = total.toLocaleString();
+    document.getElementById('kpiYes').textContent = yes.toLocaleString();
+    document.getElementById('kpiNo').textContent = no.toLocaleString();
     document.getElementById('kpiPending').textContent = pending.toLocaleString();
-    document.getElementById('kpiFarmers').textContent = allPhones.length.toLocaleString();
-    document.getElementById('kpiFarmersUnique').textContent = `Unique: ${uniquePhones.size.toLocaleString()}`;
-    document.getElementById('kpiRetailers').textContent = activeRetailers.toLocaleString();
-    document.getElementById('kpiRetailersTotal').textContent = `of ${totalRetailers.toLocaleString()}`;
-
+    document.getElementById('kpiTotalFarmers').textContent = totalFarmers.toLocaleString();
+    document.getElementById('kpiUniqueFarmers').textContent = `Unique: ${uniqueFarmers.toLocaleString()}`;
+    document.getElementById('kpiActiveRetailers').textContent = activeRetailers.toLocaleString();
+    document.getElementById('kpiTotalRetailers').textContent = `of ${totalRetailers.toLocaleString()} total`;
+    
     const yesPct = total > 0 ? ((yes / total) * 100).toFixed(1) : '0.0';
     const noPct = total > 0 ? ((no / total) * 100).toFixed(1) : '0.0';
     const pendingPct = total > 0 ? ((pending / total) * 100).toFixed(1) : '0.0';
-
-    document.getElementById('kpiApprovedPct').textContent = `${yesPct}% of total`;
-    document.getElementById('kpiRejectedPct').textContent = `${noPct}% of total`;
+    
+    document.getElementById('kpiYesPct').textContent = `${yesPct}% of total`;
+    document.getElementById('kpiNoPct').textContent = `${noPct}% of total`;
     document.getElementById('kpiPendingPct').textContent = `${pendingPct}% of total`;
   }
 
@@ -1274,28 +1062,22 @@
 
   function renderStatesTable(rows){
     const states = buildCounts(rows, 'State').slice(0, 10);
-    let html = '';
+    let html = '<div style="font-size:13px">';
     states.forEach((s, i)=>{
       const bar = Math.round((s[1] / (states[0][1] || 1)) * 100);
-      const gradients = [
-        'linear-gradient(135deg,#6366f1,#8b5cf6)',
-        'linear-gradient(135deg,#ec4899,#f43f5e)',
-        'linear-gradient(135deg,#10b981,#14b8a6)',
-        'linear-gradient(135deg,#f59e0b,#f97316)',
-        'linear-gradient(135deg,#3b82f6,#6366f1)'
-      ];
-      const grad = gradients[i % gradients.length];
-      html += `<div class="state-row">
-        <div class="state-info">
-          <div class="state-rank">${i+1}</div>
-          <div class="state-name-text">${s[0]}</div>
+      const colors = ['#6366f1','#ec4899','#10b981','#f59e0b','#3b82f6','#8b5cf6','#14b8a6','#f97316'];
+      const color = colors[i % colors.length];
+      html += `<div style="margin-bottom:18px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+          <span style="font-weight:700;color:var(--text)">${i+1}. ${s[0]}</span>
+          <span style="color:${color};font-weight:800;font-family:'Space Grotesk',sans-serif">${s[1].toLocaleString()}</span>
         </div>
-        <div class="state-value">${s[1].toLocaleString()}</div>
-      </div>
-      <div class="state-bar">
-        <div class="state-bar-fill" style="width:${bar}%;background:${grad}"></div>
+        <div style="width:100%;height:10px;background:var(--bg);border-radius:6px;overflow:hidden;border:1px solid var(--ring)">
+          <div style="width:${bar}%;height:100%;background:${color};border-radius:6px;transition:width .3s ease"></div>
+        </div>
       </div>`;
     });
+    html += '</div>';
     document.getElementById('statesTable').innerHTML = html;
   }
 
@@ -1303,13 +1085,12 @@
     const sYes = rows.filter(r=>/^yes$/i.test(trim(r['Submission Status']))).length;
     const sNo = rows.filter(r=>/^no$/i.test(trim(r['Submission Status']))).length;
     const sPending = rows.filter(r=>/^pending$/i.test(trim(r['Submission Status']))).length;
-    
     makeChart('statusChart','doughnut',{
       labels:['Approved','Rejected','Pending'],
       datasets:[{ 
         data:[sYes,sNo,sPending], 
         backgroundColor:['#10b981','#ef4444','#f59e0b'], 
-        borderWidth: 3,
+        borderWidth: 4,
         borderColor: '#fff',
         hoverOffset: 10
       }]
@@ -1321,9 +1102,38 @@
           labels:{ 
             color: '#0f172a', 
             padding: 20, 
-            font:{ size: 13, weight: '700' },
-            usePointStyle: true
+            font:{ size: 13, weight: '800' },
+            usePointStyle: true,
+            pointStyle: 'circle',
+            generateLabels: function(chart) {
+              const data = chart.data;
+              if (data.labels.length && data.datasets.length) {
+                return data.labels.map((label, i) => {
+                  const value = data.datasets[0].data[i];
+                  const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                  const percent = ((value / total) * 100).toFixed(1);
+                  return {
+                    text: `${label}: ${value.toLocaleString()} (${percent}%)`,
+                    fillStyle: data.datasets[0].backgroundColor[i],
+                    hidden: false,
+                    index: i
+                  };
+                });
+              }
+              return [];
+            }
           } 
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const label = context.label || '';
+              const value = context.parsed || 0;
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const percent = ((value / total) * 100).toFixed(1);
+              return `${label}: ${value.toLocaleString()} (${percent}%)`;
+            }
+          }
         }
       },
       cutout:'65%'
@@ -1337,7 +1147,7 @@
       datasets:[{ 
         data: trend.map(x=>x[1]), 
         borderColor:'#6366f1',
-        backgroundColor:'rgba(99,102,241,0.1)',
+        backgroundColor:'rgba(99,102,241,0.15)',
         borderWidth:3, 
         tension:.4,
         fill:true,
@@ -1349,8 +1159,8 @@
       }]
     },{ 
       scales:{ 
-        x:{ ticks:{ color:'#64748b', font:{size:11} }, grid:{color:'#e2e8f0'} }, 
-        y:{ ticks:{ color:'#64748b', font:{size:11} }, grid:{ color:'#e2e8f0' } } 
+        x:{ ticks:{ color:'#64748b', maxRotation:45, font:{weight:'600'} }, grid:{color:'#e2e8f0'} }, 
+        y:{ ticks:{ color:'#64748b', font:{weight:'600'} }, grid:{ color:'#e2e8f0' } } 
       }, 
       plugins:{ legend:{ display:false } } 
     });
@@ -1363,15 +1173,38 @@
     makeChart('retailerChart','bar',{
       labels: retailers.map(x=>x[0]),
       datasets:[
-        { label: 'Approved', data: retailerApproved, backgroundColor: '#10b981', borderRadius: 8 },
-        { label: 'Pending',  data: retailerPending,  backgroundColor: '#f59e0b', borderRadius: 8 },
-        { label: 'Rejected', data: retailerRejected, backgroundColor: '#ef4444', borderRadius: 8 }
+        { label: 'Approved', data: retailerApproved, backgroundColor: '#10b981', borderRadius: 10, barThickness: 22 },
+        { label: 'Pending',  data: retailerPending,  backgroundColor: '#f59e0b', borderRadius: 10, barThickness: 22 },
+        { label: 'Rejected', data: retailerRejected, backgroundColor: '#ef4444', borderRadius: 10, barThickness: 22 }
       ]
     },{ 
-      plugins: { legend: { display: true, position: 'top', labels: { color: '#0f172a', font:{size:12,weight:'700'}, usePointStyle:true } } }, 
+      plugins: { 
+        legend: { 
+          display: true, 
+          position: 'top', 
+          labels: { 
+            color: '#0f172a', 
+            padding: 16, 
+            font: { size: 13, weight: '700' }, 
+            usePointStyle: true, 
+            pointStyle: 'circle' 
+          } 
+        } 
+      }, 
       scales: { 
-        x: { ticks: { color: '#64748b', maxRotation: 45, font:{size:10} }, grid: { display: false } }, 
-        y: { ticks: { color: '#64748b' }, grid: { color: '#e2e8f0' } } 
+        x: { 
+          ticks: { 
+            color: '#0f172a', 
+            maxRotation: 45, 
+            minRotation: 25, 
+            font: { size: 11, weight: '700' } 
+          }, 
+          grid: { display: false } 
+        }, 
+        y: { 
+          ticks: { color: '#64748b', font: { weight: '600' } }, 
+          grid: { color: '#e2e8f0' } 
+        } 
       } 
     });
 
@@ -1388,7 +1221,7 @@
       indexAxis:'y', 
       plugins:{ legend:{ display:false } }, 
       scales:{ 
-        x:{ ticks:{ color:'#64748b' }, grid:{color:'#e2e8f0'} }, 
+        x:{ ticks:{ color:'#64748b', font:{weight:'600'} }, grid:{color:'#e2e8f0'} }, 
         y:{ ticks:{ color:'#0f172a',font:{size:11,weight:'700'} }, grid:{display:false} } 
       } 
     });
@@ -1398,7 +1231,7 @@
       const m = parseProducts(r['Cart Items']);
       for(const [name,qty] of m){ pMap.set(name,(pMap.get(name)||0)+qty); }
     }
-    const pArr = [...pMap.entries()].sort((a,b)=>b[1]-a[1]).slice(0,12);
+    const pArr = [...pMap.entries()].sort((a,b)=>b[1]-a[1]).slice(0,16);
     makeChart('productChart','bar',{
       labels: pArr.map(x=>x[0]),
       datasets:[{ 
@@ -1410,8 +1243,19 @@
     },{ 
       plugins:{ legend:{ display:false } }, 
       scales:{ 
-        x:{ ticks:{ color:'#0f172a', maxRotation:45, font:{size:10,weight:'700'} }, grid:{display:false} }, 
-        y:{ ticks:{ color:'#64748b' }, grid:{color:'#e2e8f0'} } 
+        x:{ 
+          ticks:{ 
+            color:'#0f172a', 
+            maxRotation:45, 
+            minRotation:20, 
+            font:{size:11,weight:'700'} 
+          }, 
+          grid:{display:false} 
+        }, 
+        y:{ 
+          ticks:{ color:'#64748b', font:{weight:'600'} }, 
+          grid:{color:'#e2e8f0'} 
+        } 
       } 
     });
   }
@@ -1470,31 +1314,34 @@
 
   function getMarkerIcon(state, approved) {
     const level = getMarkerLevel(approved);
-    const shortName = state.length > 12 ? state.substring(0, 10) + '...' : state;
+    const shortName = state.length > 12 ? state.substring(0, 10) + '.' : state;
     
     return L.divIcon({
-      className: 'state-marker',
+      className: 'state-marker-pin',
       html: `
-        <div class="state-marker marker-level-${level}">
-          <div class="state-name">${shortName}</div>
-          <div class="state-count">
+        <div class="marker-ripple"></div>
+        <div class="state-marker-inner state-marker-level-${level}">
+          <div class="state-marker-name">${shortName}</div>
+          <div class="state-marker-count">
             <span>✓</span>
             <span>${approved.toLocaleString()}</span>
           </div>
         </div>
       `,
       iconSize: [null, null],
-      iconAnchor: [55, 45]
+      iconAnchor: [45, 40]
     });
+  }
+
+  function getApprovalRate(approved, total) {
+    if (total === 0) return 0;
+    return (approved / total * 100).toFixed(1);
   }
 
   function initMap() {
     if (indiaMap) return;
     indiaMap = L.map('indiaMap', { center: [22.5, 82.5], zoom: 5, minZoom: 4, maxZoom: 8, zoomControl: true });
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
-      attribution: '© OpenStreetMap',
-      maxZoom: 19 
-    }).addTo(indiaMap);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors', maxZoom: 19 }).addTo(indiaMap);
   }
 
   function renderIndiaMap(rows) {
@@ -1515,55 +1362,29 @@
     }
     
     mapLayer = L.layerGroup();
-    let totalApproved = 0, totalPending = 0, totalRejected = 0;
 
     for (const [state, coords] of Object.entries(stateCoordinates)) {
       const data = stateData.get(state);
       if (!data || data.approved === 0) continue;
 
-      totalApproved += data.approved;
-      totalPending += data.pending;
-      totalRejected += data.rejected;
-
-      const approvalRate = ((data.approved / data.total) * 100).toFixed(1);
+      const approvalRate = getApprovalRate(data.approved, data.total);
       const marker = L.marker(coords, { icon: getMarkerIcon(state, data.approved) });
 
       const popupContent = `
-        <div class="popup-state">📍 ${state}</div>
-        <div class="popup-row">
-          <span class="popup-label">✅ Approved</span>
-          <span class="popup-value stat-success">${data.approved.toLocaleString()}</span>
-        </div>
-        <div class="popup-row">
-          <span class="popup-label">⏳ Pending</span>
-          <span class="popup-value stat-warning">${data.pending.toLocaleString()}</span>
-        </div>
-        <div class="popup-row">
-          <span class="popup-label">❌ Rejected</span>
-          <span class="popup-value stat-danger">${data.rejected.toLocaleString()}</span>
-        </div>
-        <div class="popup-row" style="border-top:2px solid var(--border);margin-top:12px;padding-top:12px">
-          <span class="popup-label">📊 Total</span>
-          <span class="popup-value">${data.total.toLocaleString()}</span>
-        </div>
-        <div class="popup-row">
-          <span class="popup-label">🎯 Rate</span>
-          <span class="popup-value stat-success">${approvalRate}%</span>
-        </div>
+        <div class="map-popup-state">📍 ${state}</div>
+        <div class="map-popup-row"><span class="map-popup-label">✅ Approved</span><span class="map-popup-value map-popup-success">${data.approved.toLocaleString()}</span></div>
+        <div class="map-popup-row"><span class="map-popup-label">⏳ Pending</span><span class="map-popup-value map-popup-pending">${data.pending.toLocaleString()}</span></div>
+        <div class="map-popup-row"><span class="map-popup-label">❌ Rejected</span><span class="map-popup-value map-popup-rejected">${data.rejected.toLocaleString()}</span></div>
+        <div class="map-popup-row" style="border-top:2px solid var(--ring);margin-top:12px;padding-top:12px"><span class="map-popup-label">📊 Total Scans</span><span class="map-popup-value">${data.total.toLocaleString()}</span></div>
+        <div class="map-popup-row"><span class="map-popup-label">🎯 Approval Rate</span><span class="map-popup-value map-popup-success">${approvalRate}%</span></div>
       `;
 
-      marker.bindPopup(popupContent, { closeButton: true, maxWidth: 380 });
+      marker.bindPopup(popupContent, { closeButton: true, maxWidth: 360, className: 'custom-popup' });
       marker.on('click', () => { FILTERS.state = state; selState.value = state; render(); });
       marker.addTo(mapLayer);
     }
 
     mapLayer.addTo(indiaMap);
-    
-    document.getElementById('mapActiveStates').textContent = stateData.size;
-    document.getElementById('mapApproved').textContent = totalApproved.toLocaleString();
-    document.getElementById('mapPending').textContent = totalPending.toLocaleString();
-    document.getElementById('mapRejected').textContent = totalRejected.toLocaleString();
-
     setTimeout(() => { indiaMap.fitBounds([[8, 68],[37, 97]]); }, 100);
   }
 
@@ -1669,7 +1490,7 @@
   }
 
   function normalizeRow(r){
-    return {
+    const obj = {
       'User ID': r['User ID']||r['UserID']||r['id']||'',
       'Phone Number': r['Phone Number']||r['Phone']||r['phone']||'',
       'First Name': r['First Name']||r['FirstName']||'',
@@ -1688,6 +1509,7 @@
       'Coupon Code': r['Coupon Code']||'',
       'Submission Status': r['Submission Status']||r['Approved Status']||''
     };
+    return obj;
   }
 
   Papa.parse(CSV_URL, {
@@ -1703,7 +1525,7 @@
     },
     error: (err)=>{
       console.error('CSV load error', err);
-      alert('Failed to load data.csv');
+      alert('Failed to load data.csv. Ensure the file exists at '+CSV_URL);
     }
   });
 </script>
