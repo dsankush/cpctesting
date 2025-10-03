@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lucky Draw - Prize Carousel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #000;
+    }
+    
+    .full-page {
+      width: 100vw;
+      height: 100vh;
+      background:
+        url("b2.jpg") top center / 100% 50% no-repeat,
+        url("b1.jpg") bottom center / 100% 50% no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      background-attachment: fixed;
+    }
+    
+    /* Professional overlay for better contrast */
+    .full-page::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.2) 0%,
+        rgba(0, 0, 0, 0.1) 40%,
+        rgba(0, 0, 0, 0.3) 100%
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .shiny-home {
+      display: inline-block;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #facc15 0%, #f59e0b 100%);
+      color: #1f2937;
+      font-weight: 700;
+      border-radius: 8px;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(250, 204, 21, 0.3);
+      transition: all 0.3s ease;
+      z-index: 30;
+    }
+
+    .shiny-home:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(250, 204, 21, 0.5);
+    }
+
+    .glow-effect {
+      animation: glow 1.2s ease-in-out infinite alternate, float 1.2s ease-in-out infinite;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      will-change: transform;
+      display: inline-block;
+      filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+    }
+
+    .glow-effect:hover {
+      transform: scale(1.08);
+      filter: drop-shadow(0 0 16px rgba(255, 215, 0, 0.8)) drop-shadow(0 0 24px rgba(255, 165, 0, 0.6));
+    }
+
+    @keyframes glow {
+      0% {
+        filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6))
+                drop-shadow(0 0 16px rgba(255, 165, 0, 0.4))
+                drop-shadow(0 0 24px rgba(255, 140, 0, 0.3));
+      }
+      100% {
+        filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.8))
+                drop-shadow(0 0 24px rgba(255, 165, 0, 0.6))
+                drop-shadow(0 0 36px rgba(255, 140, 0, 0.4));
+      }
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(3600deg); }
+    }
+
+    .spin-animation {
+      animation: spin 5.5s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+    }
+
+    /* Enhanced Professional Spinning Wheel */
+    .fantastic-wheel {
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      position: relative;
+      background: conic-gradient(
+        from 0deg,
+        #1e40af 0deg 51.43deg,
+        #dc2626 51.43deg 102.86deg,
+        #059669 102.86deg 154.29deg,
+        #d97706 154.29deg 205.71deg,
+        #7c3aed 205.71deg 257.14deg,
+        #be185d 257.14deg 308.57deg,
+        #0891b2 308.57deg 360deg
+      );
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 0 0 4px #fff,
+        0 0 0 8px #e5e7eb,
+        inset 0 0 20px rgba(255, 255, 255, 0.1);
+      border: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .fantastic-wheel:hover {
+      transform: scale(1.05);
+      box-shadow: 
+        0 12px 48px rgba(0, 0, 0, 0.4),
+        0 0 0 4px #fff,
+        0 0 0 8px #d1d5db,
+        inset 0 0 25px rgba(255, 255, 255, 0.15);
+    }
+
+    .wheel-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      border-radius: 50%;
+      border: 4px solid #fff;
+      box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.2),
+        inset 0 2px 4px rgba(255, 255, 255, 0.8),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 12px;
+      color: #374151;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+      letter-spacing: 1px;
+    }
+
+    .wheel-pointer {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 40px solid #dc2626;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+      z-index: 10;
+    }
+
+    .wheel-pointer::after {
+      content: '';
+      position: absolute;
+      top: 35px;
+      left: -15px;
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-bottom: 25px solid #fff;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    }
+
+    .wheel-segments {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+
+    .wheel-segment {
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      top: 0;
+      left: 50%;
+      transform-origin: 0 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wheel-segment:nth-child(1) { transform: rotate(0deg); }
+    .wheel-segment:nth-child(2) { transform: rotate(51.43deg); }
+    .wheel-segment:nth-child(3) { transform: rotate(102.86deg); }
+    .wheel-segment:nth-child(4) { transform: rotate(154.29deg); }
+    .wheel-segment:nth-child(5) { transform: rotate(205.71deg); }
+    .wheel-segment:nth-child(6) { transform: rotate(257.14deg); }
+    .wheel-segment:nth-child(7) { transform: rotate(308.57deg); }
+
+    .wheel-symbol {
+      font-size: 28px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+
+    /* Professional spin animation */
+    @keyframes professionalSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(3600deg); }
+    }
+
+    .professional-spin {
+      animation: professionalSpin 4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+
+
+    /* Enhanced carousel styling */
+    .carousel-container {
+      background: transparent;
+      backdrop-filter: none;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+    }
+    
+    .carousel-image {
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      opacity: 0;
+      transform: translateX(50px) scale(0.8) rotate(5deg);
+      filter: blur(2px);
+    }
+    
+    .carousel-image.loaded {
+      opacity: 1;
+      transform: translateX(0) scale(1) rotate(0deg);
+      filter: blur(0px);
+      animation: festiveBounce 0.8s ease-out;
+    }
+    
+    .carousel-image:hover {
+      transform: translateX(0) scale(1.08) rotate(-2deg);
+      box-shadow: 0 20px 50px rgba(255, 215, 0, 0.3);
+      animation: festiveWiggle 0.5s ease-in-out infinite alternate;
+    }
+    
+    .carousel-image.slide-out-left {
+      opacity: 0;
+      transform: translateX(-80px) scale(0.7) rotate(-10deg);
+      filter: blur(3px);
+    }
+    
+    .carousel-image.slide-out-right {
+      opacity: 0;
+      transform: translateX(80px) scale(0.7) rotate(10deg);
+      filter: blur(3px);
+    }
+    
+    @keyframes festiveBounce {
+      0% {
+        transform: translateX(0) scale(0.8) rotate(0deg);
+      }
+      50% {
+        transform: translateX(0) scale(1.1) rotate(2deg);
+      }
+      70% {
+        transform: translateX(0) scale(0.95) rotate(-1deg);
+      }
+      100% {
+        transform: translateX(0) scale(1) rotate(0deg);
+      }
+    }
+    
+    @keyframes festiveWiggle {
+      0% {
+        transform: translateX(0) scale(1.08) rotate(-2deg);
+      }
+      100% {
+        transform: translateX(0) scale(1.08) rotate(2deg);
+      }
+    }
+    
+    .control-button {
+      background: linear-gradient(135deg, #facc15 0%, #f59e0b 100%);
+      border: 2px solid #f59e0b;
+      color: #1f2937;
+      font-weight: 700;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(250, 204, 21, 0.3);
+      transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .control-button:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(250, 204, 21, 0.5);
+      animation: festiveButtonPulse 0.6s ease-in-out infinite alternate;
+    }
+    
+    .control-button:active {
+      transform: translateY(-1px) scale(0.98);
+      animation: festiveButtonClick 0.2s ease-out;
+    }
+    
+    @keyframes festiveButtonPulse {
+      0% {
+        box-shadow: 0 8px 25px rgba(250, 204, 21, 0.5);
+      }
+      100% {
+        box-shadow: 0 8px 25px rgba(250, 204, 21, 0.8), 0 0 20px rgba(255, 215, 0, 0.6);
+      }
+    }
+    
+    @keyframes festiveButtonClick {
+      0% {
+        transform: translateY(-1px) scale(0.98);
+      }
+      50% {
+        transform: translateY(-1px) scale(1.02);
+      }
+      100% {
+        transform: translateY(-1px) scale(0.98);
+      }
+    }
+    
+    .close-button {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      border: 2px solid #1d4ed8;
+      color: white;
+      font-weight: 700;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+      transition: all 0.3s ease;
+    }
+    
+    .close-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    }
+    
+    .dot-indicator {
+      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      transform: scale(0.8);
+      opacity: 0.6;
+      position: relative;
+    }
+    
+    .dot-indicator.active {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      transform: scale(1.4);
+      opacity: 1;
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+      animation: festiveDotPulse 1s ease-in-out infinite alternate;
+    }
+    
+    .dot-indicator:not(.active) {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .dot-indicator:hover {
+      transform: scale(1.2);
+      opacity: 0.9;
+      animation: festiveDotBounce 0.3s ease-in-out;
+    }
+    
+    @keyframes festiveDotPulse {
+      0% {
+        transform: scale(1.4);
+        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+      }
+      100% {
+        transform: scale(1.5);
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.8), 0 0 15px rgba(59, 130, 246, 0.4);
+      }
+    }
+    
+    @keyframes festiveDotBounce {
+      0% {
+        transform: scale(1.2);
+      }
+      50% {
+        transform: scale(1.4);
+      }
+      100% {
+        transform: scale(1.2);
+      }
+    }
+    
+    /* Carousel container animations */
+    .carousel-container {
+      animation: festiveCarouselEntry 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    @keyframes festiveCarouselEntry {
+      0% {
+        opacity: 0;
+        transform: scale(0.8) rotate(-5deg);
+        filter: blur(5px);
+      }
+      50% {
+        opacity: 0.8;
+        transform: scale(1.05) rotate(2deg);
+        filter: blur(1px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+        filter: blur(0px);
+      }
+    }
+    
+    /* Festive confetti effect */
+    .carousel-container::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      background: linear-gradient(45deg, 
+        transparent 30%, 
+        rgba(255, 215, 0, 0.1) 50%, 
+        transparent 70%);
+      animation: festiveShimmer 3s ease-in-out infinite;
+      pointer-events: none;
+      z-index: -1;
+    }
+    
+    @keyframes festiveShimmer {
+      0%, 100% {
+        transform: translateX(-100%) rotate(45deg);
+      }
+      50% {
+        transform: translateX(100%) rotate(45deg);
+      }
+    }
+    
+    /* Button animations */
+    .control-button, .close-button {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .control-button::before, .close-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.6s ease;
+    }
+    
+    .control-button:hover::before, .close-button:hover::before {
+      left: 100%;
+    }
+    
+    /* Festive particle animation */
+    @keyframes festiveParticle {
+      0% {
+        transform: scale(0) rotate(0deg);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.2) rotate(180deg);
+        opacity: 0.8;
+      }
+      100% {
+        transform: scale(0.5) rotate(360deg) translateY(-100px);
+        opacity: 0;
+      }
+    }
+    
+    /* Festive wheel celebration */
+    .fantastic-wheel.celebrating {
+      animation: wheelCelebration 0.8s ease-out;
+    }
+    
+    @keyframes wheelCelebration {
+      0% {
+        transform: scale(1) rotate(0deg);
+      }
+      25% {
+        transform: scale(1.1) rotate(5deg);
+      }
+      50% {
+        transform: scale(1.05) rotate(-3deg);
+      }
+      75% {
+        transform: scale(1.08) rotate(2deg);
+      }
+      100% {
+        transform: scale(1) rotate(0deg);
+      }
+    }
+    
+    /* Confetti falling animation */
+    @keyframes confettiFall {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body class="m-0 p-0 overflow-hidden">
+  <div class="full-page">
+    <a href="index.html" class="absolute top-10 left-10 shiny-home">
+    Home
+  </a>
+
+    <!-- Start Button -->
+    <div id="initialButtonContainer" class="absolute bottom-10 left-1/2 -translate-x-1/2 z-20">
+      <button id="startButton" class="focus:outline-none">
+        <img src="bt1.jpg" class="w-[220px] h-auto object-contain select-none glow-effect" />
+      </button>
+    </div>
+
+    <!-- Enhanced Professional Spinning Wheel -->
+    <div id="wheelContainer" class="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 hidden">
+      <button id="wheelButton" class="relative">
+        <div id="wheelImage" class="fantastic-wheel">
+          <!-- Wheel Pointer -->
+          <div class="wheel-pointer"></div>
+          
+          <!-- Wheel Segments -->
+          <div class="wheel-segments">
+            <div class="wheel-segment">
+              <div class="wheel-symbol">⭐</div>
+            </div>
+            <div class="wheel-segment">
+              <div class="wheel-symbol">💎</div>
+            </div>
+            <div class="wheel-segment">
+              <div class="wheel-symbol">🏆</div>
+            </div>
+            <div class="wheel-segment">
+              <div class="wheel-symbol">🎁</div>
+            </div>
+            <div class="wheel-segment">
+              <div class="wheel-symbol">💰</div>
+            </div>
+            <div class="wheel-segment">
+              <div class="wheel-symbol">👑</div>
+            </div>
+            <div class="wheel-segment">
+              <div class="wheel-symbol">🎊</div>
+            </div>
+          </div>
+          
+          <!-- Wheel Center -->
+          <div class="wheel-center">SPIN</div>
+        </div>
+      </button>
+    </div>
+
+    <!-- Carousel Viewer -->
+    <div id="carouselContainer" class="fixed inset-0 flex items-center justify-center z-30 hidden bg-transparent">
+      <div class="max-w-screen-lg w-full carousel-container p-6 flex flex-col items-center">
+        <img
+          id="carouselImage"
+          src=""
+          alt="Carousel Image"
+          class="w-full max-h-[85vh] object-contain carousel-image"
+        />
+
+        <!-- Dots Indicator -->
+        <div id="carouselDots" class="flex justify-center mt-4 gap-2"></div>
+
+        <!-- Controls -->
+        <div class="mt-4 flex gap-4">
+          <button id="prevBtn" class="control-button">‹</button>
+          <button id="nextBtn" class="control-button">›</button>
+          <button id="closeCarousel" class="close-button">Close</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    const startButton = document.getElementById("startButton");
+    const initialButtonContainer = document.getElementById("initialButtonContainer");
+    const wheelContainer = document.getElementById("wheelContainer");
+    const wheelButton = document.getElementById("wheelButton");
+    const wheelImage = document.getElementById("wheelImage");
+    const carouselContainer = document.getElementById("carouselContainer");
+    const carouselImage = document.getElementById("carouselImage");
+    const carouselDots = document.getElementById("carouselDots");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const closeCarousel = document.getElementById("closeCarousel");
+    const fantasticWheel = document.getElementById("wheelImage");
+
+    const carouselItems = ["w1.jpg", "w2.jpg", "w3.jpg", "w4.jpg"];
+    let currentIndex = 0;
+    let hasSpun = false;
+
+    function updateCarousel(index, direction = 'right') {
+      // Add festive slide out animation
+      carouselImage.classList.add(direction === 'left' ? 'slide-out-left' : 'slide-out-right');
+      
+      // Add festive sound effect (visual feedback)
+      carouselImage.style.filter = 'hue-rotate(20deg) saturate(1.2)';
+      
+      setTimeout(() => {
+        carouselImage.src = carouselItems[index];
+        carouselImage.classList.remove('slide-out-left', 'slide-out-right', 'loaded');
+        carouselImage.style.filter = '';
+        
+        // Trigger festive slide in animation
+        setTimeout(() => {
+          carouselImage.classList.add('loaded');
+          // Add celebration effect
+          createCelebrationEffect();
+        }, 50);
+        
+        renderDots();
+      }, 300);
+    }
+    
+    function createCelebrationEffect() {
+      // Create floating particles effect
+      for (let i = 0; i < 6; i++) {
+        const particle = document.createElement('div');
+        particle.style.cssText = `
+          position: absolute;
+          width: 8px;
+          height: 8px;
+          background: linear-gradient(45deg, #facc15, #f59e0b);
+          border-radius: 50%;
+          pointer-events: none;
+          z-index: 1000;
+          animation: festiveParticle 1.5s ease-out forwards;
+        `;
+        
+        // Random position around the image
+        const angle = (i / 6) * Math.PI * 2;
+        const radius = 150;
+        const x = Math.cos(angle) * radius + 200;
+        const y = Math.sin(angle) * radius + 150;
+        
+        particle.style.left = x + 'px';
+        particle.style.top = y + 'px';
+        
+        carouselContainer.appendChild(particle);
+        
+        // Remove particle after animation
+        setTimeout(() => {
+          if (particle.parentNode) {
+            particle.parentNode.removeChild(particle);
+          }
+        }, 1500);
+      }
+    }
+
+    function renderDots() {
+      carouselDots.innerHTML = "";
+      carouselItems.forEach((_, index) => {
+        const dot = document.createElement("span");
+        dot.className = `w-3 h-3 rounded-full cursor-pointer dot-indicator ${
+          index === currentIndex ? "active" : ""
+        }`;
+        dot.addEventListener("click", () => {
+          const direction = index > currentIndex ? 'right' : 'left';
+          currentIndex = index;
+          updateCarousel(currentIndex, direction);
+        });
+        carouselDots.appendChild(dot);
+      });
+    }
+
+    startButton.addEventListener("click", () => {
+      initialButtonContainer.classList.add("hidden");
+
+      if (hasSpun) {
+        carouselContainer.classList.remove("hidden");
+        updateCarousel(currentIndex);
+        // Add festive celebration effect
+        createConfettiBurst();
+      } else {
+        wheelContainer.classList.remove("hidden");
+        // Add festive celebration effect to wheel
+        fantasticWheel.classList.add("celebrating");
+        createConfettiBurst();
+      }
+    });
+    
+    function createConfettiBurst() {
+      // Create multiple confetti pieces
+      for (let i = 0; i < 20; i++) {
+        const confetti = document.createElement('div');
+        confetti.style.cssText = `
+          position: fixed;
+          width: 6px;
+          height: 6px;
+          background: ${['#facc15', '#f59e0b', '#3b82f6', '#dc2626', '#10b981'][Math.floor(Math.random() * 5)]};
+          pointer-events: none;
+          z-index: 2000;
+          animation: confettiFall ${2 + Math.random() * 2}s ease-out forwards;
+        `;
+        
+        // Random starting position
+        confetti.style.left = Math.random() * window.innerWidth + 'px';
+        confetti.style.top = '-10px';
+        
+        document.body.appendChild(confetti);
+        
+        // Remove confetti after animation
+        setTimeout(() => {
+          if (confetti.parentNode) {
+            confetti.parentNode.removeChild(confetti);
+          }
+        }, 4000);
+      }
+    }
+
+    wheelButton.addEventListener("click", () => {
+      if (wheelImage.classList.contains("professional-spin")) return;
+      wheelImage.classList.add("professional-spin");
+
+      setTimeout(() => {
+        wheelImage.classList.remove("professional-spin");
+        wheelContainer.classList.add("hidden");
+        carouselContainer.classList.remove("hidden");
+        updateCarousel(currentIndex);
+        hasSpun = true;
+      }, 4000);
+    });
+
+    prevBtn.addEventListener("click", () => {
+      currentIndex = (currentIndex - 1 + carouselItems.length) % carouselItems.length;
+      updateCarousel(currentIndex, 'left');
+    });
+
+    nextBtn.addEventListener("click", () => {
+      currentIndex = (currentIndex + 1) % carouselItems.length;
+      updateCarousel(currentIndex, 'right');
+    });
+
+    closeCarousel.addEventListener("click", () => {
+      carouselContainer.classList.add("hidden");
+      initialButtonContainer.classList.remove("hidden");
+    });
+  </script>
+</body>
+</html>
