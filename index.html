@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Coromandel CPC — Campaign Dashboard</title>
+  <title>Coromandel CPC — Campaign Analytics Hub</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -16,438 +16,806 @@
 
   <style>
     :root{
-      --bg:#fefefe;
-      --panel:#ffffff;
-      --card:#ffffff;
-      --card-hover:#f8f9ff;
-      --muted:#6b7280;
-      --text:#1f2937;
-      --acc1:#6366f1;
-      --acc2:#f59e0b;
-      --acc3:#10b981;
-      --acc4:#ec4899;
-      --acc5:#8b5cf6;
-      --ring:#e5e7eb;
-      --border:#d1d5db;
-      --shadow:rgba(99,102,241,.08);
-      --shadow-lg:rgba(99,102,241,.15);
-      --gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      --gradient-accent: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      --primary:#00d4ff;
+      --secondary:#ff6b9d;
+      --accent:#7c3aed;
+      --success:#00e676;
+      --warning:#ffc107;
+      --danger:#ff5252;
+      --dark:#0f0f23;
+      --darker:#08081a;
+      --light:#ffffff;
+      --muted:#94a3b8;
+      --border:rgba(255,255,255,0.08);
+      --glass:rgba(255,255,255,0.05);
+      --glow:rgba(0,212,255,0.3);
     }
+    
     *{box-sizing:border-box;margin:0;padding:0}
     html,body{height:100%;overflow-x:hidden}
-    body{
-      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
-      background-size: 400% 400%;
-      animation: gradientShift 15s ease infinite;
-      background-attachment:fixed;
-      color:var(--text);
-    }
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    .app{display:grid;grid-template-rows:auto 1fr auto;min-height:100vh}
     
-    /* Header */
+    body{
+      font-family:'Poppins',sans-serif;
+      background:#0f0f23;
+      color:#ffffff;
+      position:relative;
+      overflow-x:hidden;
+    }
+    
+    /* Animated Background */
+    body::before{
+      content:'';
+      position:fixed;
+      top:0;left:0;right:0;bottom:0;
+      background:
+        radial-gradient(circle at 20% 50%, rgba(0,212,255,0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255,107,157,0.15) 0%, transparent 50%),
+        radial-gradient(circle at 40% 20%, rgba(124,58,237,0.15) 0%, transparent 50%);
+      animation:bgFloat 20s ease-in-out infinite;
+      z-index:0;
+    }
+    
+    @keyframes bgFloat{
+      0%,100%{transform:translate(0,0) scale(1)}
+      33%{transform:translate(50px,-50px) scale(1.1)}
+      66%{transform:translate(-50px,50px) scale(0.9)}
+    }
+    
+    .app{
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-rows:auto 1fr auto;
+      min-height:100vh;
+    }
+    
+    /* Header with Glass Effect */
     header{
-      position:sticky;top:0;z-index:30;
+      position:sticky;
+      top:0;
+      z-index:100;
       backdrop-filter:saturate(180%) blur(20px);
-      background:rgba(255,255,255,.98);
-      border-bottom:3px solid transparent;
-      border-image: linear-gradient(90deg, #667eea, #764ba2, #f093fb) 1;
-      box-shadow:0 8px 32px rgba(102,126,234,.2);
+      background:rgba(15,15,35,0.8);
+      border-bottom:1px solid var(--border);
+      box-shadow:0 20px 60px rgba(0,0,0,0.4);
     }
-    .bar{display:flex;align-items:center;gap:20px;padding:20px 32px;flex-wrap:wrap}
+    
+    .bar{
+      display:flex;
+      align-items:center;
+      gap:24px;
+      padding:20px 48px;
+      flex-wrap:wrap;
+    }
+    
     .logo{
-      display:flex; align-items:center; gap:20px;
-      padding:16px 32px;
+      display:flex;
+      align-items:center;
+      gap:16px;
+      font-family:'Space Grotesk',sans-serif;
+      font-size:24px;
+      font-weight:700;
+      background:linear-gradient(135deg,var(--primary),var(--secondary));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      position:relative;
+    }
+    
+    .logo::before{
+      content:'';
+      width:40px;
+      height:40px;
+      background:linear-gradient(135deg,var(--primary),var(--secondary));
+      border-radius:12px;
+      animation:spin 3s linear infinite;
+      box-shadow:0 0 30px rgba(0,212,255,0.5);
+    }
+    
+    @keyframes spin{
+      0%{transform:rotate(0deg) scale(1)}
+      50%{transform:rotate(180deg) scale(1.1)}
+      100%{transform:rotate(360deg) scale(1)}
+    }
+    
+    .header-actions{
+      margin-left:auto;
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    
+    .btn{
+      padding:12px 28px;
+      border-radius:50px;
+      border:none;
+      background:linear-gradient(135deg,var(--primary),var(--accent));
+      color:white;
+      font-weight:600;
+      font-size:14px;
+      cursor:pointer;
+      transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+      box-shadow:0 8px 24px rgba(0,212,255,0.3);
+      position:relative;
+      overflow:hidden;
+    }
+    
+    .btn::before{
+      content:'';
+      position:absolute;
+      top:50%;
+      left:50%;
+      width:0;
+      height:0;
+      border-radius:50%;
+      background:rgba(255,255,255,0.2);
+      transform:translate(-50%,-50%);
+      transition:width 0.6s,height 0.6s;
+    }
+    
+    .btn:hover::before{
+      width:300px;
+      height:300px;
+    }
+    
+    .btn:hover{
+      transform:translateY(-2px);
+      box-shadow:0 12px 40px rgba(0,212,255,0.5);
+    }
+    
+    .btn-logout{
+      background:linear-gradient(135deg,var(--danger),#d32f2f);
+      box-shadow:0 8px 24px rgba(255,82,82,0.3);
+    }
+    
+    .btn-logout:hover{
+      box-shadow:0 12px 40px rgba(255,82,82,0.5);
+    }
+    
+    /* Main Content */
+    .main{
+      padding:40px 48px;
+      display:flex;
+      flex-direction:column;
+      gap:32px;
+    }
+    
+    /* Glass Morphism Cards */
+    .glass-card{
+      background:rgba(255,255,255,0.03);
+      backdrop-filter:blur(20px);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:24px;
+      padding:32px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.3);
+      transition:all 0.4s cubic-bezier(0.4,0,0.2,1);
+      position:relative;
+      overflow:hidden;
+    }
+    
+    .glass-card::before{
+      content:'';
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:2px;
+      background:linear-gradient(90deg,var(--primary),var(--secondary),var(--accent));
+      opacity:0;
+      transition:opacity 0.3s;
+    }
+    
+    .glass-card:hover{
+      transform:translateY(-4px);
+      border-color:rgba(0,212,255,0.3);
+      box-shadow:0 20px 60px rgba(0,212,255,0.2);
+    }
+    
+    .glass-card:hover::before{
+      opacity:1;
+    }
+    
+    /* Filters */
+    .filters{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+      gap:16px;
+      align-items:end;
+    }
+    
+    .filter-group{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    
+    .filter-label{
+      font-size:12px;
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      color:var(--muted);
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    
+    .filter-input,.filter-select{
+      padding:14px 16px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.1);
+      background:rgba(255,255,255,0.05);
+      color:white;
+      font-size:14px;
+      font-weight:500;
+      transition:all 0.3s;
+      outline:none;
+    }
+    
+    .filter-input:hover,.filter-select:hover{
+      border-color:var(--primary);
+      background:rgba(0,212,255,0.05);
+    }
+    
+    .filter-input:focus,.filter-select:focus{
+      border-color:var(--primary);
+      background:rgba(0,212,255,0.1);
+      box-shadow:0 0 0 3px rgba(0,212,255,0.1);
+    }
+    
+    .filter-select option{
+      background:#1a1a2e;
+      color:white;
+    }
+    
+    /* KPI Section */
+    .kpi-section{
+      display:grid;
+      grid-template-columns:300px 1fr;
+      gap:32px;
+      align-items:center;
+    }
+    
+    .kpi-hero{
+      width:300px;
+      height:300px;
+      border-radius:50%;
+      background:linear-gradient(135deg,rgba(0,212,255,0.1),rgba(124,58,237,0.1));
+      border:3px solid;
+      border-image:linear-gradient(135deg,var(--primary),var(--accent)) 1;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      box-shadow:0 0 60px rgba(0,212,255,0.3);
+      animation:pulse 3s ease-in-out infinite;
+    }
+    
+    @keyframes pulse{
+      0%,100%{box-shadow:0 0 60px rgba(0,212,255,0.3)}
+      50%{box-shadow:0 0 80px rgba(0,212,255,0.5)}
+    }
+    
+    .kpi-hero-label{
+      font-size:14px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:2px;
+      color:var(--muted);
+      margin-bottom:12px;
+    }
+    
+    .kpi-hero-value{
+      font-size:72px;
+      font-weight:900;
+      font-family:'Space Grotesk',sans-serif;
+      background:linear-gradient(135deg,var(--primary),var(--secondary));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      line-height:1;
+    }
+    
+    .kpi-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+      gap:20px;
+    }
+    
+    .kpi-card{
+      background:linear-gradient(135deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02));
+      border:1px solid rgba(255,255,255,0.1);
       border-radius:20px;
-      background:rgba(255,255,255,0.3);
-      backdrop-filter:blur(12px);
-      box-shadow:0 8px 24px rgba(102,126,234,0.25);
-      border: 2px solid rgba(255,255,255,0.5);
+      padding:28px;
+      text-align:center;
+      transition:all 0.3s;
+      position:relative;
+      overflow:hidden;
     }
-    .dot{
-      width:22px; height:22px; border-radius:50%;
-      background:linear-gradient(135deg,#4facfe,#00f2fe);
-      box-shadow:0 4px 12px rgba(79,172,254,0.5);
-      animation:pulseGlow 2s ease-in-out infinite;
+    
+    .kpi-card::before{
+      content:'';
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:3px;
+      background:linear-gradient(90deg,transparent,var(--kpi-color),transparent);
+      opacity:0;
+      transition:opacity 0.3s;
     }
-    @keyframes pulseGlow{
-      0%,100%{transform:scale(1);opacity:1;box-shadow:0 4px 12px rgba(79,172,254,0.5)}
-      50%{transform:scale(1.2);opacity:.8;box-shadow:0 8px 24px rgba(79,172,254,0.8)}
+    
+    .kpi-card:hover{
+      transform:translateY(-8px) scale(1.02);
+      box-shadow:0 20px 40px rgba(0,0,0,0.4);
+      border-color:var(--kpi-color);
     }
-    .title{
-      font-size:2rem; 
-      margin:0;
-      color:#1f2937;
-      letter-spacing:0.5px;
+    
+    .kpi-card:hover::before{
+      opacity:1;
+    }
+    
+    .kpi-card:nth-child(1){--kpi-color:var(--success)}
+    .kpi-card:nth-child(2){--kpi-color:var(--danger)}
+    .kpi-card:nth-child(3){--kpi-color:var(--accent)}
+    .kpi-card:nth-child(4){--kpi-color:var(--primary)}
+    .kpi-card:nth-child(5){--kpi-color:var(--secondary)}
+    
+    .kpi-label{
+      font-size:12px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      color:var(--muted);
+      margin-bottom:16px;
+    }
+    
+    .kpi-value{
+      font-size:48px;
+      font-weight:900;
+      font-family:'Space Grotesk',sans-serif;
+      color:var(--kpi-color);
+      margin-bottom:12px;
+      line-height:1;
+    }
+    
+    .kpi-subtitle{
+      font-size:13px;
+      font-weight:600;
+      color:var(--muted);
+    }
+    
+    /* Content Grid */
+    .content-grid{
+      display:grid;
+      grid-template-columns:repeat(12,1fr);
+      gap:28px;
+    }
+    
+    .span-4{grid-column:span 4}
+    .span-6{grid-column:span 6}
+    .span-8{grid-column:span 8}
+    .span-12{grid-column:span 12}
+    
+    .card-title{
+      font-size:16px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:1.5px;
+      color:var(--primary);
+      margin-bottom:24px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    
+    /* India Map - Smart Professional Design */
+    .map-container{
+      position:relative;
+      height:800px;
+      border-radius:24px;
+      overflow:hidden;
+      border:1px solid rgba(0,212,255,0.2);
+      background:rgba(0,0,0,0.3);
+    }
+    
+    #indiaMap{
+      width:100%;
+      height:100%;
+    }
+    
+    .leaflet-container{
+      background:#0a0a1a;
+      font-family:'Poppins',sans-serif;
+    }
+    
+    /* Map Controls Overlay */
+    .map-controls{
+      position:absolute;
+      top:20px;
+      left:20px;
+      z-index:1000;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    
+    .map-control-btn{
+      padding:12px 20px;
+      background:rgba(15,15,35,0.95);
+      backdrop-filter:blur(10px);
+      border:1px solid rgba(0,212,255,0.3);
+      border-radius:12px;
+      color:white;
+      font-size:13px;
+      font-weight:600;
+      cursor:pointer;
+      transition:all 0.3s;
+      box-shadow:0 4px 12px rgba(0,0,0,0.3);
+    }
+    
+    .map-control-btn:hover{
+      background:rgba(0,212,255,0.2);
+      border-color:var(--primary);
+      transform:translateX(4px);
+    }
+    
+    /* Map Stats Panel */
+    .map-stats{
+      position:absolute;
+      top:20px;
+      right:20px;
+      z-index:1000;
+      background:rgba(15,15,35,0.95);
+      backdrop-filter:blur(20px);
+      border:1px solid rgba(0,212,255,0.3);
+      border-radius:20px;
+      padding:24px;
+      min-width:280px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.4);
+    }
+    
+    .map-stats-title{
+      font-size:14px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:1.5px;
+      color:var(--primary);
+      margin-bottom:16px;
+      padding-bottom:12px;
+      border-bottom:1px solid rgba(255,255,255,0.1);
+    }
+    
+    .map-stat-item{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:12px 0;
+      border-bottom:1px solid rgba(255,255,255,0.05);
+    }
+    
+    .map-stat-label{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:600;
+    }
+    
+    .map-stat-value{
+      font-size:18px;
       font-weight:800;
-      background:linear-gradient(90deg,#667eea,#764ba2);
+      font-family:'Space Grotesk',sans-serif;
+    }
+    
+    .stat-success{color:var(--success)}
+    .stat-danger{color:var(--danger)}
+    .stat-warning{color:var(--warning)}
+    .stat-primary{color:var(--primary)}
+    
+    /* Map Legend */
+    .map-legend{
+      position:absolute;
+      bottom:20px;
+      right:20px;
+      z-index:1000;
+      background:rgba(15,15,35,0.95);
+      backdrop-filter:blur(20px);
+      border:1px solid rgba(0,212,255,0.3);
+      border-radius:20px;
+      padding:24px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.4);
+    }
+    
+    .legend-title{
+      font-size:14px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:1.5px;
+      color:var(--primary);
+      margin-bottom:16px;
+    }
+    
+    .legend-item{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin:10px 0;
+      font-size:13px;
+      font-weight:600;
+    }
+    
+    .legend-color{
+      width:36px;
+      height:24px;
+      border-radius:8px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.3);
+    }
+    
+    /* State Markers */
+    .state-marker{
+      background:rgba(15,15,35,0.95);
+      backdrop-filter:blur(10px);
+      border:2px solid;
+      border-radius:16px;
+      padding:12px 16px;
+      box-shadow:0 8px 24px rgba(0,0,0,0.5);
+      transition:all 0.3s;
+      cursor:pointer;
+      min-width:100px;
+      text-align:center;
+    }
+    
+    .state-marker:hover{
+      transform:translateY(-6px) scale(1.1);
+      box-shadow:0 16px 48px rgba(0,212,255,0.6);
+    }
+    
+    .state-name{
+      font-size:10px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+    
+    .state-count{
+      font-size:22px;
+      font-weight:900;
+      font-family:'Space Grotesk',sans-serif;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+    }
+    
+    .marker-level-1{border-color:#00e676;color:#00e676}
+    .marker-level-2{border-color:#00e5ff;color:#00e5ff}
+    .marker-level-3{border-color:#ffc107;color:#ffc107}
+    .marker-level-4{border-color:#ff9800;color:#ff9800}
+    .marker-level-5{border-color:#ff5252;color:#ff5252}
+    
+    /* Map Popup */
+    .leaflet-popup-content-wrapper{
+      background:rgba(15,15,35,0.98);
+      backdrop-filter:blur(20px);
+      border:2px solid var(--primary);
+      border-radius:20px;
+      box-shadow:0 16px 64px rgba(0,212,255,0.4);
+    }
+    
+    .leaflet-popup-content{
+      margin:28px;
+      color:white;
+      font-size:14px;
+    }
+    
+    .leaflet-popup-tip{
+      background:rgba(15,15,35,0.98);
+      border:2px solid var(--primary);
+    }
+    
+    .popup-state{
+      font-size:22px;
+      font-weight:900;
+      color:var(--primary);
+      margin-bottom:20px;
+      padding-bottom:16px;
+      border-bottom:2px solid rgba(255,255,255,0.1);
+    }
+    
+    .popup-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:12px 0;
+      border-bottom:1px solid rgba(255,255,255,0.05);
+    }
+    
+    .popup-label{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:0.5px;
+    }
+    
+    .popup-value{
+      font-size:20px;
+      font-weight:800;
+      font-family:'Space Grotesk',sans-serif;
+    }
+    
+    /* States Table */
+    .states-table{
+      overflow-y:auto;
+      max-height:400px;
+      margin-top:16px;
+    }
+    
+    .state-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:20px;
+    }
+    
+    .state-info{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    
+    .state-rank{
+      width:32px;
+      height:32px;
+      border-radius:8px;
+      background:linear-gradient(135deg,var(--primary),var(--accent));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:800;
+      font-size:14px;
+    }
+    
+    .state-name-text{
+      font-weight:600;
+      font-size:15px;
+    }
+    
+    .state-value{
+      font-size:20px;
+      font-weight:800;
+      font-family:'Space Grotesk',sans-serif;
+      background:linear-gradient(135deg,var(--primary),var(--secondary));
       -webkit-background-clip:text;
       -webkit-text-fill-color:transparent;
       background-clip:text;
     }
-    .header-actions{margin-left:auto;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-    .btn{
-      display:inline-flex;align-items:center;justify-content:center;gap:8px;
-      padding:12px 24px;border-radius:14px;border:none;
-      background:linear-gradient(135deg,#667eea,#764ba2);
-      color:white;font-weight:700;cursor:pointer;font-size:14px;
-      transition:all .3s ease;white-space:nowrap;
-      box-shadow:0 4px 16px rgba(102,126,234,.3);
-      position:relative;
+    
+    .state-bar{
+      width:100%;
+      height:8px;
+      background:rgba(255,255,255,0.05);
+      border-radius:4px;
       overflow:hidden;
-    }
-    .btn::before{
-      content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
-      background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);
-      transition:left .5s;
-    }
-    .btn:hover::before{left:100%}
-    .btn:hover{
-      transform:translateY(-3px) scale(1.02);
-      box-shadow:0 12px 32px rgba(102,126,234,.45);
-    }
-    .btn-logout{
-      background:linear-gradient(135deg,#f093fb,#f5576c);
-      box-shadow:0 4px 16px rgba(245,87,108,.3);
-    }
-    .btn-logout:hover{
-      box-shadow:0 12px 32px rgba(245,87,108,.45);
-    }
-
-    /* Layout */
-    .main{display:flex;flex-direction:column;gap:28px;padding:32px 48px 32px 48px;max-width:100%;margin:0}
-    .panel{
-      background:rgba(255,255,255,.95);
-      border:2px solid rgba(255,255,255,.5);
-      border-radius:20px;
-      padding:24px;
-      box-shadow:0 8px 32px rgba(102,126,234,.15);
-      backdrop-filter:blur(10px);
-      transition:all .3s ease;
-    }
-    .panel:hover{
-      border-color:rgba(102,126,234,.6);
-      box-shadow:0 12px 40px rgba(102,126,234,.25);
-      transform:translateY(-2px);
-    }
-
-    /* Filters */
-    .filters-horizontal{
-      background:rgba(255,255,255,.95);
-      border:2px solid rgba(255,255,255,.5);
-      border-radius:20px;
-      padding:24px 28px;
-      box-shadow:0 8px 32px rgba(102,126,234,.15);
-      backdrop-filter:blur(10px);
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-      gap:18px;
-      align-items:end;
-    }
-    .filters-horizontal .group{display:flex;flex-direction:column;gap:8px}
-    .filters-horizontal label{
-      font-size:11px;color:var(--muted);font-weight:700;
-      text-transform:uppercase;letter-spacing:.8px;
-    }
-    .filters-horizontal select,.filters-horizontal input{
-      width:100%;padding:12px 14px;
-      border-radius:12px;
-      border:2px solid var(--ring);
-      background:white;
-      color:var(--text);
-      outline:none;
-      font-size:13px;
-      font-weight:500;
-      transition:all .2s ease;
-    }
-    .filters-horizontal select:hover,.filters-horizontal input:hover{
-      border-color:#667eea;
-    }
-    .filters-horizontal select:focus,.filters-horizontal input:focus{
-      border-color:#667eea;
-      box-shadow:0 0 0 4px rgba(102,126,234,.1);
-    }
-    .filters-horizontal .btn{padding:12px 24px;font-size:13px;white-space:nowrap}
-
-    /* Content Grid */
-    .content{display:grid;grid-template-columns:repeat(12,1fr);gap:28px}
-    .card{
-      background:rgba(255,255,255,.95);
-      border:2px solid rgba(255,255,255,.5);
-      border-radius:20px;
-      padding:28px;
-      min-height:180px;
-      display:flex;
-      flex-direction:column;
-      box-shadow:0 8px 32px rgba(102,126,234,.15);
-      backdrop-filter:blur(10px);
-      transition:all .3s ease;
-      position:relative;
-      overflow:hidden;
-    }
-    .card::before{
-      content:'';position:absolute;top:0;left:0;right:0;height:5px;
-      background:linear-gradient(90deg,#667eea,#764ba2,#f093fb,#f5576c);
-      opacity:0;transition:opacity .3s;
-    }
-    .card:hover{
-      border-color:rgba(102,126,234,.6);
-      transform:translateY(-4px);
-      box-shadow:0 16px 48px rgba(102,126,234,.25);
-    }
-    .card:hover::before{opacity:1}
-    .card h3{
-      margin:0 0 16px;
-      font-size:13px;
-      color:var(--muted);
-      font-weight:800;
-      text-transform:uppercase;
-      letter-spacing:1.2px;
+      margin-top:8px;
     }
     
-    /* KPI Cards */
-    .kpi-hero{display:grid;grid-template-columns:220px 1fr;gap:40px;align-items:center}
-    .kpi-main-circle{
-      width:220px;height:220px;border-radius:50%;
-      display:flex;flex-direction:column;align-items:center;justify-content:center;
-      background:linear-gradient(135deg,rgba(102,126,234,.15),rgba(118,75,162,.15));
-      border:5px solid #667eea;
-      box-shadow:0 12px 48px rgba(102,126,234,.35);
-      position:relative;
+    .state-bar-fill{
+      height:100%;
+      border-radius:4px;
+      transition:width 0.5s cubic-bezier(0.4,0,0.2,1);
     }
-    .kpi-main-circle::after{
-      content:'';position:absolute;inset:-12px;border-radius:50%;
-      background:linear-gradient(135deg,#667eea,#764ba2);
-      opacity:.15;z-index:-1;
-      animation:pulseRing 3s ease-in-out infinite;
-    }
-    @keyframes pulseRing{
-      0%,100%{transform:scale(.95);opacity:.15}
-      50%{transform:scale(1.05);opacity:.25}
-    }
-    .kpi-main-label{
-      font-size:13px;color:var(--muted);font-weight:800;
-      text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px;
-    }
-    .kpi-main-value{
-      font-size:64px;font-weight:900;line-height:1;
-      background:linear-gradient(135deg,#667eea,#764ba2);
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-      background-clip:text;
-    }
-    .kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:18px}
-    .kpi-item{
-      background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(255,255,255,.7));
-      border:2px solid rgba(102,126,234,.2);
-      border-radius:18px;
-      padding:24px;
-      text-align:center;
-      transition:all .3s ease;
-      position:relative;
-      overflow:hidden;
-      backdrop-filter:blur(5px);
-    }
-    .kpi-item::before{
-      content:'';position:absolute;top:0;left:0;right:0;height:4px;
-      opacity:0;transition:opacity .3s;
-    }
-    .kpi-item:hover{
-      transform:translateY(-6px) scale(1.03);
-      box-shadow:0 12px 40px rgba(102,126,234,.25);
-      border-color:rgba(102,126,234,.4);
-    }
-    .kpi-item:hover::before{opacity:1}
-    .kpi-label{
-      font-size:11px;color:var(--muted);text-transform:uppercase;
-      letter-spacing:1px;font-weight:800;margin-bottom:14px;
-    }
-    .kpi-value{font-size:40px;font-weight:900;margin-bottom:10px}
-    .kpi-item:nth-child(1){border-color:rgba(16,185,129,.25)}
-    .kpi-item:nth-child(1)::before{background:#10b981}
-    .kpi-item:nth-child(1) .kpi-value{color:#10b981}
-    .kpi-item:nth-child(2){border-color:rgba(245,158,11,.25)}
-    .kpi-item:nth-child(2)::before{background:#f59e0b}
-    .kpi-item:nth-child(2) .kpi-value{color:#f59e0b}
-    .kpi-item:nth-child(3){border-color:rgba(139,92,246,.25)}
-    .kpi-item:nth-child(3)::before{background:#8b5cf6}
-    .kpi-item:nth-child(3) .kpi-value{color:#8b5cf6}
-    .kpi-item:nth-child(4){border-color:rgba(59,130,246,.25)}
-    .kpi-item:nth-child(4)::before{background:#3b82f6}
-    .kpi-item:nth-child(4) .kpi-value{color:#3b82f6}
-    .kpi-item:nth-child(5){border-color:rgba(236,72,153,.25)}
-    .kpi-item:nth-child(5)::before{background:#ec4899}
-    .kpi-item:nth-child(5) .kpi-value{color:#ec4899}
-    .kpi-percent{font-size:13px;color:var(--muted);font-weight:700}
-
-    /* India Map */
-    #indiaMapContainer{
-      width:100%;height:700px;position:relative;
-      border-radius:20px;overflow:hidden;
-      border:2px solid rgba(255,255,255,.5);
-    }
-    #indiaMap{width:100%;height:100%;z-index:1}
-    .leaflet-container{
-      background:linear-gradient(135deg, #f0f9ff 0%, #fef3c7 50%, #fce7f3 100%);
-      font-family:Inter,sans-serif;
-    }
-    .leaflet-popup-content-wrapper{
-      background:white;border-radius:18px;
-      box-shadow:0 16px 64px rgba(99,102,241,.3);
-      border:3px solid #667eea;
-    }
-    .leaflet-popup-content{margin:24px;font-size:14px;color:var(--text)}
-    .leaflet-popup-tip{background:white;border:3px solid #667eea}
-    .map-popup-state{
-      font-size:20px;font-weight:900;color:#667eea;
-      margin-bottom:16px;padding-bottom:12px;
-      border-bottom:3px solid var(--ring);
-    }
-    .map-popup-row{
-      display:flex;justify-content:space-between;align-items:center;
-      margin:12px 0;padding:10px 0;
-    }
-    .map-popup-label{
-      font-size:12px;color:var(--muted);
-      text-transform:uppercase;letter-spacing:.6px;font-weight:700;
-    }
-    .map-popup-value{font-size:22px;font-weight:900;color:var(--text)}
-    .map-popup-success{color:#10b981!important}
-    .map-popup-pending{color:#8b5cf6!important}
-    .map-popup-rejected{color:#f59e0b!important}
-    .state-marker-pin{position:relative;width:60px;height:60px;display:flex;align-items:center;justify-content:center}
-    .state-marker-inner{
-      position:relative;z-index:2;
-      background:white;
-      border-radius:14px;
-      padding:10px 14px;
-      box-shadow:0 10px 32px rgba(99,102,241,.3);
-      border:3px solid;
-      font-weight:900;font-size:15px;
-      text-align:center;min-width:85px;
-      transition:all .3s ease;cursor:pointer;
-    }
-    .state-marker-inner:hover{
-      transform:translateY(-6px) scale(1.08);
-      box-shadow:0 16px 48px rgba(99,102,241,.5);
-    }
-    .state-marker-name{
-      font-size:10px;color:var(--muted);
-      text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;
-    }
-    .state-marker-count{
-      font-size:19px;font-weight:900;
-      display:flex;align-items:center;justify-content:center;gap:5px;
-    }
-    .marker-ripple{
-      position:absolute;width:100%;height:100%;border-radius:50%;
-      background:radial-gradient(circle, rgba(102,126,234,.4) 0%, rgba(102,126,234,0) 70%);
-      animation:rippleEffect 2.5s ease-in-out infinite;z-index:1;
-    }
-    @keyframes rippleEffect{
-      0%{transform:scale(.8);opacity:.8}
-      50%{transform:scale(1.3);opacity:.3}
-      100%{transform:scale(.8);opacity:.8}
-    }
-    .state-marker-level-1{border-color:#10b981}
-    .state-marker-level-1 .state-marker-count{color:#10b981}
-    .state-marker-level-2{border-color:#22c55e}
-    .state-marker-level-2 .state-marker-count{color:#22c55e}
-    .state-marker-level-3{border-color:#84cc16}
-    .state-marker-level-3 .state-marker-count{color:#84cc16}
-    .state-marker-level-4{border-color:#eab308}
-    .state-marker-level-4 .state-marker-count{color:#eab308}
-    .state-marker-level-5{border-color:#f59e0b}
-    .state-marker-level-5 .state-marker-count{color:#f59e0b}
-    .legend{
-      position:absolute;bottom:24px;right:24px;
-      background:rgba(255,255,255,.98);
-      padding:24px;border-radius:18px;
-      box-shadow:0 12px 40px rgba(99,102,241,.25);
-      border:3px solid #667eea;z-index:1000;
-      backdrop-filter:blur(10px);
-    }
-    .legend-title{
-      font-size:14px;font-weight:900;color:var(--text);
-      margin-bottom:16px;text-transform:uppercase;letter-spacing:1.2px;
-    }
-    .legend-item{
-      display:flex;align-items:center;gap:12px;
-      margin:10px 0;font-size:13px;font-weight:700;
-    }
-    .legend-color{
-      width:32px;height:22px;border-radius:8px;
-      border:2px solid var(--border);
-      box-shadow:0 3px 10px rgba(0,0,0,.12);
-    }
-
+    
+    /* Footer */
     .footer{
-      padding:20px 32px;color:var(--muted);
-      border-top:3px solid transparent;
-      border-image: linear-gradient(90deg, #667eea, #764ba2, #f093fb) 1;
-      text-align:center;font-size:14px;
-      background:rgba(255,255,255,.95);
-      font-weight:600;
+      padding:24px 48px;
+      border-top:1px solid var(--border);
+      text-align:center;
+      color:var(--muted);
+      font-size:14px;
+      font-weight:500;
+      background:rgba(15,15,35,0.5);
       backdrop-filter:blur(10px);
     }
-
+    
     /* Login */
     .overlay{
-      position:fixed;inset:0;
-      background:linear-gradient(135deg, rgba(102,126,234,.95) 0%, rgba(118,75,162,.95) 50%, rgba(240,147,251,.95) 100%);
-      display:grid;place-items:center;z-index:100;
-      backdrop-filter:blur(15px);
+      position:fixed;
+      inset:0;
+      background:rgba(15,15,35,0.95);
+      backdrop-filter:blur(20px);
+      display:grid;
+      place-items:center;
+      z-index:200;
     }
-    .login{
-      width:min(92vw,440px);
-      background:white;
-      border:3px solid rgba(255,255,255,.8);
-      border-radius:24px;
-      padding:40px;
-      box-shadow:0 32px 96px rgba(99,102,241,.3);
-      animation:slideIn .6s ease;
+    
+    .login-card{
+      width:min(90vw,480px);
+      background:rgba(255,255,255,0.05);
+      backdrop-filter:blur(20px);
+      border:1px solid rgba(0,212,255,0.3);
+      border-radius:32px;
+      padding:48px;
+      box-shadow:0 24px 80px rgba(0,0,0,0.5);
+      animation:slideUp 0.5s cubic-bezier(0.4,0,0.2,1);
     }
-    @keyframes slideIn{
-      from{opacity:0;transform:translateY(30px) scale(.95)}
-      to{opacity:1;transform:translateY(0) scale(1)}
+    
+    @keyframes slideUp{
+      from{opacity:0;transform:translateY(40px)}
+      to{opacity:1;transform:translateY(0)}
     }
-    .login h2{margin:0 0 10px;font-size:28px;color:var(--text);font-weight:900}
-    .login p{margin:0 0 28px;color:var(--muted);font-size:15px;font-weight:500}
-    .field{display:flex;flex-direction:column;gap:10px;margin:18px 0}
-    .field label{font-size:13px;color:var(--muted);font-weight:700;letter-spacing:.5px}
-    .field input{
-      padding:16px;border-radius:14px;
-      border:2px solid var(--ring);
-      background:white;color:var(--text);font-size:15px;
-      transition:all .2s ease;
+    
+    .login-title{
+      font-size:32px;
+      font-weight:900;
+      font-family:'Space Grotesk',sans-serif;
+      background:linear-gradient(135deg,var(--primary),var(--secondary));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      margin-bottom:12px;
     }
-    .field input:focus{
-      outline:none;border-color:#667eea;
-      box-shadow:0 0 0 4px rgba(102,126,234,.15);
+    
+    .login-subtitle{
+      color:var(--muted);
+      margin-bottom:32px;
+      font-size:15px;
     }
-    .err{color:#f5576c;font-size:14px;min-height:20px;margin-top:10px;font-weight:600}
-
-    @media (max-width: 1100px){
-      .kpi-hero{grid-template-columns:1fr}
-      .kpi-main-circle{margin:0 auto}
-      .kpi-grid{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
-      .filters-horizontal{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
-      #indiaMapContainer{height:500px}
+    
+    .login-field{
+      margin-bottom:24px;
     }
-    @media (max-width: 640px){
-      .bar{padding:16px 20px}
-      .main{padding:20px;gap:20px}
-      .kpi-grid{grid-template-columns:1fr}
-      .header-actions{width:100%;justify-content:flex-start}
-      #indiaMapContainer{height:400px}
-      .filters-horizontal{grid-template-columns:1fr}
-      .title{font-size:1.5rem}
+    
+    .login-label{
+      display:block;
+      font-size:13px;
+      font-weight:600;
+      color:var(--muted);
+      margin-bottom:8px;
+      text-transform:uppercase;
+      letter-spacing:1px;
+    }
+    
+    .login-input{
+      width:100%;
+      padding:16px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.1);
+      background:rgba(255,255,255,0.05);
+      color:white;
+      font-size:15px;
+      transition:all 0.3s;
+      outline:none;
+    }
+    
+    .login-input:focus{
+      border-color:var(--primary);
+      background:rgba(0,212,255,0.1);
+      box-shadow:0 0 0 3px rgba(0,212,255,0.1);
+    }
+    
+    .login-error{
+      color:var(--danger);
+      font-size:13px;
+      font-weight:600;
+      margin-top:16px;
+      min-height:20px;
+    }
+    
+    @media (max-width:1200px){
+      .kpi-section{grid-template-columns:1fr}
+      .kpi-hero{margin:0 auto}
+      .span-4,.span-6,.span-8,.span-12{grid-column:span 12}
+    }
+    
+    @media (max-width:768px){
+      .bar{padding:16px 24px}
+      .main{padding:24px}
+      .filters{grid-template-columns:1fr}
+      .map-container{height:500px}
+      .map-stats,.map-legend{position:relative;top:auto;right:auto;bottom:auto;left:auto;margin-top:16px}
     }
   </style>
 </head>
@@ -456,211 +824,245 @@
   <header>
     <div class="bar">
       <div class="logo">
-        <span class="dot"></span>
-        <h1 class="title">Coromandel CPC Campaign Dashboard</h1>
+        <span>Coromandel CPC Analytics</span>
       </div>
       <div class="header-actions">
-        <button class="btn" id="downloadBtn">📥 Download Data</button>
-        <button class="btn btn-logout" id="logoutBtn">🔒 Logout</button>
+        <button class="btn" id="downloadBtn">📥 Export Data</button>
+        <button class="btn btn-logout" id="logoutBtn">🚪 Logout</button>
       </div>
     </div>
   </header>
 
   <main class="main">
-    <!-- Horizontal Filters -->
-    <div class="filters-horizontal">
-      <div class="group">
-        <label for="dateRange">📅 Date Range</label>
-        <input id="dateRange" placeholder="Select range" />
-      </div>
+    <!-- Filters -->
+    <div class="glass-card">
+      <div class="filters">
+        <div class="filter-group">
+          <label class="filter-label">📅 Date Range</label>
+          <input id="dateRange" class="filter-input" placeholder="Select date range" />
+        </div>
+        
+        <div class="filter-group" style="display:none">
+          <input id="dateFrom" type="date" />
+          <input id="dateTo" type="date" />
+        </div>
 
-      <div class="group" style="display:none">
-        <label for="dateFrom">Date From</label>
-        <input id="dateFrom" type="date" />
-      </div>
-      <div class="group" style="display:none">
-        <label for="dateTo">Date To</label>
-        <input id="dateTo" type="date" />
-      </div>
+        <div class="filter-group">
+          <label class="filter-label">🌍 State</label>
+          <select id="state" class="filter-select"></select>
+        </div>
 
-      <div class="group">
-        <label for="state">🌍 State</label>
-        <select id="state"></select>
-      </div>
-      <div class="group">
-        <label for="district">📍 District</label>
-        <select id="district"></select>
-      </div>
-      <div class="group">
-        <label for="retailer">🏪 Retailer</label>
-        <select id="retailer"></select>
-      </div>
-      <div class="group">
-        <label for="product">📦 Product</label>
-        <select id="product"></select>
-      </div>
+        <div class="filter-group">
+          <label class="filter-label">📍 District</label>
+          <select id="district" class="filter-select"></select>
+        </div>
 
-      <div class="group">
-        <label for="unit">📏 Quantity Unit</label>
-        <select id="unit"></select>
-      </div>
+        <div class="filter-group">
+          <label class="filter-label">🏪 Retailer</label>
+          <select id="retailer" class="filter-select"></select>
+        </div>
 
-      <div class="group">
-        <label for="qtyMin">🔢 Quantity (≥)</label>
-        <input id="qtyMin" type="number" min="0" step="1" placeholder="0" />
-      </div>
-      <div class="group">
-        <label for="status">✅ Status</label>
-        <select id="status"></select>
-      </div>
-      <div class="group" style="display:flex;align-items:flex-end">
-        <button class="btn" id="resetBtn" style="width:100%">🔄 Reset</button>
+        <div class="filter-group">
+          <label class="filter-label">📦 Product</label>
+          <select id="product" class="filter-select"></select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">📏 Unit</label>
+          <select id="unit" class="filter-select"></select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">🔢 Min Qty</label>
+          <input id="qtyMin" class="filter-input" type="number" min="0" placeholder="0" />
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">✅ Status</label>
+          <select id="status" class="filter-select"></select>
+        </div>
+
+        <div class="filter-group">
+          <button class="btn" id="resetBtn" style="width:100%">🔄 Reset All</button>
+        </div>
       </div>
     </div>
 
-    <section class="content">
-      <!-- Total Scans with Hero Design -->
-      <div class="card" style="grid-column: span 12">
-        <h3>📊 Campaign Performance Overview</h3>
+    <!-- KPIs -->
+    <div class="glass-card">
+      <h2 class="card-title">📊 Performance Overview</h2>
+      <div class="kpi-section">
         <div class="kpi-hero">
-          <div class="kpi-main-circle">
-            <div class="kpi-main-label">Total Scans</div>
-            <div class="kpi-main-value" id="kpiTotalBig">0</div>
+          <div class="kpi-hero-label">Total Scans</div>
+          <div class="kpi-hero-value" id="kpiTotal">0</div>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">✅ Approved</div>
+            <div class="kpi-value" id="kpiApproved">0</div>
+            <div class="kpi-subtitle" id="kpiApprovedPct">0%</div>
           </div>
-          <div class="kpi-grid">
-            <div class="kpi-item">
-              <div class="kpi-label">✅ Approved</div>
-              <div class="kpi-value" id="kpiYes">0</div>
-              <div class="kpi-percent" id="kpiYesPct">0%</div>
-            </div>
-            <div class="kpi-item">
-              <div class="kpi-label">❌ Rejected</div>
-              <div class="kpi-value" id="kpiNo">0</div>
-              <div class="kpi-percent" id="kpiNoPct">0%</div>
-            </div>
-            <div class="kpi-item">
-              <div class="kpi-label">⏳ Pending</div>
-              <div class="kpi-value" id="kpiPending">0</div>
-              <div class="kpi-percent" id="kpiPendingPct">0%</div>
-            </div>
-            <div class="kpi-item">
-              <div class="kpi-label">👨‍🌾 Total Farmers</div>
-              <div class="kpi-value" id="kpiTotalFarmers">0</div>
-              <div class="kpi-percent" id="kpiUniqueFarmers">Unique: 0</div>
-            </div>
-            <div class="kpi-item">
-              <div class="kpi-label">🏪 Retailers</div>
-              <div class="kpi-value" id="kpiActiveRetailers">0</div>
-              <div class="kpi-percent" id="kpiTotalRetailers">of 0 total</div>
-            </div>
+          <div class="kpi-card">
+            <div class="kpi-label">❌ Rejected</div>
+            <div class="kpi-value" id="kpiRejected">0</div>
+            <div class="kpi-subtitle" id="kpiRejectedPct">0%</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">⏳ Pending</div>
+            <div class="kpi-value" id="kpiPending">0</div>
+            <div class="kpi-subtitle" id="kpiPendingPct">0%</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">👨‍🌾 Farmers</div>
+            <div class="kpi-value" id="kpiFarmers">0</div>
+            <div class="kpi-subtitle" id="kpiFarmersUnique">Unique: 0</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">🏪 Retailers</div>
+            <div class="kpi-value" id="kpiRetailers">0</div>
+            <div class="kpi-subtitle" id="kpiRetailersTotal">of 0</div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Status Chart -->
-      <div class="card" style="grid-column: span 4">
-        <h3>📈 Order Approval Status</h3>
+    <!-- Charts Grid -->
+    <div class="content-grid">
+      <div class="glass-card span-4">
+        <h3 class="card-title">📈 Approval Status</h3>
         <canvas id="statusChart" height="280"></canvas>
       </div>
 
-      <!-- Trend Chart -->
-      <div class="card" style="grid-column: span 8">
-        <h3>📅 Time Trend (Scans per Day)</h3>
+      <div class="glass-card span-8">
+        <h3 class="card-title">📅 Daily Trend</h3>
         <canvas id="trendChart" height="280"></canvas>
       </div>
 
-      <!-- Top States Table -->
-      <div class="card" style="grid-column: span 6">
-        <h3>🌍 States by Scans</h3>
-        <div id="statesTable" style="overflow-y:auto;max-height:380px;margin-top:12px"></div>
+      <div class="glass-card span-6">
+        <h3 class="card-title">🌍 Top States</h3>
+        <div class="states-table" id="statesTable"></div>
       </div>
 
-      <!-- Retailer Performance -->
-      <div class="card" style="grid-column: span 6">
-        <h3>🏪 Retailer Performance</h3>
+      <div class="glass-card span-6">
+        <h3 class="card-title">🏪 Retailer Performance</h3>
         <canvas id="retailerChart" height="240"></canvas>
       </div>
 
-      <!-- District Scans -->
-      <div class="card" style="grid-column: span 6">
-        <h3>📍 District-wise Scans</h3>
-        <canvas id="districtChart" height="180"></canvas>
+      <div class="glass-card span-6">
+        <h3 class="card-title">📍 District Analysis</h3>
+        <canvas id="districtChart" height="200"></canvas>
       </div>
 
-      <!-- Product Basket -->
-      <div class="card" style="grid-column: span 6">
-        <h3>📦 Product Basket</h3>
-        <canvas id="productChart" height="180"></canvas>
+      <div class="glass-card span-6">
+        <h3 class="card-title">📦 Product Mix</h3>
+        <canvas id="productChart" height="200"></canvas>
       </div>
 
-      <!-- India Map -->
-      <div class="card" style="grid-column: span 12">
-        <h3>🗺️ India - State-wise Distribution</h3>
-        <div id="indiaMapContainer">
+      <!-- India Map - Smart Professional -->
+      <div class="glass-card span-12">
+        <h3 class="card-title">🗺️ Geographic Distribution</h3>
+        <div class="map-container">
           <div id="indiaMap"></div>
-          <div class="legend">
-            <div class="legend-title">Approval Levels</div>
-            <div class="legend-item"><div class="legend-color" style="background:#10b981;border-color:#10b981"></div><span>Elite (1000+)</span></div>
-            <div class="legend-item"><div class="legend-color" style="background:#22c55e;border-color:#22c55e"></div><span>High (500-999)</span></div>
-            <div class="legend-item"><div class="legend-color" style="background:#84cc16;border-color:#84cc16"></div><span>Medium (250-499)</span></div>
-            <div class="legend-item"><div class="legend-color" style="background:#eab308;border-color:#eab308"></div><span>Growing (100-249)</span></div>
-            <div class="legend-item"><div class="legend-color" style="background:#f59e0b;border-color:#f59e0b"></div><span>Emerging (1-99)</span></div>
+          
+          <!-- Map Stats Panel -->
+          <div class="map-stats">
+            <div class="map-stats-title">Live Statistics</div>
+            <div class="map-stat-item">
+              <span class="map-stat-label">Active States</span>
+              <span class="map-stat-value stat-primary" id="mapActiveStates">0</span>
+            </div>
+            <div class="map-stat-item">
+              <span class="map-stat-label">Approved</span>
+              <span class="map-stat-value stat-success" id="mapApproved">0</span>
+            </div>
+            <div class="map-stat-item">
+              <span class="map-stat-label">Pending</span>
+              <span class="map-stat-value stat-warning" id="mapPending">0</span>
+            </div>
+            <div class="map-stat-item">
+              <span class="map-stat-label">Rejected</span>
+              <span class="map-stat-value stat-danger" id="mapRejected">0</span>
+            </div>
+          </div>
+
+          <!-- Legend -->
+          <div class="map-legend">
+            <div class="legend-title">Approval Tiers</div>
+            <div class="legend-item">
+              <div class="legend-color" style="background:#00e676"></div>
+              <span>Elite (1000+)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background:#00e5ff"></div>
+              <span>High (500-999)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background:#ffc107"></div>
+              <span>Medium (250-499)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background:#ff9800"></div>
+              <span>Growing (100-249)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background:#ff5252"></div>
+              <span>Emerging (1-99)</span>
+            </div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
   </main>
 
   <div class="footer">
-    ✨ © 2025 Coromandel CPC — Empowering Agriculture through Innovation ✨
+    ⚡ Powered by Coromandel CPC Analytics Engine • Real-time Campaign Intelligence
   </div>
 </div>
 
-<!-- Login Overlay -->
+<!-- Login -->
 <div class="overlay" id="loginOverlay">
-  <form class="login" id="loginForm">
-    <h2>🔐 Secure Access</h2>
-    <p>Please authenticate to view the campaign dashboard.</p>
-    <div class="field">
-      <label>👤 Username</label>
-      <input id="u" autocomplete="username" placeholder="Enter username" />
+  <form class="login-card" id="loginForm">
+    <h2 class="login-title">🔐 Secure Access</h2>
+    <p class="login-subtitle">Enter your credentials to access the analytics hub</p>
+    <div class="login-field">
+      <label class="login-label">Username</label>
+      <input id="username" class="login-input" autocomplete="username" placeholder="Enter username" />
     </div>
-    <div class="field">
-      <label>🔑 Password</label>
-      <input id="p" type="password" autocomplete="current-password" placeholder="Enter password" />
+    <div class="login-field">
+      <label class="login-label">Password</label>
+      <input id="password" class="login-input" type="password" autocomplete="current-password" placeholder="Enter password" />
     </div>
-    <button class="btn" type="submit" style="width:100%;margin-top:12px">Login</button>
-    <div class="err" id="err"></div>
+    <button class="btn" type="submit" style="width:100%">Login to Dashboard</button>
+    <div class="login-error" id="loginError"></div>
   </form>
 </div>
 
 <script>
   const CSV_URL = './data.csv';
-
-  // Login
   const VALID_USER = 'digicides';
   const VALID_PASS = 'coro@cpc';
-  const overlay = document.getElementById('loginOverlay');
-  const form = document.getElementById('loginForm');
-  const errEl = document.getElementById('err');
   const LS_KEY = 'cpc_login_ok';
+
+  // Login
+  const overlay = document.getElementById('loginOverlay');
+  const loginForm = document.getElementById('loginForm');
+  const loginError = document.getElementById('loginError');
 
   function unlock(){ overlay.style.display='none'; }
   if(localStorage.getItem(LS_KEY)==='1'){ unlock(); }
-  
-  form.addEventListener('submit', (e)=>{
+
+  loginForm.addEventListener('submit', (e)=>{
     e.preventDefault();
-    const u = document.getElementById('u').value.trim();
-    const p = document.getElementById('p').value;
+    const u = document.getElementById('username').value.trim();
+    const p = document.getElementById('password').value;
     if(u===VALID_USER && p===VALID_PASS){
       localStorage.setItem(LS_KEY,'1');
       unlock();
     } else {
-      errEl.textContent = 'Invalid credentials. Please try again.';
+      loginError.textContent = '❌ Invalid credentials. Please try again.';
     }
   });
 
-  // Logout
   document.getElementById('logoutBtn').addEventListener('click', ()=>{
     if(confirm('Are you sure you want to logout?')){
       localStorage.removeItem(LS_KEY);
@@ -678,7 +1080,6 @@
   };
   function uniqSorted(arr){ return [...new Set(arr.filter(Boolean))].sort((a,b)=>a.localeCompare(b)); }
 
-  // ORIGINAL parseProducts — kept exactly as-is (used by charts)
   function parseProducts(cartStr){
     const map = new Map();
     const s = trim(cartStr);
@@ -696,7 +1097,6 @@
     return map;
   }
 
-  // Detailed parser to capture product + qty + unit lines
   function parseCartItems(cartStr){
     const s = trim(cartStr);
     if(!s) return [];
@@ -729,8 +1129,7 @@
   const selUnit = document.getElementById('unit');
   const inpQtyMin = document.getElementById('qtyMin');
   const selStatus = document.getElementById('status');
-  
-  // flatpickr single date-range controlling FILTERS.dateFrom/dateTo
+
   flatpickr("#dateRange",{
     mode:"range",
     dateFormat:"Y-m-d",
@@ -755,7 +1154,6 @@
     render();
   });
 
-  // Download CSV
   document.getElementById('downloadBtn').addEventListener('click', ()=>{
     const filtered = applyFilters(RAW);
     if(filtered.length === 0){ alert('No data to download!'); return; }
@@ -764,7 +1162,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'cpc_data_export_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.download = 'cpc_export_' + new Date().toISOString().slice(0,10) + '.csv';
     a.click();
     URL.revokeObjectURL(url);
   });
@@ -782,13 +1180,13 @@
     charts[id] = new Chart(ctx, { type, data, options: opts });
     return charts[id];
   }
+
+  const chartColors = ['#00d4ff','#ff6b9d','#7c3aed','#00e676','#ffc107','#ff5252','#00e5ff','#ff9800'];
   function palette(n){
-    const base = [ '#667eea','#764ba2','#f093fb','#f5576c','#4facfe','#00f2fe','#10b981','#f59e0b','#ec4899','#8b5cf6' ];
-    const arr = []; for(let i=0;i<n;i++) arr.push(base[i%base.length]);
+    const arr = []; for(let i=0;i<n;i++) arr.push(chartColors[i%chartColors.length]);
     return arr;
   }
 
-  // Apply Filters
   function applyFilters(rows){
     const f = FILTERS;
     return rows.filter(r=>{
@@ -831,61 +1229,46 @@
     const yes = rows.filter(r=>/^yes$/i.test(trim(r['Submission Status']))).length;
     const pending = rows.filter(r=>/^pending$/i.test(trim(r['Submission Status']))).length;
     const no = rows.filter(r=>/^no$/i.test(trim(r['Submission Status']))).length;
-    
-    // Calculate farmer metrics
+
     const allPhones = rows.map(r=>trim(r['Phone Number'])).filter(p=>p);
     const uniquePhones = new Set(allPhones);
-    const totalFarmers = allPhones.length;
-    const uniqueFarmers = uniquePhones.size;
-    
-    // Calculate ACTIVE retailers from current FILTERED data (all filters applied)
+
     const activeRINs = new Set(rows.map(r=>trim(r['RIN'])).filter(rin=>rin));
     const activeRetailers = activeRINs.size;
-    
-    // Calculate TOTAL retailers based on REFERENCE DATA (hardcoded state-wise totals)
-    // Reference: West Bengal=183, Maharashtra=616, Telangana=161, Andhra Pradesh=307, Karnataka=636
-    // Total across all states = 1,903
+
     const STATE_RETAILER_TOTALS = {
       'West Bengal': 183,
       'Maharashtra': 616,
       'Telangana': 161,
       'Andhra Pradesh': 307,
       'Karnataka': 636
-      // Add more states from your reference data if available
     };
-    
-    let totalRetailers = 1903; // Default: total across ALL states
-    
+
+    let totalRetailers = 1903;
     if(FILTERS.state){
-      // If state is selected, use the hardcoded total for that state
       totalRetailers = STATE_RETAILER_TOTALS[FILTERS.state] || 0;
-      
-      // Fallback: if state not in hardcoded list, calculate from RAW data
       if(totalRetailers === 0){
         const stateRetailers = RAW.filter(r=>trim(r.State)===FILTERS.state);
         const stateRetailerRINs = new Set(stateRetailers.map(r=>trim(r['RIN'])).filter(rin=>rin));
         totalRetailers = stateRetailerRINs.size;
       }
     }
-    
-    document.getElementById('kpiTotalBig').textContent = total.toLocaleString();
-    document.getElementById('kpiYes').textContent = yes.toLocaleString();
-    document.getElementById('kpiNo').textContent = no.toLocaleString();
+
+    document.getElementById('kpiTotal').textContent = total.toLocaleString();
+    document.getElementById('kpiApproved').textContent = yes.toLocaleString();
+    document.getElementById('kpiRejected').textContent = no.toLocaleString();
     document.getElementById('kpiPending').textContent = pending.toLocaleString();
-    document.getElementById('kpiTotalFarmers').textContent = totalFarmers.toLocaleString();
-    document.getElementById('kpiUniqueFarmers').textContent = `Unique: ${uniqueFarmers.toLocaleString()}`;
-    document.getElementById('kpiActiveRetailers').textContent = activeRetailers.toLocaleString();
-    
-    // 🔥 NEW: Update total retailers display
-    document.getElementById('kpiTotalRetailers').textContent = `of ${totalRetailers.toLocaleString()} total`;
-    
-    // Calculate percentages
+    document.getElementById('kpiFarmers').textContent = allPhones.length.toLocaleString();
+    document.getElementById('kpiFarmersUnique').textContent = `Unique: ${uniquePhones.size.toLocaleString()}`;
+    document.getElementById('kpiRetailers').textContent = activeRetailers.toLocaleString();
+    document.getElementById('kpiRetailersTotal').textContent = `of ${totalRetailers.toLocaleString()}`;
+
     const yesPct = total > 0 ? ((yes / total) * 100).toFixed(1) : '0.0';
     const noPct = total > 0 ? ((no / total) * 100).toFixed(1) : '0.0';
     const pendingPct = total > 0 ? ((pending / total) * 100).toFixed(1) : '0.0';
-    
-    document.getElementById('kpiYesPct').textContent = `${yesPct}% of total`;
-    document.getElementById('kpiNoPct').textContent = `${noPct}% of total`;
+
+    document.getElementById('kpiApprovedPct').textContent = `${yesPct}% of total`;
+    document.getElementById('kpiRejectedPct').textContent = `${noPct}% of total`;
     document.getElementById('kpiPendingPct').textContent = `${pendingPct}% of total`;
   }
 
@@ -900,37 +1283,42 @@
 
   function renderStatesTable(rows){
     const states = buildCounts(rows, 'State').slice(0, 10);
-    let html = '<div style="font-size:13px">';
+    let html = '';
     states.forEach((s, i)=>{
       const bar = Math.round((s[1] / (states[0][1] || 1)) * 100);
-      const colors = ['#667eea','#764ba2','#f093fb','#f5576c','#4facfe','#00f2fe','#10b981','#f59e0b','#ec4899','#8b5cf6'];
-      const color = colors[i % colors.length];
-      html += `<div style="margin-bottom:18px">
-        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
-          <span style="font-weight:700;color:var(--text)">${i+1}. ${s[0]}</span>
-          <span style="color:${color};font-weight:800">${s[1].toLocaleString()}</span>
+      const gradients = [
+        'linear-gradient(135deg,#00d4ff,#7c3aed)',
+        'linear-gradient(135deg,#ff6b9d,#ff5252)',
+        'linear-gradient(135deg,#00e676,#00e5ff)',
+        'linear-gradient(135deg,#ffc107,#ff9800)',
+        'linear-gradient(135deg,#7c3aed,#ff6b9d)'
+      ];
+      const grad = gradients[i % gradients.length];
+      html += `<div class="state-row">
+        <div class="state-info">
+          <div class="state-rank">${i+1}</div>
+          <div class="state-name-text">${s[0]}</div>
         </div>
-        <div style="width:100%;height:10px;background:rgba(102,126,234,.12);border-radius:6px;overflow:hidden">
-          <div style="width:${bar}%;height:100%;background:${color};border-radius:6px;transition:width .3s ease"></div>
-        </div>
+        <div class="state-value">${s[1].toLocaleString()}</div>
+      </div>
+      <div class="state-bar">
+        <div class="state-bar-fill" style="width:${bar}%;background:${grad}"></div>
       </div>`;
     });
-    html += '</div>';
     document.getElementById('statesTable').innerHTML = html;
   }
 
   function renderCharts(rows){
-    // Status
     const sYes = rows.filter(r=>/^yes$/i.test(trim(r['Submission Status']))).length;
     const sNo = rows.filter(r=>/^no$/i.test(trim(r['Submission Status']))).length;
     const sPending = rows.filter(r=>/^pending$/i.test(trim(r['Submission Status']))).length;
+    
     makeChart('statusChart','doughnut',{
       labels:['Approved','Rejected','Pending'],
       datasets:[{ 
         data:[sYes,sNo,sPending], 
-        backgroundColor:['#10b981','#f59e0b','#8b5cf6'], 
-        borderWidth: 4,
-        borderColor: '#fff',
+        backgroundColor:['#00e676','#ff5252','#ffc107'], 
+        borderWidth: 0,
         hoverOffset: 10
       }]
     },{
@@ -939,46 +1327,16 @@
           display: true,
           position: 'bottom',
           labels:{ 
-            color: '#1f2937', 
+            color: '#ffffff', 
             padding: 20, 
-            font:{ size: 13, weight: '800' },
-            usePointStyle: true,
-            pointStyle: 'circle',
-            generateLabels: function(chart) {
-              const data = chart.data;
-              if (data.labels.length && data.datasets.length) {
-                return data.labels.map((label, i) => {
-                  const value = data.datasets[0].data[i];
-                  const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
-                  const percent = ((value / total) * 100).toFixed(1);
-                  return {
-                    text: `${label}: ${value.toLocaleString()} (${percent}%)`,
-                    fillStyle: data.datasets[0].backgroundColor[i],
-                    hidden: false,
-                    index: i
-                  };
-                });
-              }
-              return [];
-            }
+            font:{ size: 13, weight: '700' },
+            usePointStyle: true
           } 
-        },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              const label = context.label || '';
-              const value = context.parsed || 0;
-              const total = context.dataset.data.reduce((a, b) => a + b, 0);
-              const percent = ((value / total) * 100).toFixed(1);
-              return `${label}: ${value.toLocaleString()} (${percent}%)`;
-            }
-          }
         }
       },
-      cutout:'65%'
+      cutout:'70%'
     });
 
-    // Trend
     const trendMap = new Map();
     for(const r of rows){ const k = toDateKey(trim(r['Scan Date'])); if(k) trendMap.set(k,(trendMap.get(k)||0)+1); }
     const trend = [...trendMap.entries()].sort((a,b)=>a[0].localeCompare(b[0]));
@@ -986,26 +1344,25 @@
       labels: trend.map(x=>x[0]),
       datasets:[{ 
         data: trend.map(x=>x[1]), 
-        borderColor:'#667eea',
-        backgroundColor:'rgba(102,126,234,.2)',
+        borderColor:'#00d4ff',
+        backgroundColor:'rgba(0,212,255,0.1)',
         borderWidth:3, 
         tension:.4,
         fill:true,
-        pointRadius:5,
-        pointHoverRadius:7,
-        pointBackgroundColor:'#667eea',
+        pointRadius:0,
+        pointHoverRadius:6,
+        pointBackgroundColor:'#00d4ff',
         pointBorderColor:'#fff',
-        pointBorderWidth:3
+        pointBorderWidth:2
       }]
     },{ 
       scales:{ 
-        x:{ ticks:{ color:'#6b7280', maxRotation:45, font:{weight:'600',size:11} }, grid:{display:false} }, 
-        y:{ ticks:{ color:'#6b7280', font:{weight:'600',size:12} }, grid:{ color:'#e5e7eb' } } 
+        x:{ ticks:{ color:'#94a3b8', font:{size:11} }, grid:{color:'rgba(255,255,255,0.05)'} }, 
+        y:{ ticks:{ color:'#94a3b8', font:{size:11} }, grid:{ color:'rgba(255,255,255,0.05)' } } 
       }, 
       plugins:{ legend:{ display:false } } 
     });
 
-    // Retailer - vertical grouped bars
     const retailers = buildCounts(rows,'Retailer Name').slice(0,8);
     const retailerApproved = retailers.map(r => rows.filter(row => trim(row['Retailer Name']) === r[0] && /^yes$/i.test(trim(row['Submission Status']))).length);
     const retailerPending  = retailers.map(r => rows.filter(row => trim(row['Retailer Name']) === r[0] && /^pending$/i.test(trim(row['Submission Status']))).length);
@@ -1014,42 +1371,18 @@
     makeChart('retailerChart','bar',{
       labels: retailers.map(x=>x[0]),
       datasets:[
-        { label: 'Approved', data: retailerApproved, backgroundColor: '#10b981', borderRadius: 10, barThickness: 22 },
-        { label: 'Pending',  data: retailerPending,  backgroundColor: '#8b5cf6', borderRadius: 10, barThickness: 22 },
-        { label: 'Rejected', data: retailerRejected, backgroundColor: '#f59e0b', borderRadius: 10, barThickness: 22 }
+        { label: 'Approved', data: retailerApproved, backgroundColor: '#00e676', borderRadius: 8 },
+        { label: 'Pending',  data: retailerPending,  backgroundColor: '#ffc107', borderRadius: 8 },
+        { label: 'Rejected', data: retailerRejected, backgroundColor: '#ff5252', borderRadius: 8 }
       ]
     },{ 
-      plugins: { 
-        legend: { 
-          display: true, 
-          position: 'top', 
-          labels: { 
-            color: '#1f2937', 
-            padding: 16, 
-            font: { size: 13, weight: '700' }, 
-            usePointStyle: true, 
-            pointStyle: 'circle' 
-          } 
-        } 
-      }, 
+      plugins: { legend: { display: true, position: 'top', labels: { color: '#ffffff', font:{size:12,weight:'600'}, usePointStyle:true } } }, 
       scales: { 
-        x: { 
-          ticks: { 
-            color: '#1f2937', 
-            maxRotation: 45, 
-            minRotation: 25, 
-            font: { size: 11, weight: '700' } 
-          }, 
-          grid: { display: false } 
-        }, 
-        y: { 
-          ticks: { color: '#6b7280', font: { weight: '600' } }, 
-          grid: { color: '#e5e7eb' } 
-        } 
+        x: { ticks: { color: '#94a3b8', maxRotation: 45, font:{size:10} }, grid: { display: false } }, 
+        y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } } 
       } 
     });
 
-    // District
     const districts = buildCounts(rows,'District').slice(0,10);
     makeChart('districtChart','bar',{
       labels: districts.map(x=>x[0]),
@@ -1063,18 +1396,17 @@
       indexAxis:'y', 
       plugins:{ legend:{ display:false } }, 
       scales:{ 
-        x:{ ticks:{ color:'#6b7280', font:{weight:'600'} }, grid:{color:'#e5e7eb'} }, 
-        y:{ ticks:{ color:'#1f2937',font:{size:11,weight:'700'} }, grid:{display:false} } 
+        x:{ ticks:{ color:'#94a3b8' }, grid:{color:'rgba(255,255,255,0.05)'} }, 
+        y:{ ticks:{ color:'#ffffff',font:{size:11,weight:'600'} }, grid:{display:false} } 
       } 
     });
 
-    // Product
     const pMap = new Map();
     for(const r of rows){
       const m = parseProducts(r['Cart Items']);
       for(const [name,qty] of m){ pMap.set(name,(pMap.get(name)||0)+qty); }
     }
-    const pArr = [...pMap.entries()].sort((a,b)=>b[1]-a[1]).slice(0,16);
+    const pArr = [...pMap.entries()].sort((a,b)=>b[1]-a[1]).slice(0,12);
     makeChart('productChart','bar',{
       labels: pArr.map(x=>x[0]),
       datasets:[{ 
@@ -1086,24 +1418,13 @@
     },{ 
       plugins:{ legend:{ display:false } }, 
       scales:{ 
-        x:{ 
-          ticks:{ 
-            color:'#1f2937', 
-            maxRotation:45, 
-            minRotation:20, 
-            font:{size:11,weight:'700'} 
-          }, 
-          grid:{display:false} 
-        }, 
-        y:{ 
-          ticks:{ color:'#6b7280', font:{weight:'600'} }, 
-          grid:{color:'#e5e7eb'} 
-        } 
+        x:{ ticks:{ color:'#ffffff', maxRotation:45, font:{size:10,weight:'600'} }, grid:{display:false} }, 
+        y:{ ticks:{ color:'#94a3b8' }, grid:{color:'rgba(255,255,255,0.05)'} } 
       } 
     });
   }
 
-  // India Map with Leaflet
+  // India Map
   let indiaMap = null;
   let mapLayer = null;
 
@@ -1157,34 +1478,31 @@
 
   function getMarkerIcon(state, approved) {
     const level = getMarkerLevel(approved);
-    const shortName = state.length > 12 ? state.substring(0, 10) + '.' : state;
+    const shortName = state.length > 12 ? state.substring(0, 10) + '...' : state;
     
     return L.divIcon({
-      className: 'state-marker-pin',
+      className: 'state-marker',
       html: `
-        <div class="marker-ripple"></div>
-        <div class="state-marker-inner state-marker-level-${level}">
-          <div class="state-marker-name">${shortName}</div>
-          <div class="state-marker-count">
+        <div class="state-marker marker-level-${level}">
+          <div class="state-name">${shortName}</div>
+          <div class="state-count">
             <span>✓</span>
             <span>${approved.toLocaleString()}</span>
           </div>
         </div>
       `,
       iconSize: [null, null],
-      iconAnchor: [30, 30]
+      iconAnchor: [50, 40]
     });
-  }
-
-  function getApprovalRate(approved, total) {
-    if (total === 0) return 0;
-    return (approved / total * 100).toFixed(1);
   }
 
   function initMap() {
     if (indiaMap) return;
     indiaMap = L.map('indiaMap', { center: [22.5, 82.5], zoom: 5, minZoom: 4, maxZoom: 8, zoomControl: true });
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors', maxZoom: 19 }).addTo(indiaMap);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { 
+      attribution: '© OpenStreetMap, © CartoDB',
+      maxZoom: 19 
+    }).addTo(indiaMap);
   }
 
   function renderIndiaMap(rows) {
@@ -1205,33 +1523,59 @@
     }
     
     mapLayer = L.layerGroup();
+    let totalApproved = 0, totalPending = 0, totalRejected = 0;
 
     for (const [state, coords] of Object.entries(stateCoordinates)) {
       const data = stateData.get(state);
       if (!data || data.approved === 0) continue;
 
-      const approvalRate = getApprovalRate(data.approved, data.total);
+      totalApproved += data.approved;
+      totalPending += data.pending;
+      totalRejected += data.rejected;
+
+      const approvalRate = ((data.approved / data.total) * 100).toFixed(1);
       const marker = L.marker(coords, { icon: getMarkerIcon(state, data.approved) });
 
       const popupContent = `
-        <div class="map-popup-state">📍 ${state}</div>
-        <div class="map-popup-row"><span class="map-popup-label">✅ Approved</span><span class="map-popup-value map-popup-success">${data.approved.toLocaleString()}</span></div>
-        <div class="map-popup-row"><span class="map-popup-label">⏳ Pending</span><span class="map-popup-value map-popup-pending">${data.pending.toLocaleString()}</span></div>
-        <div class="map-popup-row"><span class="map-popup-label">❌ Rejected</span><span class="map-popup-value map-popup-rejected">${data.rejected.toLocaleString()}</span></div>
-        <div class="map-popup-row" style="border-top:3px solid var(--ring);margin-top:12px;padding-top:12px"><span class="map-popup-label">📊 Total Scans</span><span class="map-popup-value">${data.total.toLocaleString()}</span></div>
-        <div class="map-popup-row"><span class="map-popup-label">🎯 Approval Rate</span><span class="map-popup-value map-popup-success">${approvalRate}%</span></div>
+        <div class="popup-state">📍 ${state}</div>
+        <div class="popup-row">
+          <span class="popup-label">✅ Approved</span>
+          <span class="popup-value stat-success">${data.approved.toLocaleString()}</span>
+        </div>
+        <div class="popup-row">
+          <span class="popup-label">⏳ Pending</span>
+          <span class="popup-value stat-warning">${data.pending.toLocaleString()}</span>
+        </div>
+        <div class="popup-row">
+          <span class="popup-label">❌ Rejected</span>
+          <span class="popup-value stat-danger">${data.rejected.toLocaleString()}</span>
+        </div>
+        <div class="popup-row" style="border-top:2px solid rgba(255,255,255,0.1);margin-top:12px;padding-top:12px">
+          <span class="popup-label">📊 Total</span>
+          <span class="popup-value">${data.total.toLocaleString()}</span>
+        </div>
+        <div class="popup-row">
+          <span class="popup-label">🎯 Rate</span>
+          <span class="popup-value stat-success">${approvalRate}%</span>
+        </div>
       `;
 
-      marker.bindPopup(popupContent, { closeButton: true, maxWidth: 340, className: 'custom-popup' });
+      marker.bindPopup(popupContent, { closeButton: true, maxWidth: 360 });
       marker.on('click', () => { FILTERS.state = state; selState.value = state; render(); });
       marker.addTo(mapLayer);
     }
 
     mapLayer.addTo(indiaMap);
+    
+    // Update map stats
+    document.getElementById('mapActiveStates').textContent = stateData.size;
+    document.getElementById('mapApproved').textContent = totalApproved.toLocaleString();
+    document.getElementById('mapPending').textContent = totalPending.toLocaleString();
+    document.getElementById('mapRejected').textContent = totalRejected.toLocaleString();
+
     setTimeout(() => { indiaMap.fitBounds([[8, 68],[37, 97]]); }, 100);
   }
 
-  // Populate + Cascading
   function populateFilters(rows){
     const states = uniqSorted(rows.map(r=>trim(r.State)));
     const dists  = uniqSorted(rows.map(r=>trim(r.District)));
@@ -1333,9 +1677,8 @@
     requestAnimationFrame(()=> renderCharts(rows));
   }
 
-  // Load CSV
   function normalizeRow(r){
-    const obj = {
+    return {
       'User ID': r['User ID']||r['UserID']||r['id']||'',
       'Phone Number': r['Phone Number']||r['Phone']||r['phone']||'',
       'First Name': r['First Name']||r['FirstName']||'',
@@ -1354,7 +1697,6 @@
       'Coupon Code': r['Coupon Code']||'',
       'Submission Status': r['Submission Status']||r['Approved Status']||''
     };
-    return obj;
   }
 
   Papa.parse(CSV_URL, {
@@ -1370,7 +1712,7 @@
     },
     error: (err)=>{
       console.error('CSV load error', err);
-      alert('Failed to load data.csv. Ensure the file exists at '+CSV_URL);
+      alert('Failed to load data.csv');
     }
   });
 </script>
