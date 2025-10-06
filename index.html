@@ -1353,7 +1353,17 @@
       .sort((a,b) => b.total - a.total)
       .slice(0, 10);
     
-    makeChart('ptStatusChart','bar',{
+    console.log('📊 PT Status Chart Data:', { totalPTs: Object.keys(ptStats).length, topPTs: topPTs.length, sample: topPTs[0] });
+    
+    // Handle empty data for PT chart
+    if(topPTs.length === 0){
+      const ptCanvas = document.getElementById('ptStatusChart');
+      if(ptCanvas){
+        const parent = ptCanvas.parentElement;
+        parent.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:240px;color:#6b7280;font-size:14px;"><div style="text-align:center;"><div style="font-size:3rem;margin-bottom:1rem;">📊</div><div style="font-weight:600;">No PT data available</div><div style="font-size:12px;margin-top:0.5rem;">Please ensure your CSV has a "PT" column with data</div></div></div>';
+      }
+    } else {
+      makeChart('ptStatusChart','bar',{
       labels: topPTs.map(p => p.pt),
       datasets:[
         { 
@@ -1408,6 +1418,7 @@
         }
       }
     });
+    }
 
     // NEW: Participation Share by Source
     const sourceStats = {};
@@ -1418,7 +1429,17 @@
     }
     const sourceData = Object.entries(sourceStats).sort((a,b) => b[1] - a[1]);
     
-    makeChart('sourceChart','doughnut',{
+    console.log('📱 Source Chart Data:', { totalSources: Object.keys(sourceStats).length, sourceData: sourceData });
+    
+    // Handle empty data for Source chart
+    if(sourceData.length === 0){
+      const sourceCanvas = document.getElementById('sourceChart');
+      if(sourceCanvas){
+        const parent = sourceCanvas.parentElement;
+        parent.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:240px;color:#6b7280;font-size:14px;"><div style="text-align:center;"><div style="font-size:3rem;margin-bottom:1rem;">📱</div><div style="font-weight:600;">No Source data available</div><div style="font-size:12px;margin-top:0.5rem;">Please ensure your CSV has a "Source" column with data</div></div></div>';
+      }
+    } else {
+      makeChart('sourceChart','doughnut',{
       labels: sourceData.map(s => s[0]),
       datasets:[{ 
         data: sourceData.map(s => s[1]), 
@@ -1471,6 +1492,7 @@
       },
       cutout:'65%'
     });
+    }
   }
 
   // India Map
@@ -1715,7 +1737,10 @@
       'Retailer Name': r['Retailer Name']||r['Retailer']||'',
       'Cart Items': r['Cart Items']||'',
       'Coupon Code': r['Coupon Code']||'',
-      'Submission Status': r['Submission Status']||r['Approved Status']||''
+      'Submission Status': r['Submission Status']||r['Approved Status']||'',
+      'Source': r['Source']||'',
+      'PT': r['PT']||'',
+      'Zone': r['Zone']||''
     };
   }
 
@@ -1726,6 +1751,32 @@
     dynamicTyping: false,
     complete: (res)=>{
       RAW = res.data.map(normalizeRow);
+      
+      // Debug: Check if new columns exist
+      if(RAW.length > 0){
+        const firstRow = RAW[0];
+        console.log('✅ CSV Columns Found:', Object.keys(firstRow));
+        console.log('📊 New Columns Check:', {
+          hasSource: 'Source' in firstRow,
+          hasPT: 'PT' in firstRow,
+          hasZone: 'Zone' in firstRow,
+          sampleSource: firstRow.Source || '(empty)',
+          samplePT: firstRow.PT || '(empty)',
+          sampleZone: firstRow.Zone || '(empty)'
+        });
+        
+        // Count rows with data
+        const withSource = RAW.filter(r => r.Source && trim(r.Source)).length;
+        const withPT = RAW.filter(r => r.PT && trim(r.PT)).length;
+        const withZone = RAW.filter(r => r.Zone && trim(r.Zone)).length;
+        console.log('📈 Data availability:', {
+          totalRows: RAW.length,
+          rowsWithSource: withSource + ' (' + ((withSource/RAW.length)*100).toFixed(1) + '%)',
+          rowsWithPT: withPT + ' (' + ((withPT/RAW.length)*100).toFixed(1) + '%)',
+          rowsWithZone: withZone + ' (' + ((withZone/RAW.length)*100).toFixed(1) + '%)'
+        });
+      }
+      
       populateFilters(RAW);
       attachFilterHandlers();
       render();
