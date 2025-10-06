@@ -737,39 +737,60 @@
           </div>
           <div class="kpi-grid">
             <div class="kpi-item">
-              <div class="kpi-label">✅ Approved</div>
+              <div class="kpi-label"><span class="kpi-label-icon">✅</span> Approved</div>
               <div class="kpi-value" id="kpiYes">0</div>
               <div class="kpi-percent" id="kpiYesPct">0%</div>
+              <div class="kpi-progress">
+                <div class="kpi-progress-bar" id="kpiYesProgress" style="width:0%"></div>
+              </div>
             </div>
             <div class="kpi-item">
-              <div class="kpi-label">❌ Rejected</div>
+              <div class="kpi-label"><span class="kpi-label-icon">❌</span> Rejected</div>
               <div class="kpi-value" id="kpiNo">0</div>
               <div class="kpi-percent" id="kpiNoPct">0%</div>
+              <div class="kpi-progress">
+                <div class="kpi-progress-bar" id="kpiNoProgress" style="width:0%"></div>
+              </div>
             </div>
             <div class="kpi-item">
-              <div class="kpi-label">⏳ Pending</div>
+              <div class="kpi-label"><span class="kpi-label-icon">⏳</span> Pending</div>
               <div class="kpi-value" id="kpiPending">0</div>
               <div class="kpi-percent" id="kpiPendingPct">0%</div>
+              <div class="kpi-progress">
+                <div class="kpi-progress-bar" id="kpiPendingProgress" style="width:0%"></div>
+              </div>
             </div>
             <div class="kpi-item">
-              <div class="kpi-label">👨‍🌾 Total Farmers</div>
+              <div class="kpi-label"><span class="kpi-label-icon">👨‍🌾</span> Total Farmers</div>
               <div class="kpi-value" id="kpiTotalFarmers">0</div>
               <div class="kpi-percent" id="kpiUniqueFarmers">Unique: 0</div>
+              <div class="kpi-progress">
+                <div class="kpi-progress-bar" id="kpiFarmersProgress" style="width:0%"></div>
+              </div>
             </div>
             <div class="kpi-item">
-              <div class="kpi-label">🏪 Retailers</div>
+              <div class="kpi-label"><span class="kpi-label-icon">🏪</span> Retailers</div>
               <div class="kpi-value" id="kpiActiveRetailers">0</div>
               <div class="kpi-percent" id="kpiTotalRetailers">of 0 total</div>
+              <div class="kpi-progress">
+                <div class="kpi-progress-bar" id="kpiRetailersProgress" style="width:0%"></div>
+              </div>
             </div>
             <div class="kpi-item">
-              <div class="kpi-label">📞 Missed Calls</div>
+              <div class="kpi-label"><span class="kpi-label-icon">📞</span> Missed Calls</div>
               <div class="kpi-value" id="kpiMissedCalls">0</div>
               <div class="kpi-percent" id="kpiMissedCallsTotal">of 0 total</div>
+              <div class="kpi-progress">
+                <div class="kpi-progress-bar" id="kpiMissedCallsProgress" style="width:0%"></div>
+              </div>
             </div>
             <div class="kpi-item">
-              <div class="kpi-label">📞 Unique Missed Calls</div>
+              <div class="kpi-label"><span class="kpi-label-icon">📱</span> Unique Calls</div>
               <div class="kpi-value" id="kpiUniqueMissedCalls">0</div>
               <div class="kpi-percent" id="kpiUniqueMissedCallsTotal">of 0 total</div>
+              <div class="kpi-progress">
+                <div class="kpi-progress-bar" id="kpiUniqueMissedCallsProgress" style="width:0%"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -1196,6 +1217,24 @@
     document.getElementById('kpiYesPct').textContent = `${yesPct}% of total`;
     document.getElementById('kpiNoPct').textContent = `${noPct}% of total`;
     document.getElementById('kpiPendingPct').textContent = `${pendingPct}% of total`;
+    
+    // Update animated progress bars
+    setTimeout(() => {
+      document.getElementById('kpiYesProgress').style.width = `${yesPct}%`;
+      document.getElementById('kpiNoProgress').style.width = `${noPct}%`;
+      document.getElementById('kpiPendingProgress').style.width = `${pendingPct}%`;
+      
+      // Calculate progress for other KPIs
+      const farmersProgress = totalFarmers > 0 ? Math.min((uniqueFarmers / totalFarmers) * 100, 100) : 0;
+      const retailersProgress = totalRetailers > 0 ? Math.min((activeRetailers / totalRetailers) * 100, 100) : 0;
+      const missedCallsProgress = missedCallsTotal > 0 ? Math.min((missedCallsDisplay / missedCallsTotal) * 100, 100) : 0;
+      const uniqueCallsProgress = missedCallsUnique > 0 ? Math.min((missedCallsUniqueDisplay / missedCallsUnique) * 100, 100) : 0;
+      
+      document.getElementById('kpiFarmersProgress').style.width = `${farmersProgress.toFixed(1)}%`;
+      document.getElementById('kpiRetailersProgress').style.width = `${retailersProgress.toFixed(1)}%`;
+      document.getElementById('kpiMissedCallsProgress').style.width = `${missedCallsProgress.toFixed(1)}%`;
+      document.getElementById('kpiUniqueMissedCallsProgress').style.width = `${uniqueCallsProgress.toFixed(1)}%`;
+    }, 100);
   }
 
   function buildCounts(rows, key){
