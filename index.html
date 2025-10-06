@@ -682,16 +682,16 @@
         <canvas id="productChart" height="180"></canvas>
       </div>
 
-      <!-- NEW: Submission Status by PT (Top 10) -->
-      <div class="card" style="grid-column: span 6">
-        <h3>📊 Submission Status by PT (Top 10)</h3>
-        <canvas id="ptStatusChart" height="240"></canvas>
-      </div>
-
-      <!-- NEW: Participation Share by Source -->
+      <!-- NEW: Participation Share by Source (LEFT) -->
       <div class="card" style="grid-column: span 4">
         <h3>📱 Participation Share by Source</h3>
         <canvas id="sourceChart" height="280"></canvas>
+      </div>
+
+      <!-- NEW: Submission Status by PT (Top 10) (RIGHT) -->
+      <div class="card" style="grid-column: span 8">
+        <h3>📊 Submission Status by PT (Top 10)</h3>
+        <canvas id="ptStatusChart" height="280"></canvas>
       </div>
 
       <!-- India Map with Stats Card -->
@@ -1341,7 +1341,8 @@
     const ptStats = {};
     for(const r of rows){
       const pt = trim(r.PT||'');
-      if(!pt) continue;
+      // Skip empty PT and exclude "Direct Landing Page" (it's a Source, not PT)
+      if(!pt || pt.toLowerCase() === 'direct landing page') continue;
       if(!ptStats[pt]) ptStats[pt] = {yes:0, no:0, pending:0};
       const status = trim((r['Submission Status']||'').toLowerCase());
       if(status==='yes') ptStats[pt].yes++;
