@@ -1353,7 +1353,12 @@
       .sort((a,b) => b.total - a.total)
       .slice(0, 10);
     
-    console.log('📊 PT Status Chart Data:', { totalPTs: Object.keys(ptStats).length, topPTs: topPTs.length, sample: topPTs[0] });
+    console.log('📊 PT Status Chart Data:', { 
+      totalPTs: Object.keys(ptStats).length, 
+      topPTs: topPTs.length, 
+      sample: topPTs[0],
+      note: 'Excluding "Direct Landing Page" - it is a Source, not a PT'
+    });
     
     // Handle empty data for PT chart
     if(topPTs.length === 0){
