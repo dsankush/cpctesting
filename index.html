@@ -689,9 +689,9 @@
       </div>
 
       <!-- NEW: Participation Share by Source -->
-      <div class="card" style="grid-column: span 6">
+      <div class="card" style="grid-column: span 4">
         <h3>📱 Participation Share by Source</h3>
-        <canvas id="sourceChart" height="240"></canvas>
+        <canvas id="sourceChart" height="280"></canvas>
       </div>
 
       <!-- India Map with Stats Card -->
@@ -1353,7 +1353,12 @@
       .sort((a,b) => b.total - a.total)
       .slice(0, 10);
     
-    console.log('📊 PT Status Chart Data:', { totalPTs: Object.keys(ptStats).length, topPTs: topPTs.length, sample: topPTs[0] });
+    console.log('📊 PT Status Chart Data:', { 
+      totalPTs: Object.keys(ptStats).length, 
+      topPTs: topPTs.length, 
+      sample: topPTs[0],
+      note: 'Excluding "Direct Landing Page" - it is a Source, not a PT'
+    });
     
     // Handle empty data for PT chart
     if(topPTs.length === 0){
@@ -1367,55 +1372,55 @@
       labels: topPTs.map(p => p.pt),
       datasets:[
         { 
-          label: 'Yes', 
+          label: 'Approved', 
           data: topPTs.map(p => p.yes), 
           backgroundColor:'#10b981',
-          borderColor:'#059669',
-          borderWidth:2
+          borderRadius: 10,
+          barThickness: 22
         },
         { 
           label: 'Pending', 
           data: topPTs.map(p => p.pending), 
-          backgroundColor:'#f59e0b',
-          borderColor:'#d97706',
-          borderWidth:2
+          backgroundColor:'#8b5cf6',
+          borderRadius: 10,
+          barThickness: 22
         },
         { 
-          label: 'No', 
+          label: 'Rejected', 
           data: topPTs.map(p => p.no), 
-          backgroundColor:'#ef4444',
-          borderColor:'#dc2626',
-          borderWidth:2
+          backgroundColor:'#f59e0b',
+          borderRadius: 10,
+          barThickness: 22
         }
       ]
-    },{
-      scales:{
-        x:{ 
-          ticks:{ color:'#6b7280', font:{weight:'600',size:11,family:'Outfit'}, maxRotation:45 }, 
-          grid:{display:false},
-          stacked:true
-        },
-        y:{ 
-          ticks:{ color:'#6b7280', font:{weight:'700',family:'Space Grotesk'} }, 
-          grid:{color:'#e5e7eb'},
-          stacked:true
-        }
-      },
-      plugins:{
-        legend:{ 
-          display:true,
-          position:'top',
-          labels:{ color:'#1f2937', font:{size:12,weight:'700',family:'Outfit'}, padding:12 }
-        },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              const label = context.dataset.label || '';
-              const value = context.parsed.y || 0;
-              return `${label}: ${value.toLocaleString()}`;
-            }
-          }
-        }
+    },{ 
+      plugins: { 
+        legend: { 
+          display: true, 
+          position: 'top', 
+          labels: { 
+            color: '#1f2937', 
+            padding: 14, 
+            font: { size: 12, weight: '700', family: 'Outfit' }, 
+            usePointStyle: true, 
+            pointStyle: 'circle' 
+          } 
+        } 
+      }, 
+      scales: { 
+        x: { 
+          ticks: { 
+            color: '#1f2937', 
+            maxRotation: 45, 
+            minRotation: 25, 
+            font: { size: 11, weight: '700', family: 'Outfit' } 
+          }, 
+          grid: { display: false } 
+        }, 
+        y: { 
+          ticks: { color: '#6b7280', font: { weight: '700', family: 'Space Grotesk' } }, 
+          grid: { color: '#e5e7eb' } 
+        } 
       }
     });
     }
