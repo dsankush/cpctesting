@@ -1048,9 +1048,20 @@
   const trim = (s)=> (s==null?'' : String(s).trim());
   const toDateKey = (dt)=>{
     if(!dt) return '';
-    const d = new Date(dt.replace(/-/g,'/'));
-    if(isNaN(d)) return '';
-    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    // Handle dates in format "2025-09-15 5:42:27" or "2025-09-15"
+    const dateStr = String(dt).trim();
+    
+    // Extract just the date part (YYYY-MM-DD) if it has time
+    const dateOnly = dateStr.split(' ')[0];
+    
+    // Validate format YYYY-MM-DD
+    const match = dateOnly.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if(!match) return '';
+    
+    const [_, year, month, day] = match;
+    
+    // Return normalized YYYY-MM-DD format
+    return `${year}-${month.padStart(2,'0')}-${day.padStart(2,'0')}`;
   };
   function uniqSorted(arr){ return [...new Set(arr.filter(Boolean))].sort((a,b)=>a.localeCompare(b)); }
 
