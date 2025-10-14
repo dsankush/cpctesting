@@ -3,188 +3,224 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>FitTrack Pro — Your Weight Journey</title>
+  <title>🎯 FitTrack — Your Weight Journey 🚀</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fredoka:wght@400;500;600;700&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
   <style>
     :root{
-      --bg:#0a0e27;
-      --bg-secondary:#1a1a2e;
-      --card:#16213e;
-      --card-hover:#1e2a47;
-      --text:#e8eaf6;
-      --text-secondary:#9ca3af;
-      --accent-primary:#ff6b35;
-      --accent-success:#00d9ff;
-      --accent-warning:#ffd93d;
-      --accent-danger:#ff3864;
-      --accent-purple:#a855f7;
-      --glow-primary:rgba(255,107,53,.5);
-      --glow-success:rgba(0,217,255,.5);
-      --border:#2d3748;
+      --bg:#0d0221;
+      --bg-secondary:#1a0b2e;
+      --card:#2d1b4e;
+      --text:#f4f1ff;
+      --text-secondary:#b8a4d4;
+      --pink:#ff006e;
+      --yellow:#ffbe0b;
+      --cyan:#00f5ff;
+      --purple:#8338ec;
+      --green:#06ffa5;
+      --orange:#fb5607;
     }
     *{box-sizing:border-box;margin:0;padding:0}
     html,body{height:100%;overflow-x:hidden}
     body{
-      font-family:'Inter',sans-serif;
+      font-family:'Fredoka',sans-serif;
       background:var(--bg);
       color:var(--text);
       background-image:
-        radial-gradient(circle at 20% 50%, rgba(255,107,53,.08) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(0,217,255,.08) 0%, transparent 50%),
-        linear-gradient(180deg, var(--bg) 0%, #0f1419 100%);
+        radial-gradient(circle at 15% 20%, rgba(255,0,110,.15) 0%, transparent 40%),
+        radial-gradient(circle at 85% 60%, rgba(131,56,236,.15) 0%, transparent 40%),
+        radial-gradient(circle at 50% 90%, rgba(0,245,255,.12) 0%, transparent 50%);
       background-attachment:fixed;
+      position:relative;
     }
-    .app{display:grid;grid-template-rows:auto 1fr auto;min-height:100vh}
     
-    /* Header - Gym Style */
+    /* Quirky floating shapes */
+    body::before,
+    body::after{
+      content:'';
+      position:fixed;
+      border-radius:50%;
+      pointer-events:none;
+      z-index:0;
+    }
+    body::before{
+      width:300px;height:300px;
+      background:radial-gradient(circle, rgba(255,190,11,.2), transparent 70%);
+      top:-150px;right:-150px;
+      animation:float1 20s ease-in-out infinite;
+    }
+    body::after{
+      width:400px;height:400px;
+      background:radial-gradient(circle, rgba(131,56,236,.15), transparent 70%);
+      bottom:-200px;left:-200px;
+      animation:float2 25s ease-in-out infinite;
+    }
+    @keyframes float1{
+      0%,100%{transform:translate(0,0) rotate(0deg)}
+      50%{transform:translate(-100px,100px) rotate(180deg)}
+    }
+    @keyframes float2{
+      0%,100%{transform:translate(0,0) rotate(0deg)}
+      50%{transform:translate(100px,-100px) rotate(-180deg)}
+    }
+    
+    .app{display:grid;grid-template-rows:auto 1fr auto;min-height:100vh;position:relative;z-index:1}
+    
+    /* Header - Quirky Style */
     header{
       position:sticky;top:0;z-index:30;
-      backdrop-filter:saturate(180%) blur(20px);
-      background:rgba(15,15,30,.98);
-      border-bottom:3px solid var(--accent-primary);
-      box-shadow:0 8px 32px rgba(255,107,53,.2);
+      backdrop-filter:saturate(200%) blur(25px);
+      background:rgba(13,2,33,.95);
+      border-bottom:4px solid;
+      border-image:linear-gradient(90deg,var(--pink),var(--yellow),var(--cyan),var(--purple)) 1;
+      box-shadow:0 10px 40px rgba(255,0,110,.25);
     }
     .bar{
       display:flex;
       align-items:center;
-      gap:24px;
-      padding:20px 40px;
+      justify-content:space-between;
+      gap:16px;
+      padding:16px 24px;
       flex-wrap:wrap;
     }
     .logo{
       display:flex;
       align-items:center;
-      gap:16px;
-      padding:16px 30px;
-      border-radius:20px;
-      background:linear-gradient(135deg, rgba(255,107,53,.2), rgba(0,217,255,.2));
-      backdrop-filter:blur(10px);
-      box-shadow:0 4px 20px rgba(255,107,53,.3), inset 0 1px 0 rgba(255,255,255,.1);
-      border:2px solid rgba(255,107,53,.4);
+      gap:12px;
+      padding:12px 24px;
+      border-radius:50px;
+      background:linear-gradient(135deg, rgba(255,0,110,.25), rgba(131,56,236,.25));
+      border:3px solid rgba(255,0,110,.5);
+      box-shadow:0 0 30px rgba(255,0,110,.4), inset 0 0 20px rgba(255,255,255,.1);
+      position:relative;
+      overflow:hidden;
+    }
+    .logo::before{
+      content:'';
+      position:absolute;
+      inset:0;
+      background:linear-gradient(45deg, transparent, rgba(255,255,255,.2), transparent);
+      transform:translateX(-100%);
+      animation:shine 3s infinite;
+    }
+    @keyframes shine{
+      0%{transform:translateX(-100%)}
+      100%{transform:translateX(200%)}
     }
     .logo-icon{
-      font-size:2.5rem;
-      animation:pulse 2s ease-in-out infinite;
-      filter:drop-shadow(0 4px 12px var(--accent-primary));
+      font-size:2rem;
+      animation:wiggle 2s ease-in-out infinite;
     }
-    @keyframes pulse{
-      0%,100%{transform:scale(1) rotate(0deg)}
-      50%{transform:scale(1.15) rotate(-5deg)}
+    @keyframes wiggle{
+      0%,100%{transform:rotate(-15deg) scale(1)}
+      25%{transform:rotate(15deg) scale(1.1)}
+      50%{transform:rotate(-15deg) scale(1)}
+      75%{transform:rotate(15deg) scale(1.1)}
     }
     .title{
-      font-size:2rem;
+      font-size:1.5rem;
       margin:0;
-      font-weight:900;
-      font-family:'Poppins',sans-serif;
-      background:linear-gradient(135deg,var(--accent-primary),var(--accent-success));
+      font-weight:700;
+      font-family:'Fredoka',sans-serif;
+      background:linear-gradient(135deg,var(--pink),var(--yellow),var(--cyan));
       -webkit-background-clip:text;
       -webkit-text-fill-color:transparent;
       background-clip:text;
-      letter-spacing:1px;
-      text-shadow:0 0 30px var(--glow-primary);
+      background-size:200% 200%;
+      animation:gradientShift 4s ease infinite;
     }
-    .header-actions{
-      margin-left:auto;
-      display:flex;
-      gap:12px;
-      align-items:center;
-      flex-wrap:wrap;
+    @keyframes gradientShift{
+      0%,100%{background-position:0% 50%}
+      50%{background-position:100% 50%}
     }
     .btn{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      gap:10px;
-      padding:14px 28px;
-      border-radius:14px;
-      border:none;
-      background:linear-gradient(135deg,var(--accent-primary),#ff8c5a);
+      gap:8px;
+      padding:12px 24px;
+      border-radius:50px;
+      border:3px solid;
+      background:linear-gradient(135deg,var(--pink),var(--purple));
+      border-color:rgba(255,255,255,.3);
       color:white;
-      font-weight:800;
+      font-weight:700;
       cursor:pointer;
       font-size:14px;
-      transition:all .3s ease;
-      box-shadow:0 6px 20px var(--glow-primary);
-      font-family:'Inter',sans-serif;
-      text-transform:uppercase;
-      letter-spacing:.5px;
+      transition:all .3s cubic-bezier(0.68,-0.55,0.265,1.55);
+      box-shadow:0 6px 25px rgba(255,0,110,.4);
+      font-family:'Fredoka',sans-serif;
+      position:relative;
+      overflow:hidden;
     }
+    .btn::before{
+      content:'';
+      position:absolute;
+      inset:0;
+      background:linear-gradient(135deg,transparent,rgba(255,255,255,.3),transparent);
+      transform:translateX(-100%);
+      transition:transform .5s;
+    }
+    .btn:hover::before{transform:translateX(100%)}
     .btn:hover{
-      transform:translateY(-3px) scale(1.02);
-      box-shadow:0 10px 35px var(--glow-primary);
+      transform:translateY(-4px) scale(1.05);
+      box-shadow:0 12px 40px rgba(255,0,110,.6);
     }
     .btn:active{
-      transform:translateY(0) scale(0.98);
-    }
-    .btn-secondary{
-      background:linear-gradient(135deg,var(--accent-success),#00f0ff);
-      box-shadow:0 6px 20px var(--glow-success);
-      color:#0a0e27;
-    }
-    .btn-secondary:hover{
-      box-shadow:0 10px 35px var(--glow-success);
-    }
-    .btn-outline{
-      background:transparent;
-      border:2px solid var(--accent-primary);
-      box-shadow:0 0 20px rgba(255,107,53,.2);
-    }
-    .btn-outline:hover{
-      background:rgba(255,107,53,.15);
+      transform:translateY(-1px) scale(0.98);
     }
 
     /* Main Layout */
     .main{
       display:flex;
       flex-direction:column;
-      gap:32px;
-      padding:40px;
-      max-width:1800px;
+      gap:24px;
+      padding:24px 16px;
+      max-width:1600px;
       margin:0 auto;
       width:100%;
     }
 
     /* Goal Setting Section */
     .goal-section{
-      background:linear-gradient(135deg, var(--card) 0%, rgba(26,26,46,.9) 100%);
-      border:2px solid rgba(255,107,53,.3);
-      border-radius:28px;
-      padding:40px;
-      box-shadow:0 12px 40px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.05);
+      background:linear-gradient(135deg, rgba(45,27,78,.9) 0%, rgba(26,11,46,.9) 100%);
+      border:3px solid;
+      border-image:linear-gradient(135deg,var(--pink),var(--yellow),var(--cyan)) 1;
+      border-radius:32px;
+      padding:24px;
+      box-shadow:0 15px 50px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1);
       position:relative;
       overflow:hidden;
     }
     .goal-section::before{
-      content:'';
+      content:'🎯';
       position:absolute;
-      top:0;left:0;right:0;
-      height:5px;
-      background:linear-gradient(90deg,var(--accent-primary),var(--accent-success),var(--accent-purple),var(--accent-primary));
-      background-size:200% 100%;
-      animation:gradientMove 3s linear infinite;
-    }
-    @keyframes gradientMove{
-      0%{background-position:0% 0%}
-      100%{background-position:200% 0%}
+      font-size:15rem;
+      opacity:.05;
+      top:50%;
+      left:50%;
+      transform:translate(-50%,-50%) rotate(-15deg);
+      pointer-events:none;
     }
     .goal-header{
       display:flex;
       justify-content:space-between;
       align-items:center;
-      margin-bottom:32px;
+      margin-bottom:24px;
       flex-wrap:wrap;
-      gap:20px;
+      gap:16px;
+      position:relative;
+      z-index:2;
     }
     .goal-title{
-      font-size:28px;
-      font-weight:900;
-      font-family:'Poppins',sans-serif;
-      background:linear-gradient(135deg,var(--accent-primary),var(--accent-success));
+      font-size:1.8rem;
+      font-weight:700;
+      font-family:'Fredoka',sans-serif;
+      background:linear-gradient(135deg,var(--yellow),var(--pink),var(--cyan));
       -webkit-background-clip:text;
       -webkit-text-fill-color:transparent;
       background-clip:text;
@@ -194,129 +230,159 @@
     }
     .goal-stats{
       display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-      gap:24px;
+      grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+      gap:16px;
+      position:relative;
+      z-index:2;
     }
     .goal-stat{
-      background:rgba(255,255,255,.03);
-      border:2px solid var(--border);
-      border-radius:20px;
-      padding:24px;
+      background:rgba(255,255,255,.08);
+      border:3px solid var(--stat-border);
+      border-radius:24px;
+      padding:20px 16px;
       text-align:center;
-      transition:all .3s ease;
+      transition:all .4s cubic-bezier(0.68,-0.55,0.265,1.55);
+      position:relative;
+      overflow:hidden;
+    }
+    .goal-stat::before{
+      content:attr(data-emoji);
+      position:absolute;
+      font-size:4rem;
+      opacity:.15;
+      top:50%;
+      left:50%;
+      transform:translate(-50%,-50%) rotate(-10deg);
+      pointer-events:none;
     }
     .goal-stat:hover{
-      background:rgba(255,107,53,.08);
-      border-color:var(--accent-primary);
-      transform:translateY(-4px);
+      transform:translateY(-8px) rotate(2deg);
+      border-color:var(--stat-glow);
+      box-shadow:0 15px 40px var(--stat-shadow);
     }
     .goal-stat-label{
-      font-size:12px;
+      font-size:11px;
       color:var(--text-secondary);
       text-transform:uppercase;
-      letter-spacing:1.2px;
-      font-weight:800;
-      margin-bottom:12px;
+      letter-spacing:1px;
+      font-weight:700;
+      margin-bottom:10px;
+      position:relative;
+      z-index:2;
     }
     .goal-stat-value{
-      font-size:36px;
-      font-weight:900;
-      font-family:'Poppins',sans-serif;
-      background:linear-gradient(135deg,var(--goal-color),var(--goal-color-light));
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-      background-clip:text;
+      font-size:2rem;
+      font-weight:700;
+      font-family:'Fredoka',sans-serif;
+      color:var(--stat-color);
       line-height:1.2;
+      text-shadow:0 0 20px var(--stat-shadow);
+      position:relative;
+      z-index:2;
     }
-    .goal-stat:nth-child(1){--goal-color:#ff6b35;--goal-color-light:#ff8c5a}
-    .goal-stat:nth-child(2){--goal-color:#00d9ff;--goal-color-light:#00f0ff}
-    .goal-stat:nth-child(3){--goal-color:#a855f7;--goal-color-light:#c084fc}
-    .goal-stat:nth-child(4){--goal-color:#ffd93d;--goal-color-light:#ffe168}
+    .goal-stat:nth-child(1){--stat-color:var(--pink);--stat-border:var(--pink);--stat-glow:var(--pink);--stat-shadow:rgba(255,0,110,.5)}
+    .goal-stat:nth-child(2){--stat-color:var(--cyan);--stat-border:var(--cyan);--stat-glow:var(--cyan);--stat-shadow:rgba(0,245,255,.5)}
+    .goal-stat:nth-child(3){--stat-color:var(--yellow);--stat-border:var(--yellow);--stat-glow:var(--yellow);--stat-shadow:rgba(255,190,11,.5)}
+    .goal-stat:nth-child(4){--stat-color:var(--green);--stat-border:var(--green);--stat-glow:var(--green);--stat-shadow:rgba(6,255,165,.5)}
 
     /* Quick Stats Hero */
     .hero-stats{
       display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-      gap:24px;
+      grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+      gap:16px;
     }
     .stat-card{
-      background:linear-gradient(135deg, var(--card) 0%, rgba(22,33,62,.8) 100%);
-      border:2px solid var(--border);
-      border-radius:24px;
-      padding:32px;
+      background:linear-gradient(135deg, rgba(45,27,78,.9) 0%, rgba(26,11,46,.9) 100%);
+      border:3px solid var(--stat-color);
+      border-radius:28px;
+      padding:24px 16px;
       position:relative;
       overflow:hidden;
-      transition:all .4s cubic-bezier(0.4,0,0.2,1);
-      box-shadow:0 8px 32px rgba(0,0,0,.3);
+      transition:all .4s cubic-bezier(0.68,-0.55,0.265,1.55);
+      box-shadow:0 10px 35px rgba(0,0,0,.4);
+      text-align:center;
     }
     .stat-card::before{
       content:'';
       position:absolute;
-      top:0;left:0;right:0;
-      height:4px;
-      background:linear-gradient(90deg,var(--stat-color),var(--stat-color-light));
-      transform:scaleX(0);
-      transform-origin:left;
-      transition:transform .6s ease;
+      top:-50%;
+      right:-50%;
+      width:200%;
+      height:200%;
+      background:radial-gradient(circle, var(--stat-glow) 0%, transparent 70%);
+      animation:rotate 10s linear infinite;
+    }
+    @keyframes rotate{
+      0%{transform:rotate(0deg)}
+      100%{transform:rotate(360deg)}
     }
     .stat-card:hover{
-      transform:translateY(-8px);
-      border-color:var(--stat-color);
-      box-shadow:0 20px 60px rgba(0,0,0,.5);
+      transform:translateY(-12px) rotate(-2deg) scale(1.05);
+      box-shadow:0 20px 60px var(--stat-shadow);
     }
-    .stat-card:hover::before{transform:scaleX(1)}
     .stat-icon{
-      font-size:3.5rem;
-      margin-bottom:16px;
-      filter:drop-shadow(0 6px 16px var(--stat-color));
-      animation:float 3s ease-in-out infinite;
+      font-size:3rem;
+      margin-bottom:12px;
+      filter:drop-shadow(0 6px 20px var(--stat-shadow));
+      animation:bounce 2s ease-in-out infinite;
+      position:relative;
+      z-index:2;
     }
-    @keyframes float{
-      0%,100%{transform:translateY(0px)}
-      50%{transform:translateY(-10px)}
+    @keyframes bounce{
+      0%,100%{transform:translateY(0) rotate(0deg)}
+      25%{transform:translateY(-15px) rotate(-10deg)}
+      50%{transform:translateY(0) rotate(0deg)}
+      75%{transform:translateY(-8px) rotate(10deg)}
     }
     .stat-label{
-      font-size:12px;
+      font-size:11px;
       color:var(--text-secondary);
       text-transform:uppercase;
-      letter-spacing:1.5px;
-      font-weight:800;
-      margin-bottom:12px;
+      letter-spacing:1.2px;
+      font-weight:700;
+      margin-bottom:10px;
+      position:relative;
+      z-index:2;
     }
     .stat-value{
-      font-size:52px;
-      font-weight:900;
-      font-family:'Poppins',sans-serif;
-      background:linear-gradient(135deg,var(--stat-color),var(--stat-color-light));
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-      background-clip:text;
+      font-size:2.5rem;
+      font-weight:700;
+      font-family:'Fredoka',sans-serif;
+      color:var(--stat-color);
       line-height:1;
-      margin-bottom:12px;
+      margin-bottom:10px;
+      text-shadow:0 0 25px var(--stat-shadow);
+      position:relative;
+      z-index:2;
     }
     .stat-change{
-      font-size:14px;
-      font-weight:700;
+      font-size:13px;
+      font-weight:600;
       display:flex;
       align-items:center;
-      gap:8px;
+      justify-content:center;
+      gap:6px;
+      position:relative;
+      z-index:2;
     }
-    .stat-up{color:#00d9ff}
-    .stat-down{color:#ff3864}
 
-    .stat-card:nth-child(1){--stat-color:#ff6b35;--stat-color-light:#ff8c5a}
-    .stat-card:nth-child(2){--stat-color:#00d9ff;--stat-color-light:#00f0ff}
-    .stat-card:nth-child(3){--stat-color:#a855f7;--stat-color-light:#c084fc}
-    .stat-card:nth-child(4){--stat-color:#ffd93d;--stat-color-light:#ffe168}
+    .stat-card:nth-child(1){--stat-color:var(--pink);--stat-glow:rgba(255,0,110,.3);--stat-shadow:rgba(255,0,110,.6)}
+    .stat-card:nth-child(2){--stat-color:var(--cyan);--stat-glow:rgba(0,245,255,.3);--stat-shadow:rgba(0,245,255,.6)}
+    .stat-card:nth-child(3){--stat-color:var(--yellow);--stat-glow:rgba(255,190,11,.3);--stat-shadow:rgba(255,190,11,.6)}
+    .stat-card:nth-child(4){--stat-color:var(--green);--stat-glow:rgba(6,255,165,.3);--stat-shadow:rgba(6,255,165,.6)}
 
     /* Content Grid */
-    .content{display:grid;grid-template-columns:repeat(12,1fr);gap:28px}
+    .content{
+      display:grid;
+      grid-template-columns:repeat(12,1fr);
+      gap:16px;
+    }
     .card{
-      background:linear-gradient(135deg, var(--card) 0%, rgba(22,33,62,.95) 100%);
-      border:2px solid var(--border);
-      border-radius:24px;
-      padding:36px;
-      box-shadow:0 12px 40px rgba(0,0,0,.4);
+      background:linear-gradient(135deg, rgba(45,27,78,.95) 0%, rgba(26,11,46,.95) 100%);
+      border:3px solid rgba(255,0,110,.4);
+      border-radius:28px;
+      padding:24px;
+      box-shadow:0 12px 40px rgba(0,0,0,.5);
       transition:all .3s ease;
       position:relative;
       overflow:hidden;
@@ -324,88 +390,90 @@
     .card::after{
       content:'';
       position:absolute;
-      top:50%;left:50%;
-      width:300px;height:300px;
-      background:radial-gradient(circle, rgba(255,107,53,.1) 0%, transparent 70%);
+      top:50%;
+      left:50%;
+      width:500px;
+      height:500px;
+      background:radial-gradient(circle, rgba(255,0,110,.08) 0%, transparent 70%);
       transform:translate(-50%,-50%);
       pointer-events:none;
     }
     .card:hover{
-      border-color:var(--accent-primary);
+      border-color:var(--pink);
       transform:translateY(-6px);
-      box-shadow:0 20px 60px rgba(255,107,53,.3);
+      box-shadow:0 20px 60px rgba(255,0,110,.4);
     }
     .card h3{
-      margin:0 0 28px;
-      font-size:20px;
+      margin:0 0 20px;
+      font-size:1.3rem;
       color:var(--text);
-      font-weight:900;
-      font-family:'Poppins',sans-serif;
+      font-weight:700;
+      font-family:'Fredoka',sans-serif;
       display:flex;
       align-items:center;
-      gap:12px;
+      gap:10px;
       position:relative;
       z-index:2;
     }
 
     /* Weight Entry Table */
+    .table-container{
+      overflow-x:auto;
+      position:relative;
+      z-index:2;
+      margin:0 -12px;
+      padding:0 12px;
+    }
     .weight-table{
       width:100%;
       border-collapse:separate;
-      border-spacing:0 12px;
-      margin-top:20px;
-      position:relative;
-      z-index:2;
+      border-spacing:0 10px;
+      min-width:600px;
     }
     .weight-table thead th{
       text-align:left;
-      padding:12px 18px;
-      font-size:12px;
+      padding:12px 16px;
+      font-size:11px;
       color:var(--text-secondary);
       text-transform:uppercase;
-      letter-spacing:1.2px;
-      font-weight:800;
-      border-bottom:3px solid var(--border);
+      letter-spacing:1px;
+      font-weight:700;
+      border-bottom:3px solid rgba(255,0,110,.3);
     }
     .weight-table tbody tr{
-      background:rgba(255,255,255,.04);
-      transition:all .3s ease;
+      background:rgba(255,255,255,.05);
+      transition:all .3s cubic-bezier(0.68,-0.55,0.265,1.55);
       cursor:pointer;
     }
     .weight-table tbody tr:hover{
-      background:rgba(255,107,53,.12);
-      transform:translateX(6px);
+      background:rgba(255,0,110,.15);
+      transform:translateX(8px) scale(1.02);
     }
     .weight-table tbody td{
-      padding:18px;
-      border-top:2px solid var(--border);
-      border-bottom:2px solid var(--border);
-      font-size:15px;
+      padding:16px;
+      border-top:2px solid rgba(255,0,110,.2);
+      border-bottom:2px solid rgba(255,0,110,.2);
+      font-size:14px;
       font-weight:600;
     }
     .weight-table tbody td:first-child{
-      border-left:2px solid var(--border);
-      border-radius:14px 0 0 14px;
+      border-left:2px solid rgba(255,0,110,.2);
+      border-radius:16px 0 0 16px;
+      color:var(--cyan);
       font-weight:700;
-      color:var(--accent-success);
     }
     .weight-table tbody td:last-child{
-      border-right:2px solid var(--border);
-      border-radius:0 14px 14px 0;
+      border-right:2px solid rgba(255,0,110,.2);
+      border-radius:0 16px 16px 0;
     }
     .weight-value{
-      font-size:24px;
-      font-weight:900;
-      font-family:'Poppins',sans-serif;
-      background:linear-gradient(135deg,var(--accent-primary),var(--accent-success));
+      font-size:1.5rem;
+      font-weight:700;
+      font-family:'Fredoka',sans-serif;
+      background:linear-gradient(135deg,var(--pink),var(--cyan));
       -webkit-background-clip:text;
       -webkit-text-fill-color:transparent;
       background-clip:text;
-    }
-    .weight-change{
-      font-size:13px;
-      font-weight:700;
-      margin-left:12px;
     }
 
     /* Input Groups */
@@ -413,12 +481,12 @@
       display:flex;
       flex-direction:column;
       gap:10px;
-      margin-bottom:24px;
+      margin-bottom:20px;
     }
     .input-group label{
-      font-size:13px;
+      font-size:12px;
       color:var(--text-secondary);
-      font-weight:800;
+      font-weight:700;
       text-transform:uppercase;
       letter-spacing:1px;
       display:flex;
@@ -428,13 +496,13 @@
     .input-group input,
     .input-group select,
     .input-group textarea{
-      padding:16px 20px;
-      border-radius:14px;
-      border:2px solid var(--border);
-      background:rgba(255,255,255,.05);
+      padding:14px 18px;
+      border-radius:16px;
+      border:3px solid rgba(255,0,110,.3);
+      background:rgba(255,255,255,.08);
       color:var(--text);
-      font-size:16px;
-      font-family:'Inter',sans-serif;
+      font-size:15px;
+      font-family:'Fredoka',sans-serif;
       font-weight:600;
       transition:all .3s ease;
     }
@@ -442,66 +510,73 @@
     .input-group select:focus,
     .input-group textarea:focus{
       outline:none;
-      border-color:var(--accent-primary);
-      background:rgba(255,107,53,.1);
-      box-shadow:0 0 0 4px rgba(255,107,53,.2);
+      border-color:var(--pink);
+      background:rgba(255,0,110,.15);
+      box-shadow:0 0 0 4px rgba(255,0,110,.2);
     }
 
     /* Footer */
     .footer{
-      padding:28px 40px;
+      padding:24px;
       color:var(--text-secondary);
-      border-top:2px solid var(--border);
+      border-top:3px solid;
+      border-image:linear-gradient(90deg,var(--pink),var(--purple),var(--cyan)) 1;
       text-align:center;
       font-size:14px;
-      background:var(--bg-secondary);
-      font-weight:700;
+      background:rgba(13,2,33,.95);
+      font-weight:600;
     }
 
     /* Modal */
     .modal-overlay{
       position:fixed;
       inset:0;
-      background:rgba(10,14,39,.97);
-      backdrop-filter:blur(15px);
+      background:rgba(13,2,33,.98);
+      backdrop-filter:blur(20px);
       display:none;
       align-items:center;
       justify-content:center;
       z-index:100;
+      padding:16px;
     }
     .modal-overlay.active{display:flex}
     .modal{
-      background:linear-gradient(135deg, var(--card) 0%, rgba(22,33,62,.95) 100%);
-      border:3px solid var(--accent-primary);
-      border-radius:28px;
-      padding:44px;
-      max-width:550px;
-      width:90%;
+      background:linear-gradient(135deg, rgba(45,27,78,.98) 0%, rgba(26,11,46,.98) 100%);
+      border:4px solid var(--pink);
+      border-radius:32px;
+      padding:32px;
+      max-width:500px;
+      width:100%;
       max-height:90vh;
       overflow-y:auto;
-      box-shadow:0 24px 80px rgba(0,0,0,.7), 0 0 0 1px rgba(255,107,53,.2);
-      animation:slideIn .4s cubic-bezier(0.4,0,0.2,1);
+      box-shadow:0 30px 90px rgba(0,0,0,.8), 0 0 0 1px rgba(255,0,110,.3);
+      animation:popIn .4s cubic-bezier(0.68,-0.55,0.265,1.55);
       position:relative;
     }
     .modal::before{
       content:'';
       position:absolute;
       top:0;left:0;right:0;
-      height:4px;
-      background:linear-gradient(90deg,var(--accent-primary),var(--accent-success),var(--accent-purple));
+      height:5px;
+      background:linear-gradient(90deg,var(--pink),var(--yellow),var(--cyan),var(--purple));
       background-size:200% 100%;
-      animation:gradientMove 2s linear infinite;
+      animation:gradientMove 3s linear infinite;
     }
-    @keyframes slideIn{
-      from{opacity:0;transform:translateY(40px) scale(0.95)}
-      to{opacity:1;transform:translateY(0) scale(1)}
+    @keyframes popIn{
+      0%{opacity:0;transform:scale(0.5) rotate(-10deg)}
+      70%{transform:scale(1.05) rotate(2deg)}
+      100%{opacity:1;transform:scale(1) rotate(0)}
+    }
+    @keyframes gradientMove{
+      0%{background-position:0% 0%}
+      100%{background-position:200% 0%}
     }
     .modal h2{
-      margin:0 0 28px;
-      font-size:32px;
-      font-weight:900;
-      font-family:'Poppins',sans-serif;
-      background:linear-gradient(135deg,var(--accent-primary),var(--accent-success));
+      margin:0 0 24px;
+      font-size:2rem;
+      font-weight:700;
+      font-family:'Fredoka',sans-serif;
+      background:linear-gradient(135deg,var(--pink),var(--yellow),var(--cyan));
       -webkit-background-clip:text;
       -webkit-text-fill-color:transparent;
       background-clip:text;
@@ -512,12 +587,42 @@
 
     /* Responsive */
     @media (max-width: 768px){
-      .main{padding:20px}
-      .bar{padding:16px 20px}
+      .main{padding:16px 12px}
+      .bar{padding:12px 16px}
+      .logo{padding:10px 16px;gap:8px}
+      .logo-icon{font-size:1.5rem}
+      .title{font-size:1.1rem}
+      .btn{padding:10px 20px;font-size:13px}
+      .goal-section{padding:20px 16px;border-radius:24px}
+      .goal-title{font-size:1.4rem}
+      .goal-stats{grid-template-columns:repeat(2,1fr)}
+      .goal-stat{padding:16px 12px}
+      .goal-stat-value{font-size:1.6rem}
+      .hero-stats{grid-template-columns:repeat(2,1fr)}
+      .stat-card{padding:20px 12px}
+      .stat-icon{font-size:2.5rem}
+      .stat-value{font-size:2rem}
+      .stat-label{font-size:10px}
+      .stat-change{font-size:12px}
+      .card{padding:20px 16px;border-radius:24px}
+      .card h3{font-size:1.1rem}
+      .modal{padding:24px 20px}
+      .modal h2{font-size:1.5rem}
+      .content > *{grid-column:span 12 !important}
+      .weight-table{font-size:13px}
+      .weight-table thead th{padding:10px 12px;font-size:10px}
+      .weight-table tbody td{padding:12px}
+      .weight-value{font-size:1.2rem}
+    }
+    
+    @media (max-width: 480px){
+      .bar{flex-direction:column;gap:12px}
+      .logo{width:100%;justify-content:center}
+      .header-actions{width:100%}
+      .btn{width:100%;justify-content:center}
+      .goal-header{flex-direction:column;align-items:stretch}
+      .goal-stats{grid-template-columns:1fr}
       .hero-stats{grid-template-columns:1fr}
-      .title{font-size:1.5rem}
-      .goal-section{padding:24px}
-      .card{padding:24px}
     }
   </style>
 </head>
@@ -526,11 +631,11 @@
   <header>
     <div class="bar">
       <div class="logo">
-        <span class="logo-icon">💪</span>
-        <h1 class="title">FitTrack Pro</h1>
+        <span class="logo-icon">🎯</span>
+        <h1 class="title">FitTrack</h1>
       </div>
       <div class="header-actions">
-        <button class="btn btn-secondary" id="addEntryBtn">➕ Add Weight Entry</button>
+        <button class="btn" id="addEntryBtn">➕ Add Weight</button>
       </div>
     </div>
   </header>
@@ -539,25 +644,25 @@
     <!-- Goal Setting Section -->
     <section class="goal-section">
       <div class="goal-header">
-        <h2 class="goal-title">🎯 Your Weight Goal</h2>
+        <h2 class="goal-title">🎯 Your Goal</h2>
         <button class="btn" id="setGoalBtn">⚙️ Set Goal</button>
       </div>
       
       <div class="goal-stats">
-        <div class="goal-stat">
-          <div class="goal-stat-label">🏁 Starting Weight</div>
-          <div class="goal-stat-value" id="startWeight">145 kg</div>
+        <div class="goal-stat" data-emoji="🏁">
+          <div class="goal-stat-label">🏁 Start</div>
+          <div class="goal-stat-value" id="startWeight">145</div>
         </div>
-        <div class="goal-stat">
-          <div class="goal-stat-label">⚖️ Current Weight</div>
-          <div class="goal-stat-value" id="currentWeight">133.4 kg</div>
+        <div class="goal-stat" data-emoji="⚖️">
+          <div class="goal-stat-label">⚖️ Current</div>
+          <div class="goal-stat-value" id="currentWeight">133.4</div>
         </div>
-        <div class="goal-stat">
-          <div class="goal-stat-label">🎯 Target Weight</div>
-          <div class="goal-stat-value" id="targetWeight">125 kg</div>
+        <div class="goal-stat" data-emoji="🎯">
+          <div class="goal-stat-label">🎯 Target</div>
+          <div class="goal-stat-value" id="targetWeight">125</div>
         </div>
-        <div class="goal-stat">
-          <div class="goal-stat-label">📉 Progress</div>
+        <div class="goal-stat" data-emoji="📊">
+          <div class="goal-stat-label">📊 Progress</div>
           <div class="goal-stat-value" id="progressPercent">58%</div>
         </div>
       </div>
@@ -566,31 +671,31 @@
     <!-- Quick Stats Hero -->
     <section class="hero-stats">
       <div class="stat-card">
-        <div class="stat-icon">📉</div>
+        <div class="stat-icon">🔥</div>
         <div class="stat-label">Total Lost</div>
         <div class="stat-value" id="totalLost">11.6</div>
-        <div class="stat-change stat-down">kg lost 🎉</div>
+        <div class="stat-change">kg lost! 🎉</div>
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">🎯</div>
+        <div class="stat-icon">🚀</div>
         <div class="stat-label">To Goal</div>
         <div class="stat-value" id="toGo">8.4</div>
-        <div class="stat-change stat-up">kg remaining</div>
+        <div class="stat-change">kg to go!</div>
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">📅</div>
-        <div class="stat-label">Journey Days</div>
+        <div class="stat-icon">⏰</div>
+        <div class="stat-label">Journey</div>
         <div class="stat-value" id="journeyDays">74</div>
-        <div class="stat-change stat-up">days tracking</div>
+        <div class="stat-change">days 💪</div>
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">📊</div>
-        <div class="stat-label">Avg Loss/Week</div>
+        <div class="stat-icon">📈</div>
+        <div class="stat-label">Avg/Week</div>
         <div class="stat-value" id="avgLoss">1.1</div>
-        <div class="stat-change stat-down">kg/week</div>
+        <div class="stat-change">kg/week</div>
       </div>
     </section>
 
@@ -598,20 +703,20 @@
     <section class="content">
       <!-- Weight Progress Chart -->
       <div class="card" style="grid-column: span 8">
-        <h3>📈 Weight Journey</h3>
-        <canvas id="weightChart" height="300"></canvas>
+        <h3>📊 Weight Journey</h3>
+        <canvas id="weightChart" height="280"></canvas>
       </div>
 
       <!-- Weight Change Chart -->
       <div class="card" style="grid-column: span 4">
-        <h3>📊 Weekly Changes</h3>
-        <canvas id="changeChart" height="300"></canvas>
+        <h3>📉 Changes</h3>
+        <canvas id="changeChart" height="280"></canvas>
       </div>
 
       <!-- Weight Data Table -->
       <div class="card" style="grid-column: span 12">
-        <h3>📋 Weight Log History</h3>
-        <div style="overflow-x:auto;position:relative;z-index:2">
+        <h3>📋 Weight History</h3>
+        <div class="table-container">
           <table class="weight-table" id="weightTable">
             <thead>
               <tr>
@@ -632,14 +737,14 @@
   </main>
 
   <div class="footer">
-    💪 FitTrack Pro © 2025 — Transform Your Body, Transform Your Life 🔥
+    🎯 FitTrack © 2025 — Keep Going! You Got This! 💪🔥
   </div>
 </div>
 
 <!-- Add Entry Modal -->
 <div class="modal-overlay" id="entryModal">
   <div class="modal">
-    <h2>➕ Add Weight Entry</h2>
+    <h2>➕ Add Weight</h2>
     
     <div class="input-group">
       <label>📅 Date</label>
@@ -648,17 +753,17 @@
 
     <div class="input-group">
       <label>⚖️ Weight (kg)</label>
-      <input type="number" step="0.1" id="entryWeight" placeholder="e.g., 75.5">
+      <input type="number" step="0.1" id="entryWeight" placeholder="75.5">
     </div>
 
     <div class="input-group">
       <label>📝 Notes (Optional)</label>
-      <textarea id="entryNotes" rows="3" placeholder="How are you feeling? Any observations?"></textarea>
+      <textarea id="entryNotes" rows="3" placeholder="How are you feeling?"></textarea>
     </div>
 
-    <div style="display:flex;gap:14px;margin-top:32px">
-      <button class="btn" id="saveEntryBtn" style="flex:1">💾 Save Entry</button>
-      <button class="btn btn-outline" id="closeEntryModalBtn" style="flex:1">✖️ Cancel</button>
+    <div style="display:flex;gap:12px;margin-top:24px;flex-wrap:wrap">
+      <button class="btn" id="saveEntryBtn" style="flex:1;min-width:120px">💾 Save</button>
+      <button class="btn" id="closeEntryModalBtn" style="flex:1;min-width:120px;background:linear-gradient(135deg,#666,#444)">✖️ Cancel</button>
     </div>
   </div>
 </div>
@@ -666,16 +771,16 @@
 <!-- Set Goal Modal -->
 <div class="modal-overlay" id="goalModal">
   <div class="modal">
-    <h2>🎯 Set Your Goal</h2>
+    <h2>🎯 Set Goal</h2>
     
     <div class="input-group">
-      <label>🏁 Starting Weight (kg)</label>
-      <input type="number" step="0.1" id="goalStartWeight" placeholder="e.g., 145">
+      <label>🏁 Start Weight (kg)</label>
+      <input type="number" step="0.1" id="goalStartWeight" placeholder="145">
     </div>
 
     <div class="input-group">
       <label>🎯 Target Weight (kg)</label>
-      <input type="number" step="0.1" id="goalTargetWeight" placeholder="e.g., 125">
+      <input type="number" step="0.1" id="goalTargetWeight" placeholder="125">
     </div>
 
     <div class="input-group">
@@ -683,9 +788,9 @@
       <input type="date" id="goalTargetDate">
     </div>
 
-    <div style="display:flex;gap:14px;margin-top:32px">
-      <button class="btn" id="saveGoalBtn" style="flex:1">💾 Save Goal</button>
-      <button class="btn btn-outline" id="closeGoalModalBtn" style="flex:1">✖️ Cancel</button>
+    <div style="display:flex;gap:12px;margin-top:24px;flex-wrap:wrap">
+      <button class="btn" id="saveGoalBtn" style="flex:1;min-width:120px">💾 Save</button>
+      <button class="btn" id="closeGoalModalBtn" style="flex:1;min-width:120px;background:linear-gradient(135deg,#666,#444)">✖️ Cancel</button>
     </div>
   </div>
 </div>
@@ -838,7 +943,6 @@
     alert('🎯 Goal updated successfully!');
   };
 
-
   // Charts
   let weightChart = null;
   let changeChart = null;
@@ -865,9 +969,9 @@
     const avgLoss = weeks > 0 ? (totalLost / weeks).toFixed(1) : 0;
     
     // Update goal stats
-    document.getElementById('startWeight').textContent = startWeight.toFixed(1) + ' kg';
-    document.getElementById('currentWeight').textContent = currentWeight.toFixed(1) + ' kg';
-    document.getElementById('targetWeight').textContent = targetWeight.toFixed(1) + ' kg';
+    document.getElementById('startWeight').textContent = startWeight.toFixed(1);
+    document.getElementById('currentWeight').textContent = currentWeight.toFixed(1);
+    document.getElementById('targetWeight').textContent = targetWeight.toFixed(1);
     document.getElementById('progressPercent').textContent = progress + '%';
     
     // Update hero stats
@@ -882,7 +986,7 @@
     tbody.innerHTML = '';
     
     if(WEIGHT_DATA.length === 0){
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-secondary)">📊 No weight entries yet. Click "Add Weight Entry" to start!</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-secondary)">📊 No entries yet! Click "Add Weight" to start! 🚀</td></tr>';
       return;
     }
     
@@ -896,7 +1000,7 @@
       const fromStart = weight - startWeight;
       const toGoal = weight - targetWeight;
       
-      const changeColor = change < 0 ? '#00d9ff' : change > 0 ? '#ff3864' : '#9ca3af';
+      const changeColor = change < 0 ? 'var(--cyan)' : change > 0 ? 'var(--pink)' : 'var(--text-secondary)';
       const changeArrow = change < 0 ? '↓' : change > 0 ? '↑' : '→';
       
       const row = document.createElement('tr');
@@ -906,10 +1010,10 @@
         <td style="color:${changeColor};font-weight:700">
           ${change !== 0 ? changeArrow + ' ' + Math.abs(change).toFixed(1) + ' kg' : '—'}
         </td>
-        <td style="color:#00d9ff;font-weight:700">
+        <td style="color:var(--cyan);font-weight:700">
           ${fromStart < 0 ? '↓ ' + Math.abs(fromStart).toFixed(1) : fromStart > 0 ? '↑ ' + fromStart.toFixed(1) : '0'} kg
         </td>
-        <td style="color:#ffd93d;font-weight:700">
+        <td style="color:var(--yellow);font-weight:700">
           ${toGoal.toFixed(1)} kg
         </td>
       `;
@@ -925,9 +1029,9 @@
     
     // Weight Chart
     const weightCtx = document.getElementById('weightChart').getContext('2d');
-    const weightGradient = weightCtx.createLinearGradient(0, 0, 0, 300);
-    weightGradient.addColorStop(0, 'rgba(255,107,53,0.5)');
-    weightGradient.addColorStop(1, 'rgba(255,107,53,0.02)');
+    const weightGradient = weightCtx.createLinearGradient(0, 0, 0, 280);
+    weightGradient.addColorStop(0, 'rgba(255,0,110,0.6)');
+    weightGradient.addColorStop(1, 'rgba(131,56,236,0.1)');
     
     if(weightChart) weightChart.destroy();
     weightChart = new Chart(weightCtx, {
@@ -937,65 +1041,66 @@
         datasets: [{
           label: 'Weight (kg)',
           data: weights,
-          borderColor: '#ff6b35',
+          borderColor: '#ff006e',
           backgroundColor: weightGradient,
-          borderWidth: 5,
+          borderWidth: 4,
           tension: 0.4,
           fill: true,
-          pointRadius: 8,
-          pointBackgroundColor: '#ff6b35',
+          pointRadius: 7,
+          pointBackgroundColor: '#ff006e',
           pointBorderColor: '#fff',
-          pointBorderWidth: 4,
-          pointHoverRadius: 12,
-          pointHoverBackgroundColor: '#ff8c5a',
-          pointHoverBorderWidth: 5
+          pointBorderWidth: 3,
+          pointHoverRadius: 10,
+          pointHoverBackgroundColor: '#ff006e',
+          pointHoverBorderWidth: 4
         },{
           label: 'Goal',
           data: Array(weights.length).fill(GOAL.targetWeight),
-          borderColor: '#00d9ff',
-          borderWidth: 4,
-          borderDash: [12,6],
+          borderColor: '#00f5ff',
+          borderWidth: 3,
+          borderDash: [10,5],
           fill: false,
           pointRadius: 0
         }]
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
           legend: {
             display: true,
             position: 'top',
             labels: {
-              color: '#e8eaf6',
-              font: {size: 14, weight: '800', family: 'Poppins'},
+              color: '#f4f1ff',
+              font: {size: 13, weight: '700', family: 'Fredoka'},
               usePointStyle: true,
-              padding: 20
+              padding: 16
             }
           },
           tooltip: {
-            backgroundColor: 'rgba(22,33,62,0.98)',
-            titleColor: '#e8eaf6',
+            backgroundColor: 'rgba(45,27,78,0.98)',
+            titleColor: '#f4f1ff',
             titleFont: {size: 14, weight: '700'},
-            bodyColor: '#e8eaf6',
-            bodyFont: {size: 16, weight: '800', family: 'Poppins'},
-            padding: 16,
-            borderColor: '#ff6b35',
+            bodyColor: '#f4f1ff',
+            bodyFont: {size: 16, weight: '700', family: 'Fredoka'},
+            padding: 14,
+            borderColor: '#ff006e',
             borderWidth: 2,
             cornerRadius: 12
           }
         },
         scales: {
           x: {
-            ticks: {color: '#9ca3af', font: {weight: '700', size: 12}},
-            grid: {color: '#2d3748', lineWidth: 1}
+            ticks: {color: '#b8a4d4', font: {weight: '600', size: 11}},
+            grid: {color: 'rgba(255,255,255,0.05)'}
           },
           y: {
             ticks: {
-              color: '#9ca3af',
-              font: {weight: '800', size: 13, family: 'Poppins'},
+              color: '#b8a4d4',
+              font: {weight: '700', size: 12, family: 'Fredoka'},
               callback: (value) => value + ' kg'
             },
-            grid: {color: '#2d3748', lineWidth: 1}
+            grid: {color: 'rgba(255,255,255,0.05)'}
           }
         }
       }
@@ -1016,16 +1121,25 @@
         datasets: [{
           label: 'Change',
           data: changes,
-          backgroundColor: changes.map(c => c < 0 ? '#00d9ff' : '#ff3864'),
+          backgroundColor: changes.map(c => c < 0 ? '#00f5ff' : '#ff006e'),
           borderRadius: 12,
-          barThickness: 24
+          barThickness: 20
         }]
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
           legend: {display: false},
           tooltip: {
+            backgroundColor: 'rgba(45,27,78,0.98)',
+            titleColor: '#f4f1ff',
+            bodyColor: '#f4f1ff',
+            bodyFont: {size: 14, weight: '700', family: 'Fredoka'},
+            padding: 12,
+            borderColor: '#ff006e',
+            borderWidth: 2,
+            cornerRadius: 12,
             callbacks: {
               label: (context) => {
                 const val = context.parsed.y;
@@ -1036,16 +1150,16 @@
         },
         scales: {
           x: {
-            ticks: {color: '#9ca3af', font: {weight: '700', size: 11}},
+            ticks: {color: '#b8a4d4', font: {weight: '600', size: 10}},
             grid: {display: false}
           },
           y: {
             ticks: {
-              color: '#9ca3af',
+              color: '#b8a4d4',
               font: {weight: '700'},
-              callback: (value) => value.toFixed(1) + ' kg'
+              callback: (value) => value.toFixed(1)
             },
-            grid: {color: '#2d3748'}
+            grid: {color: 'rgba(255,255,255,0.05)'}
           }
         }
       }
@@ -1069,7 +1183,6 @@
       // Merge with localStorage entries
       const localEntries = JSON.parse(localStorage.getItem('fittrack_entries') || '[]');
       if(localEntries.length > 0){
-        // Convert local entries to match CSV format
         const formattedLocal = localEntries.map(e => ({
           Date: e.Date,
           'Weight in Kg': e['Weight in Kg']
@@ -1084,11 +1197,7 @@
         return dateA.localeCompare(dateB);
       });
       
-      console.log('✅ Weight data loaded:', {
-        entries: WEIGHT_DATA.length,
-        firstEntry: WEIGHT_DATA[0],
-        lastEntry: WEIGHT_DATA[WEIGHT_DATA.length - 1]
-      });
+      console.log('✅ Weight data loaded:', WEIGHT_DATA.length, 'entries');
       
       render();
     },
