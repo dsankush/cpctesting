@@ -1299,6 +1299,10 @@
         // Apply date range filter if present
         if(FILTERS.dateFrom || FILTERS.dateTo){
           const refDate = parseReferenceDate(trim(r['Date Processed'] || ''));
+          
+          // Skip if date parsing failed
+          if(!refDate) return true; // Include rows without valid dates
+          
           if(FILTERS.dateFrom && refDate < FILTERS.dateFrom) return false;
           if(FILTERS.dateTo && refDate > FILTERS.dateTo) return false;
         }
@@ -1313,9 +1317,35 @@
         return true;
       });
       
+      // Debug: Log filtered data when date filter is active
+      if(FILTERS.dateFrom || FILTERS.dateTo){
+        console.log('📅 Date Range Filter Applied to Missed Calls:', {
+          dateFrom: FILTERS.dateFrom,
+          dateTo: FILTERS.dateTo,
+          totalReferenceRows: REFERENCE_DATA.length,
+          filteredRows: filteredReferenceData.length,
+          sampleFilteredRows: filteredReferenceData.slice(0, 5).map(r => ({
+            date: r['Date Processed'],
+            parsedDate: parseReferenceDate(r['Date Processed']),
+            name: r.Name,
+            total: r['Total Missed Calls'],
+            unique: r['Total Unique Missed Calls']
+          }))
+        });
+      }
+      
       for(const r of filteredReferenceData){
         missedCallsDisplay += Number(r['Total Missed Calls']) || 0;
         missedCallsUniqueDisplay += Number(r['Total Unique Missed Calls']) || 0;
+      }
+      
+      // Debug: Log calculated totals
+      if(FILTERS.dateFrom || FILTERS.dateTo){
+        console.log('📊 Missed Calls Calculation:', {
+          filteredRowCount: filteredReferenceData.length,
+          calculatedTotal: missedCallsDisplay,
+          calculatedUnique: missedCallsUniqueDisplay
+        });
       }
       
       // Grand totals for context (use Grand Total row if available, otherwise calculate)
