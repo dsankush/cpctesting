@@ -1300,8 +1300,8 @@
         if(FILTERS.dateFrom || FILTERS.dateTo){
           const refDate = parseReferenceDate(trim(r['Date Processed'] || ''));
           
-          // Skip if date parsing failed
-          if(!refDate) return true; // Include rows without valid dates
+          // Exclude rows with invalid/missing dates when date filter is active
+          if(!refDate) return false;
           
           if(FILTERS.dateFrom && refDate < FILTERS.dateFrom) return false;
           if(FILTERS.dateTo && refDate > FILTERS.dateTo) return false;
@@ -1319,11 +1319,37 @@
       
       // Debug: Log filtered data when date filter is active
       if(FILTERS.dateFrom || FILTERS.dateTo){
+        // Analyze all rows to see date parsing success/failure
+        const dateAnalysis = REFERENCE_DATA.map(r => {
+          const rawDate = trim(r['Date Processed'] || '');
+          const parsedDate = parseReferenceDate(rawDate);
+          const inRange = parsedDate && parsedDate >= FILTERS.dateFrom && parsedDate <= FILTERS.dateTo;
+          return { rawDate, parsedDate, inRange, total: Number(r['Total Missed Calls']||0), unique: Number(r['Total Unique Missed Calls']||0) };
+        });
+        
+        const totalParsed = dateAnalysis.filter(d => d.parsedDate).length;
+        const totalFailed = dateAnalysis.filter(d => !d.parsedDate && d.rawDate).length;
+        const inRangeRows = dateAnalysis.filter(d => d.inRange);
+        const inRangeTotal = inRangeRows.reduce((sum, r) => sum + r.total, 0);
+        const inRangeUnique = inRangeRows.reduce((sum, r) => sum + r.unique, 0);
+        
         console.log('📅 Date Range Filter Applied to Missed Calls:', {
           dateFrom: FILTERS.dateFrom,
           dateTo: FILTERS.dateTo,
           totalReferenceRows: REFERENCE_DATA.length,
+          datesParsedSuccessfully: totalParsed,
+          datesFailedToParse: totalFailed,
+          rowsInDateRange: inRangeRows.length,
+          calculatedTotalInRange: inRangeTotal,
+          calculatedUniqueInRange: inRangeUnique,
           filteredRows: filteredReferenceData.length,
+          sampleParsedDates: dateAnalysis.slice(0, 10).map(d => ({
+            raw: d.rawDate,
+            parsed: d.parsedDate || 'FAILED',
+            inRange: d.inRange ? 'YES' : 'NO',
+            total: d.total,
+            unique: d.unique
+          })),
           sampleFilteredRows: filteredReferenceData.slice(0, 5).map(r => ({
             date: r['Date Processed'],
             parsedDate: parseReferenceDate(r['Date Processed']),
