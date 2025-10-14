@@ -1059,6 +1059,43 @@
     if(isNaN(d)) return '';
     return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
   };
+  
+  // Parse date from reference.csv format (DD-MMM-YY or DD-MMM-YYYY)
+  const parseReferenceDate = (dateStr) => {
+    if(!dateStr) return '';
+    const s = trim(dateStr);
+    if(!s) return '';
+    
+    // Try to parse DD-MMM-YY format (e.g., "10-Sep-25")
+    const parts = s.split('-');
+    if(parts.length === 3){
+      const day = parts[0].padStart(2, '0');
+      const monthStr = parts[1];
+      let year = parts[2];
+      
+      // Convert 2-digit year to 4-digit (25 -> 2025)
+      if(year.length === 2){
+        const yearNum = parseInt(year);
+        year = yearNum < 50 ? '20' + year : '19' + year;
+      }
+      
+      // Month mapping
+      const months = {
+        'jan': '01', 'feb': '02', 'mar': '03', 'apr': '04',
+        'may': '05', 'jun': '06', 'jul': '07', 'aug': '08',
+        'sep': '09', 'oct': '10', 'nov': '11', 'dec': '12'
+      };
+      
+      const month = months[monthStr.toLowerCase()];
+      if(month){
+        return year + '-' + month + '-' + day;
+      }
+    }
+    
+    // Fallback to standard date parsing
+    return toDateKey(s);
+  };
+  
   function uniqSorted(arr){ return [...new Set(arr.filter(Boolean))].sort((a,b)=>a.localeCompare(b)); }
 
   function parseProducts(cartStr){
@@ -1243,7 +1280,7 @@
     
     // Calculate Missed Calls from reference.csv (dynamic based on filters)
     // Check if any reference-related filters are applied
-    const hasReferenceFilters = FILTERS.state || FILTERS.zone || FILTERS.pt || FILTERS.hq;
+    const hasReferenceFilters = FILTERS.state || FILTERS.zone || FILTERS.pt || FILTERS.hq || FILTERS.dateFrom || FILTERS.dateTo;
     
     let missedCallsDisplay = 0;
     let missedCallsUniqueDisplay = 0;
@@ -1259,6 +1296,13 @@
     } else {
       // Filters applied - calculate from filtered PT data
       const filteredReferenceData = REFERENCE_DATA.filter(r => {
+        // Apply date range filter if present
+        if(FILTERS.dateFrom || FILTERS.dateTo){
+          const refDate = parseReferenceDate(trim(r['Date Processed'] || ''));
+          if(FILTERS.dateFrom && refDate < FILTERS.dateFrom) return false;
+          if(FILTERS.dateTo && refDate > FILTERS.dateTo) return false;
+        }
+        
         // Apply common filters: State, Zone, PT
         if(FILTERS.state && trim(r.State) !== FILTERS.state) return false;
         if(FILTERS.zone && trim(r.ZONE) !== FILTERS.zone) return false;
@@ -1998,6 +2042,13 @@
     let filteredRefData = refData;
     if(preserveFilters && refData.length > 0){
       filteredRefData = refData.filter(r => {
+        // Apply date range filter if present
+        if(FILTERS.dateFrom || FILTERS.dateTo){
+          const refDate = parseReferenceDate(trim(r['Date Processed'] || ''));
+          if(FILTERS.dateFrom && refDate < FILTERS.dateFrom) return false;
+          if(FILTERS.dateTo && refDate > FILTERS.dateTo) return false;
+        }
+        
         if(FILTERS.state && trim(r.State) !== FILTERS.state) return false;
         if(FILTERS.zone && trim(r.ZONE) !== FILTERS.zone) return false;
         if(FILTERS.pt && trim(r.Name) !== FILTERS.pt) return false;
