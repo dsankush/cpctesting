@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FitTrack Pro — Your Weight Journey</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <style>
+    :root{
+      --bg:#0a0e27;
+      --bg-secondary:#1a1a2e;
+      --card:#16213e;
+      --card-hover:#1e2a47;
+      --text:#e8eaf6;
+      --text-secondary:#9ca3af;
+      --accent-primary:#ff6b35;
+      --accent-success:#00d9ff;
+      --accent-warning:#ffd93d;
+      --accent-danger:#ff3864;
+      --accent-purple:#a855f7;
+      --glow-primary:rgba(255,107,53,.5);
+      --glow-success:rgba(0,217,255,.5);
+      --border:#2d3748;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;overflow-x:hidden}
+    body{
+      font-family:'Inter',sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      background-image:
+        radial-gradient(circle at 20% 50%, rgba(255,107,53,.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0,217,255,.08) 0%, transparent 50%),
+        linear-gradient(180deg, var(--bg) 0%, #0f1419 100%);
+      background-attachment:fixed;
+    }
+    .app{display:grid;grid-template-rows:auto 1fr auto;min-height:100vh}
+    
+    /* Header - Gym Style */
+    header{
+      position:sticky;top:0;z-index:30;
+      backdrop-filter:saturate(180%) blur(20px);
+      background:rgba(15,15,30,.98);
+      border-bottom:3px solid var(--accent-primary);
+      box-shadow:0 8px 32px rgba(255,107,53,.2);
+    }
+    .bar{
+      display:flex;
+      align-items:center;
+      gap:24px;
+      padding:20px 40px;
+      flex-wrap:wrap;
+    }
+    .logo{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      padding:16px 30px;
+      border-radius:20px;
+      background:linear-gradient(135deg, rgba(255,107,53,.2), rgba(0,217,255,.2));
+      backdrop-filter:blur(10px);
+      box-shadow:0 4px 20px rgba(255,107,53,.3), inset 0 1px 0 rgba(255,255,255,.1);
+      border:2px solid rgba(255,107,53,.4);
+    }
+    .logo-icon{
+      font-size:2.5rem;
+      animation:pulse 2s ease-in-out infinite;
+      filter:drop-shadow(0 4px 12px var(--accent-primary));
+    }
+    @keyframes pulse{
+      0%,100%{transform:scale(1) rotate(0deg)}
+      50%{transform:scale(1.15) rotate(-5deg)}
+    }
+    .title{
+      font-size:2rem;
+      margin:0;
+      font-weight:900;
+      font-family:'Poppins',sans-serif;
+      background:linear-gradient(135deg,var(--accent-primary),var(--accent-success));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      letter-spacing:1px;
+      text-shadow:0 0 30px var(--glow-primary);
+    }
+    .header-actions{
+      margin-left:auto;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:14px 28px;
+      border-radius:14px;
+      border:none;
+      background:linear-gradient(135deg,var(--accent-primary),#ff8c5a);
+      color:white;
+      font-weight:800;
+      cursor:pointer;
+      font-size:14px;
+      transition:all .3s ease;
+      box-shadow:0 6px 20px var(--glow-primary);
+      font-family:'Inter',sans-serif;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+    }
+    .btn:hover{
+      transform:translateY(-3px) scale(1.02);
+      box-shadow:0 10px 35px var(--glow-primary);
+    }
+    .btn:active{
+      transform:translateY(0) scale(0.98);
+    }
+    .btn-secondary{
+      background:linear-gradient(135deg,var(--accent-success),#00f0ff);
+      box-shadow:0 6px 20px var(--glow-success);
+      color:#0a0e27;
+    }
+    .btn-secondary:hover{
+      box-shadow:0 10px 35px var(--glow-success);
+    }
+    .btn-outline{
+      background:transparent;
+      border:2px solid var(--accent-primary);
+      box-shadow:0 0 20px rgba(255,107,53,.2);
+    }
+    .btn-outline:hover{
+      background:rgba(255,107,53,.15);
+    }
+
+    /* Main Layout */
+    .main{
+      display:flex;
+      flex-direction:column;
+      gap:32px;
+      padding:40px;
+      max-width:1800px;
+      margin:0 auto;
+      width:100%;
+    }
+
+    /* Goal Setting Section */
+    .goal-section{
+      background:linear-gradient(135deg, var(--card) 0%, rgba(26,26,46,.9) 100%);
+      border:2px solid rgba(255,107,53,.3);
+      border-radius:28px;
+      padding:40px;
+      box-shadow:0 12px 40px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.05);
+      position:relative;
+      overflow:hidden;
+    }
+    .goal-section::before{
+      content:'';
+      position:absolute;
+      top:0;left:0;right:0;
+      height:5px;
+      background:linear-gradient(90deg,var(--accent-primary),var(--accent-success),var(--accent-purple),var(--accent-primary));
+      background-size:200% 100%;
+      animation:gradientMove 3s linear infinite;
+    }
+    @keyframes gradientMove{
+      0%{background-position:0% 0%}
+      100%{background-position:200% 0%}
+    }
+    .goal-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:32px;
+      flex-wrap:wrap;
+      gap:20px;
+    }
+    .goal-title{
+      font-size:28px;
+      font-weight:900;
+      font-family:'Poppins',sans-serif;
+      background:linear-gradient(135deg,var(--accent-primary),var(--accent-success));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .goal-stats{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+      gap:24px;
+    }
+    .goal-stat{
+      background:rgba(255,255,255,.03);
+      border:2px solid var(--border);
+      border-radius:20px;
+      padding:24px;
+      text-align:center;
+      transition:all .3s ease;
+    }
+    .goal-stat:hover{
+      background:rgba(255,107,53,.08);
+      border-color:var(--accent-primary);
+      transform:translateY(-4px);
+    }
+    .goal-stat-label{
+      font-size:12px;
+      color:var(--text-secondary);
+      text-transform:uppercase;
+      letter-spacing:1.2px;
+      font-weight:800;
+      margin-bottom:12px;
+    }
+    .goal-stat-value{
+      font-size:36px;
+      font-weight:900;
+      font-family:'Poppins',sans-serif;
+      background:linear-gradient(135deg,var(--goal-color),var(--goal-color-light));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      line-height:1.2;
+    }
+    .goal-stat:nth-child(1){--goal-color:#ff6b35;--goal-color-light:#ff8c5a}
+    .goal-stat:nth-child(2){--goal-color:#00d9ff;--goal-color-light:#00f0ff}
+    .goal-stat:nth-child(3){--goal-color:#a855f7;--goal-color-light:#c084fc}
+    .goal-stat:nth-child(4){--goal-color:#ffd93d;--goal-color-light:#ffe168}
+
+    /* Quick Stats Hero */
+    .hero-stats{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:24px;
+    }
+    .stat-card{
+      background:linear-gradient(135deg, var(--card) 0%, rgba(22,33,62,.8) 100%);
+      border:2px solid var(--border);
+      border-radius:24px;
+      padding:32px;
+      position:relative;
+      overflow:hidden;
+      transition:all .4s cubic-bezier(0.4,0,0.2,1);
+      box-shadow:0 8px 32px rgba(0,0,0,.3);
+    }
+    .stat-card::before{
+      content:'';
+      position:absolute;
+      top:0;left:0;right:0;
+      height:4px;
+      background:linear-gradient(90deg,var(--stat-color),var(--stat-color-light));
+      transform:scaleX(0);
+      transform-origin:left;
+      transition:transform .6s ease;
+    }
+    .stat-card:hover{
+      transform:translateY(-8px);
+      border-color:var(--stat-color);
+      box-shadow:0 20px 60px rgba(0,0,0,.5);
+    }
+    .stat-card:hover::before{transform:scaleX(1)}
+    .stat-icon{
+      font-size:3.5rem;
+      margin-bottom:16px;
+      filter:drop-shadow(0 6px 16px var(--stat-color));
+      animation:float 3s ease-in-out infinite;
+    }
+    @keyframes float{
+      0%,100%{transform:translateY(0px)}
+      50%{transform:translateY(-10px)}
+    }
+    .stat-label{
+      font-size:12px;
+      color:var(--text-secondary);
+      text-transform:uppercase;
+      letter-spacing:1.5px;
+      font-weight:800;
+      margin-bottom:12px;
+    }
+    .stat-value{
+      font-size:52px;
+      font-weight:900;
+      font-family:'Poppins',sans-serif;
+      background:linear-gradient(135deg,var(--stat-color),var(--stat-color-light));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      line-height:1;
+      margin-bottom:12px;
+    }
+    .stat-change{
+      font-size:14px;
+      font-weight:700;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .stat-up{color:#00d9ff}
+    .stat-down{color:#ff3864}
+
+    .stat-card:nth-child(1){--stat-color:#ff6b35;--stat-color-light:#ff8c5a}
+    .stat-card:nth-child(2){--stat-color:#00d9ff;--stat-color-light:#00f0ff}
+    .stat-card:nth-child(3){--stat-color:#a855f7;--stat-color-light:#c084fc}
+    .stat-card:nth-child(4){--stat-color:#ffd93d;--stat-color-light:#ffe168}
+
+    /* Content Grid */
+    .content{display:grid;grid-template-columns:repeat(12,1fr);gap:28px}
+    .card{
+      background:linear-gradient(135deg, var(--card) 0%, rgba(22,33,62,.95) 100%);
+      border:2px solid var(--border);
+      border-radius:24px;
+      padding:36px;
+      box-shadow:0 12px 40px rgba(0,0,0,.4);
+      transition:all .3s ease;
+      position:relative;
+      overflow:hidden;
+    }
+    .card::after{
+      content:'';
+      position:absolute;
+      top:50%;left:50%;
+      width:300px;height:300px;
+      background:radial-gradient(circle, rgba(255,107,53,.1) 0%, transparent 70%);
+      transform:translate(-50%,-50%);
+      pointer-events:none;
+    }
+    .card:hover{
+      border-color:var(--accent-primary);
+      transform:translateY(-6px);
+      box-shadow:0 20px 60px rgba(255,107,53,.3);
+    }
+    .card h3{
+      margin:0 0 28px;
+      font-size:20px;
+      color:var(--text);
+      font-weight:900;
+      font-family:'Poppins',sans-serif;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      position:relative;
+      z-index:2;
+    }
+
+    /* Weight Entry Table */
+    .weight-table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0 12px;
+      margin-top:20px;
+      position:relative;
+      z-index:2;
+    }
+    .weight-table thead th{
+      text-align:left;
+      padding:12px 18px;
+      font-size:12px;
+      color:var(--text-secondary);
+      text-transform:uppercase;
+      letter-spacing:1.2px;
+      font-weight:800;
+      border-bottom:3px solid var(--border);
+    }
+    .weight-table tbody tr{
+      background:rgba(255,255,255,.04);
+      transition:all .3s ease;
+      cursor:pointer;
+    }
+    .weight-table tbody tr:hover{
+      background:rgba(255,107,53,.12);
+      transform:translateX(6px);
+    }
+    .weight-table tbody td{
+      padding:18px;
+      border-top:2px solid var(--border);
+      border-bottom:2px solid var(--border);
+      font-size:15px;
+      font-weight:600;
+    }
+    .weight-table tbody td:first-child{
+      border-left:2px solid var(--border);
+      border-radius:14px 0 0 14px;
+      font-weight:700;
+      color:var(--accent-success);
+    }
+    .weight-table tbody td:last-child{
+      border-right:2px solid var(--border);
+      border-radius:0 14px 14px 0;
+    }
+    .weight-value{
+      font-size:24px;
+      font-weight:900;
+      font-family:'Poppins',sans-serif;
+      background:linear-gradient(135deg,var(--accent-primary),var(--accent-success));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .weight-change{
+      font-size:13px;
+      font-weight:700;
+      margin-left:12px;
+    }
+
+    /* Input Groups */
+    .input-group{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-bottom:24px;
+    }
+    .input-group label{
+      font-size:13px;
+      color:var(--text-secondary);
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .input-group input,
+    .input-group select,
+    .input-group textarea{
+      padding:16px 20px;
+      border-radius:14px;
+      border:2px solid var(--border);
+      background:rgba(255,255,255,.05);
+      color:var(--text);
+      font-size:16px;
+      font-family:'Inter',sans-serif;
+      font-weight:600;
+      transition:all .3s ease;
+    }
+    .input-group input:focus,
+    .input-group select:focus,
+    .input-group textarea:focus{
+      outline:none;
+      border-color:var(--accent-primary);
+      background:rgba(255,107,53,.1);
+      box-shadow:0 0 0 4px rgba(255,107,53,.2);
+    }
+
+    /* Footer */
+    .footer{
+      padding:28px 40px;
+      color:var(--text-secondary);
+      border-top:2px solid var(--border);
+      text-align:center;
+      font-size:14px;
+      background:var(--bg-secondary);
+      font-weight:700;
+    }
+
+    /* Modal */
+    .modal-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(10,14,39,.97);
+      backdrop-filter:blur(15px);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:100;
+    }
+    .modal-overlay.active{display:flex}
+    .modal{
+      background:linear-gradient(135deg, var(--card) 0%, rgba(22,33,62,.95) 100%);
+      border:3px solid var(--accent-primary);
+      border-radius:28px;
+      padding:44px;
+      max-width:550px;
+      width:90%;
+      max-height:90vh;
+      overflow-y:auto;
+      box-shadow:0 24px 80px rgba(0,0,0,.7), 0 0 0 1px rgba(255,107,53,.2);
+      animation:slideIn .4s cubic-bezier(0.4,0,0.2,1);
+      position:relative;
+    }
+    .modal::before{
+      content:'';
+      position:absolute;
+      top:0;left:0;right:0;
+      height:4px;
+      background:linear-gradient(90deg,var(--accent-primary),var(--accent-success),var(--accent-purple));
+      background-size:200% 100%;
+      animation:gradientMove 2s linear infinite;
+    }
+    @keyframes slideIn{
+      from{opacity:0;transform:translateY(40px) scale(0.95)}
+      to{opacity:1;transform:translateY(0) scale(1)}
+    }
+    .modal h2{
+      margin:0 0 28px;
+      font-size:32px;
+      font-weight:900;
+      font-family:'Poppins',sans-serif;
+      background:linear-gradient(135deg,var(--accent-primary),var(--accent-success));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px){
+      .main{padding:20px}
+      .bar{padding:16px 20px}
+      .hero-stats{grid-template-columns:1fr}
+      .title{font-size:1.5rem}
+      .goal-section{padding:24px}
+      .card{padding:24px}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="bar">
+      <div class="logo">
+        <span class="logo-icon">💪</span>
+        <h1 class="title">FitTrack Pro</h1>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" id="addEntryBtn">➕ Add Weight Entry</button>
+        <button class="btn btn-outline" id="downloadCSVBtn">📥 Download Data</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- Goal Setting Section -->
+    <section class="goal-section">
+      <div class="goal-header">
+        <h2 class="goal-title">🎯 Your Weight Goal</h2>
+        <button class="btn" id="setGoalBtn">⚙️ Set Goal</button>
+      </div>
+      
+      <div class="goal-stats">
+        <div class="goal-stat">
+          <div class="goal-stat-label">🏁 Starting Weight</div>
+          <div class="goal-stat-value" id="startWeight">145 kg</div>
+        </div>
+        <div class="goal-stat">
+          <div class="goal-stat-label">⚖️ Current Weight</div>
+          <div class="goal-stat-value" id="currentWeight">133.4 kg</div>
+        </div>
+        <div class="goal-stat">
+          <div class="goal-stat-label">🎯 Target Weight</div>
+          <div class="goal-stat-value" id="targetWeight">125 kg</div>
+        </div>
+        <div class="goal-stat">
+          <div class="goal-stat-label">📉 Progress</div>
+          <div class="goal-stat-value" id="progressPercent">58%</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Stats Hero -->
+    <section class="hero-stats">
+      <div class="stat-card">
+        <div class="stat-icon">📉</div>
+        <div class="stat-label">Total Lost</div>
+        <div class="stat-value" id="totalLost">11.6</div>
+        <div class="stat-change stat-down">kg lost 🎉</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-label">To Goal</div>
+        <div class="stat-value" id="toGo">8.4</div>
+        <div class="stat-change stat-up">kg remaining</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div class="stat-label">Journey Days</div>
+        <div class="stat-value" id="journeyDays">74</div>
+        <div class="stat-change stat-up">days tracking</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-label">Avg Loss/Week</div>
+        <div class="stat-value" id="avgLoss">1.1</div>
+        <div class="stat-change stat-down">kg/week</div>
+      </div>
+    </section>
+
+    <!-- Content Grid -->
+    <section class="content">
+      <!-- Weight Progress Chart -->
+      <div class="card" style="grid-column: span 8">
+        <h3>📈 Weight Journey</h3>
+        <canvas id="weightChart" height="300"></canvas>
+      </div>
+
+      <!-- Weight Change Chart -->
+      <div class="card" style="grid-column: span 4">
+        <h3>📊 Weekly Changes</h3>
+        <canvas id="changeChart" height="300"></canvas>
+      </div>
+
+      <!-- Weight Data Table -->
+      <div class="card" style="grid-column: span 12">
+        <h3>📋 Weight Log History</h3>
+        <div style="overflow-x:auto;position:relative;z-index:2">
+          <table class="weight-table" id="weightTable">
+            <thead>
+              <tr>
+                <th>📅 Date</th>
+                <th>⚖️ Weight</th>
+                <th>📉 Change</th>
+                <th>📊 From Start</th>
+                <th>🎯 To Goal</th>
+              </tr>
+            </thead>
+            <tbody id="weightTableBody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="footer">
+    💪 FitTrack Pro © 2025 — Transform Your Body, Transform Your Life 🔥
+  </div>
+</div>
+
+<!-- Add Entry Modal -->
+<div class="modal-overlay" id="entryModal">
+  <div class="modal">
+    <h2>➕ Add Weight Entry</h2>
+    
+    <div class="input-group">
+      <label>📅 Date</label>
+      <input type="date" id="entryDate" value="">
+    </div>
+
+    <div class="input-group">
+      <label>⚖️ Weight (kg)</label>
+      <input type="number" step="0.1" id="entryWeight" placeholder="e.g., 75.5">
+    </div>
+
+    <div class="input-group">
+      <label>📝 Notes (Optional)</label>
+      <textarea id="entryNotes" rows="3" placeholder="How are you feeling? Any observations?"></textarea>
+    </div>
+
+    <div style="display:flex;gap:14px;margin-top:32px">
+      <button class="btn" id="saveEntryBtn" style="flex:1">💾 Save Entry</button>
+      <button class="btn btn-outline" id="closeEntryModalBtn" style="flex:1">✖️ Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Set Goal Modal -->
+<div class="modal-overlay" id="goalModal">
+  <div class="modal">
+    <h2>🎯 Set Your Goal</h2>
+    
+    <div class="input-group">
+      <label>🏁 Starting Weight (kg)</label>
+      <input type="number" step="0.1" id="goalStartWeight" placeholder="e.g., 145">
+    </div>
+
+    <div class="input-group">
+      <label>🎯 Target Weight (kg)</label>
+      <input type="number" step="0.1" id="goalTargetWeight" placeholder="e.g., 125">
+    </div>
+
+    <div class="input-group">
+      <label>📅 Target Date (Optional)</label>
+      <input type="date" id="goalTargetDate">
+    </div>
+
+    <div style="display:flex;gap:14px;margin-top:32px">
+      <button class="btn" id="saveGoalBtn" style="flex:1">💾 Save Goal</button>
+      <button class="btn btn-outline" id="closeGoalModalBtn" style="flex:1">✖️ Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const CSV_URL = './weight.csv';
+  
+  // State
+  let WEIGHT_DATA = [];
+  let GOAL = {
+    startWeight: 145,
+    targetWeight: 125,
+    targetDate: null
+  };
+
+  // Load goal from localStorage
+  const savedGoal = localStorage.getItem('fittrack_goal');
+  if(savedGoal){
+    GOAL = JSON.parse(savedGoal);
+  }
+
+  // Date utilities
+  const trim = (s) => (s == null ? '' : String(s).trim());
+  
+  const parseWeightDate = (dateStr) => {
+    if(!dateStr) return '';
+    const s = trim(dateStr);
+    if(!s) return '';
+    
+    const months = {
+      'jan': '01', 'feb': '02', 'mar': '03', 'apr': '04',
+      'may': '05', 'jun': '06', 'jul': '07', 'aug': '08',
+      'sep': '09', 'oct': '10', 'nov': '11', 'dec': '12'
+    };
+    
+    const parts = s.split('-');
+    if(parts.length === 3){
+      const day = parts[0].trim().padStart(2, '0');
+      const monthStr = parts[1].trim().toLowerCase();
+      let year = parts[2].trim();
+      
+      if(year.length === 2){
+        const yearNum = parseInt(year);
+        year = yearNum < 50 ? '20' + year : '19' + year;
+      }
+      
+      const month = months[monthStr];
+      if(month){
+        return year + '-' + month + '-' + day;
+      }
+    }
+    
+    return s;
+  };
+
+  const formatDisplayDate = (dateKey) => {
+    if(!dateKey) return '';
+    const d = new Date(dateKey);
+    if(isNaN(d)) return dateKey;
+    
+    const options = { month: 'short', day: 'numeric', year: 'numeric' };
+    return d.toLocaleDateString('en-US', options);
+  };
+
+  // Modal handlers
+  const entryModal = document.getElementById('entryModal');
+  const goalModal = document.getElementById('goalModal');
+  
+  document.getElementById('addEntryBtn').onclick = () => {
+    document.getElementById('entryDate').value = new Date().toISOString().slice(0,10);
+    entryModal.classList.add('active');
+  };
+  
+  document.getElementById('closeEntryModalBtn').onclick = () => entryModal.classList.remove('active');
+  document.getElementById('closeGoalModalBtn').onclick = () => goalModal.classList.remove('active');
+  
+  entryModal.onclick = (e) => { if(e.target === entryModal) entryModal.classList.remove('active'); };
+  goalModal.onclick = (e) => { if(e.target === goalModal) goalModal.classList.remove('active'); };
+
+  document.getElementById('setGoalBtn').onclick = () => {
+    document.getElementById('goalStartWeight').value = GOAL.startWeight;
+    document.getElementById('goalTargetWeight').value = GOAL.targetWeight;
+    goalModal.classList.add('active');
+  };
+
+  // Save Entry
+  document.getElementById('saveEntryBtn').onclick = () => {
+    const date = document.getElementById('entryDate').value;
+    const weight = parseFloat(document.getElementById('entryWeight').value);
+    const notes = document.getElementById('entryNotes').value;
+    
+    if(!date || !weight){
+      alert('⚠️ Please enter both date and weight!');
+      return;
+    }
+
+    // Add to data
+    const newEntry = {
+      Date: date,
+      'Weight in Kg': weight,
+      Notes: notes || ''
+    };
+    
+    WEIGHT_DATA.push(newEntry);
+    
+    // Sort by date
+    WEIGHT_DATA.sort((a,b) => {
+      const dateA = parseWeightDate(a.Date);
+      const dateB = parseWeightDate(b.Date);
+      return dateA.localeCompare(dateB);
+    });
+    
+    // Save to localStorage
+    localStorage.setItem('fittrack_entries', JSON.stringify(WEIGHT_DATA));
+    
+    // Clear form
+    document.getElementById('entryWeight').value = '';
+    document.getElementById('entryNotes').value = '';
+    
+    entryModal.classList.remove('active');
+    
+    // Re-render
+    render();
+    
+    alert('✅ Weight entry added successfully!');
+  };
+
+  // Save Goal
+  document.getElementById('saveGoalBtn').onclick = () => {
+    const startWeight = parseFloat(document.getElementById('goalStartWeight').value);
+    const targetWeight = parseFloat(document.getElementById('goalTargetWeight').value);
+    const targetDate = document.getElementById('goalTargetDate').value;
+    
+    if(!startWeight || !targetWeight){
+      alert('⚠️ Please enter both starting and target weight!');
+      return;
+    }
+
+    GOAL = {
+      startWeight: startWeight,
+      targetWeight: targetWeight,
+      targetDate: targetDate || null
+    };
+    
+    localStorage.setItem('fittrack_goal', JSON.stringify(GOAL));
+    
+    goalModal.classList.remove('active');
+    render();
+    
+    alert('🎯 Goal updated successfully!');
+  };
+
+  // Download CSV
+  document.getElementById('downloadCSVBtn').onclick = () => {
+    if(WEIGHT_DATA.length === 0){
+      alert('⚠️ No data to download!');
+      return;
+    }
+    
+    const csv = Papa.unparse(WEIGHT_DATA);
+    const blob = new Blob([csv], {type: 'text/csv'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'weight_data_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // Charts
+  let weightChart = null;
+  let changeChart = null;
+
+  function updateStats(){
+    if(WEIGHT_DATA.length === 0) return;
+    
+    const weights = WEIGHT_DATA.map(d => parseFloat(d['Weight in Kg']));
+    const currentWeight = weights[weights.length - 1];
+    const startWeight = GOAL.startWeight;
+    const targetWeight = GOAL.targetWeight;
+    
+    const totalLost = startWeight - currentWeight;
+    const toGo = currentWeight - targetWeight;
+    const progress = ((startWeight - currentWeight) / (startWeight - targetWeight) * 100).toFixed(0);
+    
+    // Calculate journey days
+    const firstDate = new Date(parseWeightDate(WEIGHT_DATA[0].Date));
+    const lastDate = new Date(parseWeightDate(WEIGHT_DATA[WEIGHT_DATA.length - 1].Date));
+    const journeyDays = Math.ceil((lastDate - firstDate) / (1000 * 60 * 60 * 24));
+    
+    // Average loss per week
+    const weeks = journeyDays / 7;
+    const avgLoss = weeks > 0 ? (totalLost / weeks).toFixed(1) : 0;
+    
+    // Update goal stats
+    document.getElementById('startWeight').textContent = startWeight.toFixed(1) + ' kg';
+    document.getElementById('currentWeight').textContent = currentWeight.toFixed(1) + ' kg';
+    document.getElementById('targetWeight').textContent = targetWeight.toFixed(1) + ' kg';
+    document.getElementById('progressPercent').textContent = progress + '%';
+    
+    // Update hero stats
+    document.getElementById('totalLost').textContent = totalLost.toFixed(1);
+    document.getElementById('toGo').textContent = toGo.toFixed(1);
+    document.getElementById('journeyDays').textContent = journeyDays;
+    document.getElementById('avgLoss').textContent = avgLoss;
+  }
+
+  function renderTable(){
+    const tbody = document.getElementById('weightTableBody');
+    tbody.innerHTML = '';
+    
+    if(WEIGHT_DATA.length === 0){
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-secondary)">📊 No weight entries yet. Click "Add Weight Entry" to start!</td></tr>';
+      return;
+    }
+    
+    const startWeight = GOAL.startWeight;
+    const targetWeight = GOAL.targetWeight;
+    
+    WEIGHT_DATA.forEach((entry, i) => {
+      const weight = parseFloat(entry['Weight in Kg']);
+      const prevWeight = i > 0 ? parseFloat(WEIGHT_DATA[i-1]['Weight in Kg']) : startWeight;
+      const change = weight - prevWeight;
+      const fromStart = weight - startWeight;
+      const toGoal = weight - targetWeight;
+      
+      const changeColor = change < 0 ? '#00d9ff' : change > 0 ? '#ff3864' : '#9ca3af';
+      const changeArrow = change < 0 ? '↓' : change > 0 ? '↑' : '→';
+      
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${formatDisplayDate(parseWeightDate(entry.Date))}</td>
+        <td><span class="weight-value">${weight.toFixed(1)}</span> kg</td>
+        <td style="color:${changeColor};font-weight:700">
+          ${change !== 0 ? changeArrow + ' ' + Math.abs(change).toFixed(1) + ' kg' : '—'}
+        </td>
+        <td style="color:#00d9ff;font-weight:700">
+          ${fromStart < 0 ? '↓ ' + Math.abs(fromStart).toFixed(1) : fromStart > 0 ? '↑ ' + fromStart.toFixed(1) : '0'} kg
+        </td>
+        <td style="color:#ffd93d;font-weight:700">
+          ${toGoal.toFixed(1)} kg
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  function renderCharts(){
+    if(WEIGHT_DATA.length === 0) return;
+    
+    const dates = WEIGHT_DATA.map(d => formatDisplayDate(parseWeightDate(d.Date)));
+    const weights = WEIGHT_DATA.map(d => parseFloat(d['Weight in Kg']));
+    
+    // Weight Chart
+    const weightCtx = document.getElementById('weightChart').getContext('2d');
+    const weightGradient = weightCtx.createLinearGradient(0, 0, 0, 300);
+    weightGradient.addColorStop(0, 'rgba(255,107,53,0.5)');
+    weightGradient.addColorStop(1, 'rgba(255,107,53,0.02)');
+    
+    if(weightChart) weightChart.destroy();
+    weightChart = new Chart(weightCtx, {
+      type: 'line',
+      data: {
+        labels: dates,
+        datasets: [{
+          label: 'Weight (kg)',
+          data: weights,
+          borderColor: '#ff6b35',
+          backgroundColor: weightGradient,
+          borderWidth: 5,
+          tension: 0.4,
+          fill: true,
+          pointRadius: 8,
+          pointBackgroundColor: '#ff6b35',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 4,
+          pointHoverRadius: 12,
+          pointHoverBackgroundColor: '#ff8c5a',
+          pointHoverBorderWidth: 5
+        },{
+          label: 'Goal',
+          data: Array(weights.length).fill(GOAL.targetWeight),
+          borderColor: '#00d9ff',
+          borderWidth: 4,
+          borderDash: [12,6],
+          fill: false,
+          pointRadius: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top',
+            labels: {
+              color: '#e8eaf6',
+              font: {size: 14, weight: '800', family: 'Poppins'},
+              usePointStyle: true,
+              padding: 20
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(22,33,62,0.98)',
+            titleColor: '#e8eaf6',
+            titleFont: {size: 14, weight: '700'},
+            bodyColor: '#e8eaf6',
+            bodyFont: {size: 16, weight: '800', family: 'Poppins'},
+            padding: 16,
+            borderColor: '#ff6b35',
+            borderWidth: 2,
+            cornerRadius: 12
+          }
+        },
+        scales: {
+          x: {
+            ticks: {color: '#9ca3af', font: {weight: '700', size: 12}},
+            grid: {color: '#2d3748', lineWidth: 1}
+          },
+          y: {
+            ticks: {
+              color: '#9ca3af',
+              font: {weight: '800', size: 13, family: 'Poppins'},
+              callback: (value) => value + ' kg'
+            },
+            grid: {color: '#2d3748', lineWidth: 1}
+          }
+        }
+      }
+    });
+
+    // Weight Change Chart
+    const changes = [];
+    for(let i = 1; i < weights.length; i++){
+      changes.push(weights[i] - weights[i-1]);
+    }
+    
+    const changeCtx = document.getElementById('changeChart').getContext('2d');
+    if(changeChart) changeChart.destroy();
+    changeChart = new Chart(changeCtx, {
+      type: 'bar',
+      data: {
+        labels: dates.slice(1),
+        datasets: [{
+          label: 'Change',
+          data: changes,
+          backgroundColor: changes.map(c => c < 0 ? '#00d9ff' : '#ff3864'),
+          borderRadius: 12,
+          barThickness: 24
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {display: false},
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const val = context.parsed.y;
+                return (val < 0 ? '↓ ' : '↑ ') + Math.abs(val).toFixed(1) + ' kg';
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: {color: '#9ca3af', font: {weight: '700', size: 11}},
+            grid: {display: false}
+          },
+          y: {
+            ticks: {
+              color: '#9ca3af',
+              font: {weight: '700'},
+              callback: (value) => value.toFixed(1) + ' kg'
+            },
+            grid: {color: '#2d3748'}
+          }
+        }
+      }
+    });
+  }
+
+  function render(){
+    updateStats();
+    renderTable();
+    renderCharts();
+  }
+
+  // Load CSV
+  Papa.parse(CSV_URL, {
+    download: true,
+    header: true,
+    skipEmptyLines: true,
+    complete: (res) => {
+      WEIGHT_DATA = res.data;
+      
+      // Merge with localStorage entries
+      const localEntries = JSON.parse(localStorage.getItem('fittrack_entries') || '[]');
+      if(localEntries.length > 0){
+        // Convert local entries to match CSV format
+        const formattedLocal = localEntries.map(e => ({
+          Date: e.Date,
+          'Weight in Kg': e['Weight in Kg']
+        }));
+        WEIGHT_DATA = [...WEIGHT_DATA, ...formattedLocal];
+      }
+      
+      // Sort by date
+      WEIGHT_DATA.sort((a,b) => {
+        const dateA = parseWeightDate(a.Date);
+        const dateB = parseWeightDate(b.Date);
+        return dateA.localeCompare(dateB);
+      });
+      
+      console.log('✅ Weight data loaded:', {
+        entries: WEIGHT_DATA.length,
+        firstEntry: WEIGHT_DATA[0],
+        lastEntry: WEIGHT_DATA[WEIGHT_DATA.length - 1]
+      });
+      
+      render();
+    },
+    error: (err) => {
+      console.error('CSV load error', err);
+      alert('⚠️ Failed to load weight.csv');
+    }
+  });
+</script>
+
+</body>
+</html>
