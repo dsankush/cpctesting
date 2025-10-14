@@ -442,6 +442,32 @@
     .delete-btn:active{
       transform:scale(0.95);
     }
+    .edit-btn{
+      position:absolute;
+      top:12px;
+      right:48px;
+      width:28px;
+      height:28px;
+      border-radius:8px;
+      border:none;
+      background:var(--primary);
+      color:white;
+      font-size:16px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all .2s ease;
+      box-shadow:0 2px 8px rgba(99,102,241,0.3);
+    }
+    .edit-btn:hover{
+      background:var(--primary-dark);
+      transform:scale(1.1);
+      box-shadow:0 4px 12px rgba(99,102,241,0.5);
+    }
+    .edit-btn:active{
+      transform:scale(0.95);
+    }
 
     /* Modal */
     .modal-overlay{

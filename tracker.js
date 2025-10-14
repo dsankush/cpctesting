@@ -16,6 +16,11 @@ let CHARTS = {
   gain: null,
   calorie: null
 };
+let EDIT_MODE = {
+  active: false,
+  type: null,
+  index: null
+};
 
 // Load from localStorage
 const savedGoals = localStorage.getItem('fittrack_goals');
@@ -78,6 +83,8 @@ document.querySelectorAll('.tab').forEach(tab => {
 
 // Add button
 document.getElementById('addBtn').onclick = () => {
+  EDIT_MODE = { active: false, type: null, index: null };
+  
   if(ACTIVE_TAB === 'calorie'){
     document.getElementById('activityDate').value = new Date().toISOString().slice(0,10);
     document.getElementById('modalActivity').classList.add('active');
@@ -91,11 +98,13 @@ document.getElementById('addBtn').onclick = () => {
 
 // Food & Activity buttons
 document.getElementById('addFoodBtn').onclick = () => {
+  EDIT_MODE = { active: false, type: null, index: null };
   document.getElementById('foodDate').value = new Date().toISOString().slice(0,10);
   document.getElementById('modalFood').classList.add('active');
 };
 
 document.getElementById('addActivityBtn').onclick = () => {
+  EDIT_MODE = { active: false, type: null, index: null };
   document.getElementById('activityDate').value = new Date().toISOString().slice(0,10);
   document.getElementById('modalActivity').classList.add('active');
 };
@@ -270,11 +279,21 @@ document.getElementById('saveWeight').onclick = () => {
   
   if(!date || !weight) return alert('Please enter date and weight');
   
-  DATA[ACTIVE_TAB].push({
+  const entry = {
     Date: date,
     'Weight in Kg': weight,
     Notes: notes || ''
-  });
+  };
+  
+  if(EDIT_MODE.active && EDIT_MODE.type === 'weight'){
+    // Update existing entry
+    DATA[ACTIVE_TAB][EDIT_MODE.index] = entry;
+    alert('Entry updated successfully');
+  } else {
+    // Add new entry
+    DATA[ACTIVE_TAB].push(entry);
+    alert('Entry added successfully');
+  }
   
   DATA[ACTIVE_TAB].sort((a,b) => a.Date.localeCompare(b.Date));
   localStorage.setItem('fittrack_data_' + ACTIVE_TAB, JSON.stringify(DATA[ACTIVE_TAB]));
@@ -282,9 +301,9 @@ document.getElementById('saveWeight').onclick = () => {
   document.getElementById('weightValue').value = '';
   document.getElementById('weightNotes').value = '';
   document.getElementById('modalWeight').classList.remove('active');
+  EDIT_MODE = { active: false, type: null, index: null };
   
   render(ACTIVE_TAB);
-  alert('Entry added successfully');
 };
 
 // Save food entry
@@ -322,14 +341,24 @@ document.getElementById('saveFood').onclick = () => {
   else if(portion === 1.5) portionLabel = ' (Large)';
   else if(portion === 2) portionLabel = ' (XL)';
   
-  DATA.food.push({
+  const entry = {
     Date: date,
     MealType: mealType,
     FoodName: foodName,
     Portion: portion,
     Calories: totalCalories,
     Description: mealType + ': ' + foodName + portionLabel
-  });
+  };
+  
+  if(EDIT_MODE.active && EDIT_MODE.type === 'food'){
+    // Update existing entry
+    DATA.food[EDIT_MODE.index] = entry;
+    alert('Food entry updated successfully');
+  } else {
+    // Add new entry
+    DATA.food.push(entry);
+    alert('Food entry added successfully');
+  }
   
   DATA.food.sort((a,b) => a.Date.localeCompare(b.Date));
   localStorage.setItem('fittrack_data_food', JSON.stringify(DATA.food));
@@ -343,9 +372,9 @@ document.getElementById('saveFood').onclick = () => {
   document.getElementById('customFoodCalGroup').style.display = 'none';
   document.getElementById('estimatedFoodCalories').textContent = '0';
   document.getElementById('modalFood').classList.remove('active');
+  EDIT_MODE = { active: false, type: null, index: null };
   
   render('calorie');
-  alert('Food entry added successfully');
 };
 
 // Save activity entry
@@ -376,14 +405,24 @@ document.getElementById('saveActivity').onclick = () => {
   
   const totalCalories = Math.round(calPerMin * duration * intensity);
   
-  DATA.activity.push({
+  const entry = {
     Date: date,
     Activity: activityName,
     Duration: duration,
     Intensity: intensity,
     CaloriesPerMin: calPerMin,
     TotalCalories: totalCalories
-  });
+  };
+  
+  if(EDIT_MODE.active && EDIT_MODE.type === 'activity'){
+    // Update existing entry
+    DATA.activity[EDIT_MODE.index] = entry;
+    alert('Activity updated successfully');
+  } else {
+    // Add new entry
+    DATA.activity.push(entry);
+    alert('Activity added successfully');
+  }
   
   DATA.activity.sort((a,b) => a.Date.localeCompare(b.Date));
   localStorage.setItem('fittrack_data_activity', JSON.stringify(DATA.activity));
@@ -398,9 +437,9 @@ document.getElementById('saveActivity').onclick = () => {
   document.getElementById('customCalGroup').style.display = 'none';
   document.getElementById('estimatedCalories').textContent = '0';
   document.getElementById('modalActivity').classList.remove('active');
+  EDIT_MODE = { active: false, type: null, index: null };
   
   render('calorie');
-  alert('Activity added successfully');
 };
 
 // Render functions
@@ -472,7 +511,8 @@ function renderWeight(type){
       <td><span class="weight-value">${weight.toFixed(1)}</span> kg</td>
       <td>
         <span class="weight-change ${changeClass}">${change !== 0 ? changeIcon + ' ' + Math.abs(change).toFixed(1) + ' kg' : '—'}</span>
-        <button class="delete-btn" onclick="deleteWeightEntry('${type}', ${idx})" style="margin-left:12px;position:relative;top:0;right:0">🗑️</button>
+        <button class="edit-btn" onclick="editWeightEntry('${type}', ${idx})" style="margin-left:12px;position:relative;top:0;right:auto">✏️</button>
+        <button class="delete-btn" onclick="deleteWeightEntry('${type}', ${idx})" style="margin-left:8px;position:relative;top:0;right:0">🗑️</button>
       </td>
     `;
     tbody.appendChild(row);
@@ -640,6 +680,7 @@ function renderActivitiesList(activities){
     
     list.innerHTML = todayActivitiesWithIndex.map(a => `
       <div class="calorie-entry">
+        <button class="edit-btn" onclick="editActivity(${a.originalIndex})">✏️</button>
         <button class="delete-btn" onclick="deleteActivity(${a.originalIndex})">🗑️</button>
         <div class="calorie-entry-header">
           <div class="calorie-entry-time">${a.Activity}</div>
@@ -701,6 +742,7 @@ function renderFoodList(food){
             </div>
             ${meals[mealType].map(f => `
               <div class="calorie-entry">
+                <button class="edit-btn" onclick="editFood(${f.originalIndex})">✏️</button>
                 <button class="delete-btn" onclick="deleteFood(${f.originalIndex})">🗑️</button>
                 <div class="calorie-entry-header">
                   <div class="calorie-entry-time">${f.FoodName || f.Description}</div>
@@ -846,6 +888,91 @@ function loadData(){
   // Render other tabs
   render('gain');
   render('calorie');
+}
+
+// Edit functions
+function editWeightEntry(type, index){
+  EDIT_MODE = { active: true, type: 'weight', index: index };
+  const entry = DATA[type][index];
+  
+  document.getElementById('modalWeightTitle').textContent = 
+    type === 'loss' ? 'Edit Weight Entry (Loss)' : 'Edit Weight Entry (Gain)';
+  document.getElementById('weightDate').value = entry.Date;
+  document.getElementById('weightValue').value = entry['Weight in Kg'];
+  document.getElementById('weightNotes').value = entry.Notes || '';
+  
+  document.getElementById('modalWeight').classList.add('active');
+}
+
+function editFood(index){
+  EDIT_MODE = { active: true, type: 'food', index: index };
+  const entry = DATA.food[index];
+  
+  document.getElementById('foodDate').value = entry.Date;
+  document.getElementById('mealType').value = entry.MealType || 'Breakfast';
+  
+  // For custom foods or when we can't find the original item
+  if(entry.FoodName){
+    // Try to find matching food item
+    const foodSelect = document.getElementById('foodItem');
+    let found = false;
+    
+    for(let i = 0; i < foodSelect.options.length; i++){
+      if(foodSelect.options[i].text === entry.FoodName){
+        foodSelect.value = foodSelect.options[i].value;
+        found = true;
+        break;
+      }
+    }
+    
+    if(!found){
+      // It's a custom food
+      foodSelect.value = 'custom';
+      document.getElementById('customFoodGroup').style.display = 'block';
+      document.getElementById('customFoodCalGroup').style.display = 'block';
+      document.getElementById('customFoodName').value = entry.FoodName;
+      document.getElementById('customFoodCal').value = entry.Calories / (entry.Portion || 1);
+    }
+  }
+  
+  document.getElementById('portionSize').value = entry.Portion || 1;
+  updateFoodCaloriePreview();
+  
+  document.getElementById('modalFood').classList.add('active');
+}
+
+function editActivity(index){
+  EDIT_MODE = { active: true, type: 'activity', index: index };
+  const entry = DATA.activity[index];
+  
+  document.getElementById('activityDate').value = entry.Date;
+  
+  // Try to find matching activity
+  const activitySelect = document.getElementById('activityType');
+  let found = false;
+  
+  for(let i = 0; i < activitySelect.options.length; i++){
+    if(activitySelect.options[i].text === entry.Activity){
+      activitySelect.value = activitySelect.options[i].value;
+      found = true;
+      break;
+    }
+  }
+  
+  if(!found){
+    // It's a custom activity
+    activitySelect.value = 'custom';
+    document.getElementById('customActivityGroup').style.display = 'block';
+    document.getElementById('customCalGroup').style.display = 'block';
+    document.getElementById('customActivityName').value = entry.Activity;
+    document.getElementById('customCalPerMin').value = entry.CaloriesPerMin || 8;
+  }
+  
+  document.getElementById('activityDuration').value = entry.Duration;
+  document.getElementById('activityIntensity').value = entry.Intensity;
+  updateCaloriePreview();
+  
+  document.getElementById('modalActivity').classList.add('active');
 }
 
 // Delete functions
