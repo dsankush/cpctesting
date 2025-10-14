@@ -1124,6 +1124,7 @@
         FILTERS.dateTo   = dates[1].toISOString().slice(0,10);
         selDateFrom.value = FILTERS.dateFrom;
         selDateTo.value   = FILTERS.dateTo;
+        populateFilters(RAW, REFERENCE_DATA, true);
         render();
       }
     }
@@ -1135,7 +1136,7 @@
     selDateRange._flatpickr && selDateRange._flatpickr.clear();
     selState.value = selDistrict.value = selRetailer.value = selProduct.value = selUnit.value = selStatus.value = '';
     selSource.value = selPT.value = selZone.value = selHQ.value = '';
-    populateFilters(RAW, REFERENCE_DATA);
+    populateFilters(RAW, REFERENCE_DATA, false); // Reset to full dataset
     render();
   });
 
@@ -1859,110 +1860,170 @@
     setTimeout(() => { indiaMap.fitBounds([[8, 68],[37, 97]]); }, 100);
   }
 
-  function populateFilters(rows, refData = []){
-    const states = uniqSorted(rows.map(r=>trim(r.State)));
-    const dists  = uniqSorted(rows.map(r=>trim(r.District)));
-    const rets   = uniqSorted(rows.map(r=>trim(r['Retailer Name'])));
-    const products = uniqSorted(rows.flatMap(r=>[...parseProducts(r['Cart Items']).keys()]));
-    const unitsAll = uniqSorted(rows.flatMap(r=>parseCartItems(r['Cart Items']).map(it=>it.unit).filter(Boolean)));
-    const statuses = ['','Yes','No','Pending'];
-    const sources = uniqSorted(rows.map(r=>trim(r.Source||'')).filter(Boolean));
+  // Smart cascading filter population - updates all filters based on current selections
+  function populateFilters(rows, refData = [], preserveFilters = false){
+    // Apply current filters to get filtered dataset
+    const filteredRows = preserveFilters ? applyFilters(rows) : rows;
     
-    // Combine PT names from both data.csv (PT column) and reference.csv (Name column)
-    const ptsFromData = rows.map(r=>trim(r.PT||'')).filter(Boolean);
-    const ptsFromRef = refData.map(r=>trim(r.Name||'')).filter(Boolean);
+    // For reference data, apply relevant filters
+    let filteredRefData = refData;
+    if(preserveFilters && refData.length > 0){
+      filteredRefData = refData.filter(r => {
+        if(FILTERS.state && trim(r.State) !== FILTERS.state) return false;
+        if(FILTERS.zone && trim(r.ZONE) !== FILTERS.zone) return false;
+        if(FILTERS.pt && trim(r.Name) !== FILTERS.pt) return false;
+        if(FILTERS.hq && trim(r.HQ) !== FILTERS.hq) return false;
+        return true;
+      });
+    }
+    
+    // Extract unique values from filtered data
+    const states = uniqSorted(filteredRows.map(r=>trim(r.State)));
+    const dists  = uniqSorted(filteredRows.map(r=>trim(r.District)));
+    const rets   = uniqSorted(filteredRows.map(r=>trim(r['Retailer Name'])));
+    const products = uniqSorted(filteredRows.flatMap(r=>[...parseProducts(r['Cart Items']).keys()]));
+    const unitsAll = uniqSorted(filteredRows.flatMap(r=>parseCartItems(r['Cart Items']).map(it=>it.unit).filter(Boolean)));
+    const statuses = ['','Yes','No','Pending'];
+    const sources = uniqSorted(filteredRows.map(r=>trim(r.Source||'')).filter(Boolean));
+    
+    // Combine PT names from both filtered datasets
+    const ptsFromData = filteredRows.map(r=>trim(r.PT||'')).filter(Boolean);
+    const ptsFromRef = filteredRefData.map(r=>trim(r.Name||'')).filter(Boolean);
     const pts = uniqSorted([...ptsFromData, ...ptsFromRef]);
     
-    const zones = uniqSorted(rows.map(r=>trim(r.Zone||'')).filter(Boolean));
+    const zones = uniqSorted(filteredRows.map(r=>trim(r.Zone||'')).filter(Boolean));
     
     // HQ filter is unique to reference.csv
-    const hqs = uniqSorted(refData.map(r=>trim(r.HQ||'')).filter(Boolean));
+    const hqs = uniqSorted(filteredRefData.map(r=>trim(r.HQ||'')).filter(Boolean));
 
-    function fill(sel, items){ 
+    function fill(sel, items, currentValue){ 
+      const prevValue = currentValue !== undefined ? currentValue : sel.value;
       sel.innerHTML = ''; 
       const opt0 = document.createElement('option'); 
-      opt0.value=''; opt0.textContent='All'; sel.appendChild(opt0); 
-      for(const v of items){ const o=document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o); }
+      opt0.value=''; 
+      // Show count of available options
+      opt0.textContent = items.length > 0 ? `All (${items.length})` : 'All'; 
+      sel.appendChild(opt0); 
+      
+      let valueStillExists = false;
+      for(const v of items){ 
+        const o=document.createElement('option'); 
+        o.value=v; 
+        o.textContent=v; 
+        sel.appendChild(o);
+        if(v === prevValue) valueStillExists = true;
+      }
+      
+      // Restore previous value if it still exists in filtered options
+      if(preserveFilters && valueStillExists){
+        sel.value = prevValue;
+      } else if(preserveFilters && !valueStillExists && prevValue){
+        // Value no longer valid, clear it from FILTERS
+        return null; // Indicates filter should be cleared
+      }
+      
+      return valueStillExists ? prevValue : '';
     }
 
-    fill(selState, states); 
-    fill(selDistrict, dists); 
-    fill(selRetailer, rets); 
-    fill(selProduct, products);
-    fill(selUnit, unitsAll);
-    fill(selStatus, statuses);
-    fill(selSource, sources);
-    fill(selPT, pts);
-    fill(selZone, zones);
-    fill(selHQ, hqs);
+    // Fill all dropdowns and track if any filters need to be cleared
+    const stateValid = fill(selState, states, FILTERS.state);
+    const distValid = fill(selDistrict, dists, FILTERS.district);
+    const retValid = fill(selRetailer, rets, FILTERS.retailer);
+    const prodValid = fill(selProduct, products, FILTERS.product);
+    const unitValid = fill(selUnit, unitsAll, FILTERS.unit);
+    fill(selStatus, statuses, FILTERS.status);
+    const sourceValid = fill(selSource, sources, FILTERS.source);
+    const ptValid = fill(selPT, pts, FILTERS.pt);
+    const zoneValid = fill(selZone, zones, FILTERS.zone);
+    const hqValid = fill(selHQ, hqs, FILTERS.hq);
+    
+    // Clear filters that are no longer valid
+    if(preserveFilters){
+      if(stateValid === null) FILTERS.state = '';
+      if(distValid === null) FILTERS.district = '';
+      if(retValid === null) FILTERS.retailer = '';
+      if(prodValid === null) FILTERS.product = '';
+      if(unitValid === null) FILTERS.unit = '';
+      if(sourceValid === null) FILTERS.source = '';
+      if(ptValid === null) FILTERS.pt = '';
+      if(zoneValid === null) FILTERS.zone = '';
+      if(hqValid === null) FILTERS.hq = '';
+    }
   }
 
   function attachFilterHandlers(){
-    selDateFrom.onchange = ()=>{ FILTERS.dateFrom = selDateFrom.value; render(); };
-    selDateTo.onchange   = ()=>{ FILTERS.dateTo   = selDateTo.value; render(); };
+    // Date filters
+    selDateFrom.onchange = ()=>{ 
+      FILTERS.dateFrom = selDateFrom.value; 
+      populateFilters(RAW, REFERENCE_DATA, true);
+      render(); 
+    };
+    selDateTo.onchange = ()=>{ 
+      FILTERS.dateTo = selDateTo.value; 
+      populateFilters(RAW, REFERENCE_DATA, true);
+      render(); 
+    };
 
+    // All other filters trigger cascading updates
     selState.onchange = ()=>{
       FILTERS.state = selState.value;
-
-      const dists = uniqSorted(RAW.filter(r=>!FILTERS.state || trim(r.State)===FILTERS.state).map(r=>trim(r.District)));
-      selDistrict.innerHTML = ''; 
-      const opt0=document.createElement('option'); opt0.value=''; opt0.textContent='All'; selDistrict.appendChild(opt0);
-      for(const v of dists){ const o=document.createElement('option'); o.value=v; o.textContent=v; selDistrict.appendChild(o); }
-      FILTERS.district = ''; selDistrict.value='';
-
-      const rets = uniqSorted(RAW.filter(r=>!FILTERS.state || trim(r.State)===FILTERS.state).map(r=>trim(r['Retailer Name'])));
-      selRetailer.innerHTML = ''; 
-      const optR=document.createElement('option'); optR.value=''; optR.textContent='All'; selRetailer.appendChild(optR);
-      for(const v of rets){ const o=document.createElement('option'); o.value=v; o.textContent=v; selRetailer.appendChild(o); }
-      FILTERS.retailer = ''; selRetailer.value='';
-
+      populateFilters(RAW, REFERENCE_DATA, true);
       render();
     };
 
     selDistrict.onchange = ()=>{
       FILTERS.district = selDistrict.value;
-
-      const rets = uniqSorted(RAW.filter(r=>{
-        if(FILTERS.state && trim(r.State)!==FILTERS.state) return false;
-        if(FILTERS.district && trim(r.District)!==FILTERS.district) return false;
-        return true;
-      }).map(r=>trim(r['Retailer Name'])));
-      selRetailer.innerHTML = ''; 
-      const optR=document.createElement('option'); optR.value=''; optR.textContent='All'; selRetailer.appendChild(optR);
-      for(const v of rets){ const o=document.createElement('option'); o.value=v; o.textContent=v; selRetailer.appendChild(o); }
-      FILTERS.retailer = ''; selRetailer.value='';
-
+      populateFilters(RAW, REFERENCE_DATA, true);
       render();
     };
 
-    selRetailer.onchange = ()=>{ FILTERS.retailer = selRetailer.value; render(); };
+    selRetailer.onchange = ()=>{ 
+      FILTERS.retailer = selRetailer.value; 
+      populateFilters(RAW, REFERENCE_DATA, true);
+      render(); 
+    };
 
     selProduct.onchange = ()=>{
       FILTERS.product = selProduct.value;
-
-      const unitsSet = new Set();
-      RAW.forEach(r=>{
-        parseCartItems(r['Cart Items']).forEach(it=>{
-          if(!FILTERS.product || it.name===FILTERS.product){
-            if(it.unit) unitsSet.add(it.unit);
-          }
-        });
-      });
-      const units = [...unitsSet].sort((a,b)=>a.localeCompare(b));
-      selUnit.innerHTML = '';
-      const optU=document.createElement('option'); optU.value=''; optU.textContent='All'; selUnit.appendChild(optU);
-      for(const v of units){ const o=document.createElement('option'); o.value=v; o.textContent=v; selUnit.appendChild(o); }
-      FILTERS.unit = ''; selUnit.value='';
-
+      populateFilters(RAW, REFERENCE_DATA, true);
       render();
     };
 
-    selUnit.onchange = ()=>{ FILTERS.unit = selUnit.value; render(); };
-    selStatus.onchange = ()=>{ FILTERS.status = selStatus.value; render(); };
-    selSource.onchange = ()=>{ FILTERS.source = selSource.value; render(); };
-    selPT.onchange = ()=>{ FILTERS.pt = selPT.value; render(); };
-    selZone.onchange = ()=>{ FILTERS.zone = selZone.value; render(); };
-    selHQ.onchange = ()=>{ FILTERS.hq = selHQ.value; render(); };
+    selUnit.onchange = ()=>{ 
+      FILTERS.unit = selUnit.value; 
+      populateFilters(RAW, REFERENCE_DATA, true);
+      render(); 
+    };
+    
+    selStatus.onchange = ()=>{ 
+      FILTERS.status = selStatus.value; 
+      populateFilters(RAW, REFERENCE_DATA, true);
+      render(); 
+    };
+    
+    selSource.onchange = ()=>{ 
+      FILTERS.source = selSource.value; 
+      populateFilters(RAW, REFERENCE_DATA, true);
+      render(); 
+    };
+    
+    selPT.onchange = ()=>{ 
+      FILTERS.pt = selPT.value; 
+      populateFilters(RAW, REFERENCE_DATA, true);
+      render(); 
+    };
+    
+    selZone.onchange = ()=>{ 
+      FILTERS.zone = selZone.value; 
+      populateFilters(RAW, REFERENCE_DATA, true);
+      render(); 
+    };
+    
+    selHQ.onchange = ()=>{ 
+      FILTERS.hq = selHQ.value; 
+      populateFilters(RAW, REFERENCE_DATA, true);
+      render(); 
+    };
   }
 
   function render(){
