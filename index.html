@@ -1066,12 +1066,28 @@
     const s = trim(dateStr);
     if(!s) return '';
     
-    // Try to parse DD-MMM-YY format (e.g., "10-Sep-25")
+    // Month mapping
+    const months = {
+      'jan': '01', 'january': '01',
+      'feb': '02', 'february': '02',
+      'mar': '03', 'march': '03',
+      'apr': '04', 'april': '04',
+      'may': '05',
+      'jun': '06', 'june': '06',
+      'jul': '07', 'july': '07',
+      'aug': '08', 'august': '08',
+      'sep': '09', 'sept': '09', 'september': '09',
+      'oct': '10', 'october': '10',
+      'nov': '11', 'november': '11',
+      'dec': '12', 'december': '12'
+    };
+    
+    // Try to parse DD-MMM-YY or D-MMM-YY format (e.g., "10-Sep-25" or "6-Oct-25")
     const parts = s.split('-');
     if(parts.length === 3){
-      const day = parts[0].padStart(2, '0');
-      const monthStr = parts[1];
-      let year = parts[2];
+      const day = parts[0].trim().padStart(2, '0');
+      const monthStr = parts[1].trim().toLowerCase();
+      let year = parts[2].trim();
       
       // Convert 2-digit year to 4-digit (25 -> 2025)
       if(year.length === 2){
@@ -1079,14 +1095,25 @@
         year = yearNum < 50 ? '20' + year : '19' + year;
       }
       
-      // Month mapping
-      const months = {
-        'jan': '01', 'feb': '02', 'mar': '03', 'apr': '04',
-        'may': '05', 'jun': '06', 'jul': '07', 'aug': '08',
-        'sep': '09', 'oct': '10', 'nov': '11', 'dec': '12'
-      };
+      const month = months[monthStr];
+      if(month){
+        return year + '-' + month + '-' + day;
+      }
+    }
+    
+    // Try space-separated format: "6 Oct 25" or "06 Oct 25"
+    const spaceParts = s.split(/[\s\/]+/);
+    if(spaceParts.length === 3){
+      const day = spaceParts[0].trim().padStart(2, '0');
+      const monthStr = spaceParts[1].trim().toLowerCase();
+      let year = spaceParts[2].trim();
       
-      const month = months[monthStr.toLowerCase()];
+      if(year.length === 2){
+        const yearNum = parseInt(year);
+        year = yearNum < 50 ? '20' + year : '19' + year;
+      }
+      
+      const month = months[monthStr];
       if(month){
         return year + '-' + month + '-' + day;
       }
