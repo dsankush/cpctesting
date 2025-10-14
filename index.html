@@ -1185,10 +1185,26 @@
     dateFormat:"Y-m-d",
     onChange:(dates)=>{
       if(dates.length===2){
-        FILTERS.dateFrom = dates[0].toISOString().slice(0,10);
-        FILTERS.dateTo   = dates[1].toISOString().slice(0,10);
+        // Fix timezone issue - use local date instead of UTC
+        const fromDate = dates[0];
+        const toDate = dates[1];
+        
+        FILTERS.dateFrom = fromDate.getFullYear() + '-' + 
+                          String(fromDate.getMonth() + 1).padStart(2, '0') + '-' + 
+                          String(fromDate.getDate()).padStart(2, '0');
+        FILTERS.dateTo = toDate.getFullYear() + '-' + 
+                        String(toDate.getMonth() + 1).padStart(2, '0') + '-' + 
+                        String(toDate.getDate()).padStart(2, '0');
+        
         selDateFrom.value = FILTERS.dateFrom;
         selDateTo.value   = FILTERS.dateTo;
+        
+        console.log('🗓️ Date Range Selected:', {
+          selectedFrom: FILTERS.dateFrom,
+          selectedTo: FILTERS.dateTo,
+          rawDates: dates.map(d => d.toString())
+        });
+        
         populateFilters(RAW, REFERENCE_DATA, true);
         render();
       }
@@ -2228,12 +2244,14 @@
   function attachFilterHandlers(){
     // Date filters
     selDateFrom.onchange = ()=>{ 
-      FILTERS.dateFrom = selDateFrom.value; 
+      FILTERS.dateFrom = selDateFrom.value;
+      console.log('🗓️ Date From Changed:', FILTERS.dateFrom);
       populateFilters(RAW, REFERENCE_DATA, true);
       render(); 
     };
     selDateTo.onchange = ()=>{ 
-      FILTERS.dateTo = selDateTo.value; 
+      FILTERS.dateTo = selDateTo.value;
+      console.log('🗓️ Date To Changed:', FILTERS.dateTo);
       populateFilters(RAW, REFERENCE_DATA, true);
       render(); 
     };
