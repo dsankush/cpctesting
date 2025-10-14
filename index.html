@@ -1421,6 +1421,14 @@
     document.getElementById('kpiUniqueFarmers').textContent = `Unique: ${uniqueFarmers.toLocaleString()}`;
     document.getElementById('kpiActiveRetailers').textContent = activeRetailers.toLocaleString();
     document.getElementById('kpiTotalRetailers').textContent = `of ${totalRetailers.toLocaleString()} total`;
+    // Debug: Log the actual values being displayed
+    console.log('💡 Setting Missed Calls Display:', {
+      missedCallsDisplay: missedCallsDisplay,
+      formattedDisplay: missedCallsDisplay.toLocaleString(),
+      missedCallsUniqueDisplay: missedCallsUniqueDisplay,
+      formattedUnique: missedCallsUniqueDisplay.toLocaleString()
+    });
+    
     document.getElementById('kpiMissedCalls').textContent = missedCallsDisplay.toLocaleString();
     document.getElementById('kpiMissedCallsTotal').textContent = FILTERS.state ? FILTERS.state : 'All States';
     document.getElementById('kpiUniqueMissedCalls').textContent = missedCallsUniqueDisplay.toLocaleString();
