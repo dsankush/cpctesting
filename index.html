@@ -1098,6 +1098,7 @@
   // State
   let RAW = [];
   let REFERENCE_DATA = []; // PT/Missed Calls reference data
+  let REFERENCE_GRAND_TOTAL = null; // Grand Total row (excluded from filters)
   let FILTERS = { dateFrom:'', dateTo:'', state:'', district:'', retailer:'', product:'', unit:'', status:'', source:'', pt:'', zone:'', hq:'' };
 
   // DOM
@@ -1241,31 +1242,48 @@
     }
     
     // Calculate Missed Calls from reference.csv (dynamic based on filters)
-    const filteredReferenceData = REFERENCE_DATA.filter(r => {
-      // Apply common filters: State, Zone, PT
-      if(FILTERS.state && trim(r.State) !== FILTERS.state) return false;
-      if(FILTERS.zone && trim(r.ZONE) !== FILTERS.zone) return false;
-      // PT filter (maps to Name column in reference.csv)
-      if(FILTERS.pt && trim(r.Name) !== FILTERS.pt) return false;
-      // HQ filter (unique to reference data)
-      if(FILTERS.hq && trim(r.HQ) !== FILTERS.hq) return false;
-      return true;
-    });
+    // Check if any reference-related filters are applied
+    const hasReferenceFilters = FILTERS.state || FILTERS.zone || FILTERS.pt || FILTERS.hq;
     
     let missedCallsDisplay = 0;
     let missedCallsUniqueDisplay = 0;
-    
-    for(const r of filteredReferenceData){
-      missedCallsDisplay += Number(r['Total Missed Calls']) || 0;
-      missedCallsUniqueDisplay += Number(r['Total Unique Missed Calls']) || 0;
-    }
-    
-    // Calculate grand totals for context
     let missedCallsTotal = 0;
     let missedCallsUnique = 0;
-    for(const r of REFERENCE_DATA){
-      missedCallsTotal += Number(r['Total Missed Calls']) || 0;
-      missedCallsUnique += Number(r['Total Unique Missed Calls']) || 0;
+    
+    if(!hasReferenceFilters && REFERENCE_GRAND_TOTAL){
+      // No filters applied - use Grand Total row values
+      missedCallsDisplay = REFERENCE_GRAND_TOTAL.total;
+      missedCallsUniqueDisplay = REFERENCE_GRAND_TOTAL.unique;
+      missedCallsTotal = REFERENCE_GRAND_TOTAL.total;
+      missedCallsUnique = REFERENCE_GRAND_TOTAL.unique;
+    } else {
+      // Filters applied - calculate from filtered PT data
+      const filteredReferenceData = REFERENCE_DATA.filter(r => {
+        // Apply common filters: State, Zone, PT
+        if(FILTERS.state && trim(r.State) !== FILTERS.state) return false;
+        if(FILTERS.zone && trim(r.ZONE) !== FILTERS.zone) return false;
+        // PT filter (maps to Name column in reference.csv)
+        if(FILTERS.pt && trim(r.Name) !== FILTERS.pt) return false;
+        // HQ filter (unique to reference data)
+        if(FILTERS.hq && trim(r.HQ) !== FILTERS.hq) return false;
+        return true;
+      });
+      
+      for(const r of filteredReferenceData){
+        missedCallsDisplay += Number(r['Total Missed Calls']) || 0;
+        missedCallsUniqueDisplay += Number(r['Total Unique Missed Calls']) || 0;
+      }
+      
+      // Grand totals for context (use Grand Total row if available, otherwise calculate)
+      if(REFERENCE_GRAND_TOTAL){
+        missedCallsTotal = REFERENCE_GRAND_TOTAL.total;
+        missedCallsUnique = REFERENCE_GRAND_TOTAL.unique;
+      } else {
+        for(const r of REFERENCE_DATA){
+          missedCallsTotal += Number(r['Total Missed Calls']) || 0;
+          missedCallsUnique += Number(r['Total Unique Missed Calls']) || 0;
+        }
+      }
     }
     
     document.getElementById('kpiTotalBig').textContent = total.toLocaleString();
@@ -2109,24 +2127,47 @@
     skipEmptyLines: true,
     dynamicTyping: false,
     complete: (res)=>{
-      REFERENCE_DATA = res.data;
+      // Separate Grand Total row from actual PT data
+      const allData = res.data;
+      REFERENCE_DATA = allData.filter(r => {
+        const name = trim(r.Name || '');
+        // Exclude Grand Total row from PT data
+        return name && !name.toLowerCase().includes('grand total');
+      });
+      
+      // Find and store Grand Total row separately
+      const grandTotalRow = allData.find(r => {
+        const name = trim(r.Name || '');
+        return name && name.toLowerCase().includes('grand total');
+      });
+      
+      if(grandTotalRow){
+        REFERENCE_GRAND_TOTAL = {
+          total: Number(grandTotalRow['Total Missed Calls']) || 0,
+          unique: Number(grandTotalRow['Total Unique Missed Calls']) || 0
+        };
+      }
       
       if(REFERENCE_DATA.length > 0){
         console.log('✅ reference.csv loaded:', {
           totalPTs: REFERENCE_DATA.length,
           columns: Object.keys(REFERENCE_DATA[0]),
-          sample: REFERENCE_DATA[0]
+          sample: REFERENCE_DATA[0],
+          hasGrandTotal: !!REFERENCE_GRAND_TOTAL
         });
         
-        // Calculate totals
+        // Calculate totals from PT data (excluding Grand Total)
         let totalMissed = 0, totalUnique = 0;
         for(const r of REFERENCE_DATA){
           totalMissed += Number(r['Total Missed Calls']) || 0;
           totalUnique += Number(r['Total Unique Missed Calls']) || 0;
         }
-        console.log('📞 Total Missed Calls Data:', {
-          total: totalMissed.toLocaleString(),
-          unique: totalUnique.toLocaleString(),
+        
+        console.log('📞 Missed Calls Data:', {
+          ptCount: REFERENCE_DATA.length,
+          calculatedTotal: totalMissed.toLocaleString(),
+          calculatedUnique: totalUnique.toLocaleString(),
+          grandTotalRow: REFERENCE_GRAND_TOTAL ? `${REFERENCE_GRAND_TOTAL.total.toLocaleString()} total, ${REFERENCE_GRAND_TOTAL.unique.toLocaleString()} unique` : 'Not found',
           states: [...new Set(REFERENCE_DATA.map(r=>r.State))].length
         });
       }
