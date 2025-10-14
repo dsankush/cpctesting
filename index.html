@@ -1066,12 +1066,28 @@
     const s = trim(dateStr);
     if(!s) return '';
     
-    // Try to parse DD-MMM-YY format (e.g., "10-Sep-25")
+    // Month mapping
+    const months = {
+      'jan': '01', 'january': '01',
+      'feb': '02', 'february': '02',
+      'mar': '03', 'march': '03',
+      'apr': '04', 'april': '04',
+      'may': '05',
+      'jun': '06', 'june': '06',
+      'jul': '07', 'july': '07',
+      'aug': '08', 'august': '08',
+      'sep': '09', 'sept': '09', 'september': '09',
+      'oct': '10', 'october': '10',
+      'nov': '11', 'november': '11',
+      'dec': '12', 'december': '12'
+    };
+    
+    // Try to parse DD-MMM-YY or D-MMM-YY format (e.g., "10-Sep-25" or "6-Oct-25")
     const parts = s.split('-');
     if(parts.length === 3){
-      const day = parts[0].padStart(2, '0');
-      const monthStr = parts[1];
-      let year = parts[2];
+      const day = parts[0].trim().padStart(2, '0');
+      const monthStr = parts[1].trim().toLowerCase();
+      let year = parts[2].trim();
       
       // Convert 2-digit year to 4-digit (25 -> 2025)
       if(year.length === 2){
@@ -1079,14 +1095,25 @@
         year = yearNum < 50 ? '20' + year : '19' + year;
       }
       
-      // Month mapping
-      const months = {
-        'jan': '01', 'feb': '02', 'mar': '03', 'apr': '04',
-        'may': '05', 'jun': '06', 'jul': '07', 'aug': '08',
-        'sep': '09', 'oct': '10', 'nov': '11', 'dec': '12'
-      };
+      const month = months[monthStr];
+      if(month){
+        return year + '-' + month + '-' + day;
+      }
+    }
+    
+    // Try space-separated format: "6 Oct 25" or "06 Oct 25"
+    const spaceParts = s.split(/[\s\/]+/);
+    if(spaceParts.length === 3){
+      const day = spaceParts[0].trim().padStart(2, '0');
+      const monthStr = spaceParts[1].trim().toLowerCase();
+      let year = spaceParts[2].trim();
       
-      const month = months[monthStr.toLowerCase()];
+      if(year.length === 2){
+        const yearNum = parseInt(year);
+        year = yearNum < 50 ? '20' + year : '19' + year;
+      }
+      
+      const month = months[monthStr];
       if(month){
         return year + '-' + month + '-' + day;
       }
@@ -1299,6 +1326,10 @@
         // Apply date range filter if present
         if(FILTERS.dateFrom || FILTERS.dateTo){
           const refDate = parseReferenceDate(trim(r['Date Processed'] || ''));
+          
+          // Exclude rows with invalid/missing dates when date filter is active
+          if(!refDate) return false;
+          
           if(FILTERS.dateFrom && refDate < FILTERS.dateFrom) return false;
           if(FILTERS.dateTo && refDate > FILTERS.dateTo) return false;
         }
@@ -1313,9 +1344,61 @@
         return true;
       });
       
+      // Debug: Log filtered data when date filter is active
+      if(FILTERS.dateFrom || FILTERS.dateTo){
+        // Analyze all rows to see date parsing success/failure
+        const dateAnalysis = REFERENCE_DATA.map(r => {
+          const rawDate = trim(r['Date Processed'] || '');
+          const parsedDate = parseReferenceDate(rawDate);
+          const inRange = parsedDate && parsedDate >= FILTERS.dateFrom && parsedDate <= FILTERS.dateTo;
+          return { rawDate, parsedDate, inRange, total: Number(r['Total Missed Calls']||0), unique: Number(r['Total Unique Missed Calls']||0) };
+        });
+        
+        const totalParsed = dateAnalysis.filter(d => d.parsedDate).length;
+        const totalFailed = dateAnalysis.filter(d => !d.parsedDate && d.rawDate).length;
+        const inRangeRows = dateAnalysis.filter(d => d.inRange);
+        const inRangeTotal = inRangeRows.reduce((sum, r) => sum + r.total, 0);
+        const inRangeUnique = inRangeRows.reduce((sum, r) => sum + r.unique, 0);
+        
+        console.log('📅 Date Range Filter Applied to Missed Calls:', {
+          dateFrom: FILTERS.dateFrom,
+          dateTo: FILTERS.dateTo,
+          totalReferenceRows: REFERENCE_DATA.length,
+          datesParsedSuccessfully: totalParsed,
+          datesFailedToParse: totalFailed,
+          rowsInDateRange: inRangeRows.length,
+          calculatedTotalInRange: inRangeTotal,
+          calculatedUniqueInRange: inRangeUnique,
+          filteredRows: filteredReferenceData.length,
+          sampleParsedDates: dateAnalysis.slice(0, 10).map(d => ({
+            raw: d.rawDate,
+            parsed: d.parsedDate || 'FAILED',
+            inRange: d.inRange ? 'YES' : 'NO',
+            total: d.total,
+            unique: d.unique
+          })),
+          sampleFilteredRows: filteredReferenceData.slice(0, 5).map(r => ({
+            date: r['Date Processed'],
+            parsedDate: parseReferenceDate(r['Date Processed']),
+            name: r.Name,
+            total: r['Total Missed Calls'],
+            unique: r['Total Unique Missed Calls']
+          }))
+        });
+      }
+      
       for(const r of filteredReferenceData){
         missedCallsDisplay += Number(r['Total Missed Calls']) || 0;
         missedCallsUniqueDisplay += Number(r['Total Unique Missed Calls']) || 0;
+      }
+      
+      // Debug: Log calculated totals
+      if(FILTERS.dateFrom || FILTERS.dateTo){
+        console.log('📊 Missed Calls Calculation:', {
+          filteredRowCount: filteredReferenceData.length,
+          calculatedTotal: missedCallsDisplay,
+          calculatedUnique: missedCallsUniqueDisplay
+        });
       }
       
       // Grand totals for context (use Grand Total row if available, otherwise calculate)
