@@ -3,12 +3,13 @@ let ACTIVE_TAB = 'loss';
 let DATA = {
   loss: [],
   gain: [],
-  calorie: []
+  food: [],
+  activity: []
 };
 let GOALS = {
   loss: { start: 145, target: 125 },
   gain: { start: 60, target: 70 },
-  calorie: { daily: 2000 }
+  calorie: { intake: 2000, burn: 500 }
 };
 let CHARTS = {
   loss: null,
@@ -78,8 +79,8 @@ document.querySelectorAll('.tab').forEach(tab => {
 // Add button
 document.getElementById('addBtn').onclick = () => {
   if(ACTIVE_TAB === 'calorie'){
-    document.getElementById('calorieDate').value = new Date().toISOString().slice(0,10);
-    document.getElementById('modalCalorie').classList.add('active');
+    document.getElementById('activityDate').value = new Date().toISOString().slice(0,10);
+    document.getElementById('modalActivity').classList.add('active');
   } else {
     document.getElementById('modalWeightTitle').textContent = 
       ACTIVE_TAB === 'loss' ? 'Add Weight Entry (Loss)' : 'Add Weight Entry (Gain)';
@@ -88,11 +89,24 @@ document.getElementById('addBtn').onclick = () => {
   }
 };
 
+// Food & Activity buttons
+document.getElementById('addFoodBtn').onclick = () => {
+  document.getElementById('foodDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('modalFood').classList.add('active');
+};
+
+document.getElementById('addActivityBtn').onclick = () => {
+  document.getElementById('activityDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('modalActivity').classList.add('active');
+};
+
 // Modal close handlers
 document.getElementById('closeWeightModal').onclick = () => 
   document.getElementById('modalWeight').classList.remove('active');
-document.getElementById('closeCalorieModal').onclick = () => 
-  document.getElementById('modalCalorie').classList.remove('active');
+document.getElementById('closeFoodModal').onclick = () => 
+  document.getElementById('modalFood').classList.remove('active');
+document.getElementById('closeActivityModal').onclick = () => 
+  document.getElementById('modalActivity').classList.remove('active');
 document.getElementById('closeGoalModal').onclick = () => 
   document.getElementById('modalGoal').classList.remove('active');
 
@@ -100,14 +114,56 @@ document.getElementById('modalWeight').onclick = (e) => {
   if(e.target.id === 'modalWeight') 
     document.getElementById('modalWeight').classList.remove('active');
 };
-document.getElementById('modalCalorie').onclick = (e) => {
-  if(e.target.id === 'modalCalorie') 
-    document.getElementById('modalCalorie').classList.remove('active');
+document.getElementById('modalFood').onclick = (e) => {
+  if(e.target.id === 'modalFood') 
+    document.getElementById('modalFood').classList.remove('active');
+};
+document.getElementById('modalActivity').onclick = (e) => {
+  if(e.target.id === 'modalActivity') 
+    document.getElementById('modalActivity').classList.remove('active');
 };
 document.getElementById('modalGoal').onclick = (e) => {
   if(e.target.id === 'modalGoal') 
     document.getElementById('modalGoal').classList.remove('active');
 };
+
+// Activity type change handler
+document.getElementById('activityType').onchange = function(){
+  const customGroup = document.getElementById('customActivityGroup');
+  const customCalGroup = document.getElementById('customCalGroup');
+  
+  if(this.value === 'custom'){
+    customGroup.style.display = 'block';
+    customCalGroup.style.display = 'block';
+  } else {
+    customGroup.style.display = 'none';
+    customCalGroup.style.display = 'none';
+  }
+  
+  updateCaloriePreview();
+};
+
+document.getElementById('activityDuration').oninput = updateCaloriePreview;
+document.getElementById('activityIntensity').onchange = updateCaloriePreview;
+document.getElementById('customCalPerMin').oninput = updateCaloriePreview;
+
+function updateCaloriePreview(){
+  const activityType = document.getElementById('activityType');
+  const duration = parseFloat(document.getElementById('activityDuration').value) || 0;
+  const intensity = parseFloat(document.getElementById('activityIntensity').value) || 1;
+  
+  let calPerMin = 0;
+  
+  if(activityType.value === 'custom'){
+    calPerMin = parseFloat(document.getElementById('customCalPerMin').value) || 0;
+  } else if(activityType.value){
+    const selectedOption = activityType.options[activityType.selectedIndex];
+    calPerMin = parseFloat(selectedOption.dataset.cal) || 0;
+  }
+  
+  const totalCal = Math.round(calPerMin * duration * intensity);
+  document.getElementById('estimatedCalories').textContent = totalCal;
+}
 
 // Goal buttons
 document.getElementById('setGoalLoss').onclick = () => openGoalModal('loss');
@@ -118,13 +174,17 @@ function openGoalModal(type){
   const modal = document.getElementById('modalGoal');
   const body = document.getElementById('goalModalBody');
   document.getElementById('modalGoalTitle').textContent = 
-    type === 'calorie' ? 'Set Calorie Goal' : `Set ${type === 'loss' ? 'Weight Loss' : 'Weight Gain'} Goal`;
+    type === 'calorie' ? 'Set Calorie Goals' : `Set ${type === 'loss' ? 'Weight Loss' : 'Weight Gain'} Goal`;
   
   if(type === 'calorie'){
     body.innerHTML = `
       <div class="input-group">
-        <label>Daily Calorie Goal (kcal)</label>
-        <input type="number" id="goalCalorieDaily" value="${GOALS.calorie.daily}" placeholder="2000">
+        <label>Daily Calorie Intake Goal (kcal)</label>
+        <input type="number" id="goalCalorieIntake" value="${GOALS.calorie.intake}" placeholder="2000">
+      </div>
+      <div class="input-group">
+        <label>Daily Calorie Burn Goal (kcal)</label>
+        <input type="number" id="goalCalorieBurn" value="${GOALS.calorie.burn}" placeholder="500">
       </div>
     `;
   } else {
@@ -149,9 +209,10 @@ document.getElementById('saveGoal').onclick = () => {
   const type = document.getElementById('modalGoal').dataset.type;
   
   if(type === 'calorie'){
-    const daily = parseFloat(document.getElementById('goalCalorieDaily').value);
-    if(!daily) return alert('Please enter daily calorie goal');
-    GOALS.calorie.daily = daily;
+    const intake = parseFloat(document.getElementById('goalCalorieIntake').value);
+    const burn = parseFloat(document.getElementById('goalCalorieBurn').value);
+    if(!intake || !burn) return alert('Please enter both goals');
+    GOALS.calorie = { intake, burn };
   } else {
     const start = parseFloat(document.getElementById('goalWeightStart').value);
     const target = parseFloat(document.getElementById('goalWeightTarget').value);
@@ -190,29 +251,84 @@ document.getElementById('saveWeight').onclick = () => {
   alert('Entry added successfully');
 };
 
-// Save calorie entry
-document.getElementById('saveCalorie').onclick = () => {
-  const date = document.getElementById('calorieDate').value;
-  const calories = parseInt(document.getElementById('calorieValue').value);
-  const desc = document.getElementById('calorieDesc').value;
+// Save food entry
+document.getElementById('saveFood').onclick = () => {
+  const date = document.getElementById('foodDate').value;
+  const calories = parseInt(document.getElementById('foodCalories').value);
+  const desc = document.getElementById('foodDesc').value;
   
   if(!date || !calories) return alert('Please enter date and calories');
   
-  DATA.calorie.push({
+  DATA.food.push({
     Date: date,
     Calories: calories,
     Description: desc || 'Food'
   });
   
-  DATA.calorie.sort((a,b) => a.Date.localeCompare(b.Date));
-  localStorage.setItem('fittrack_data_calorie', JSON.stringify(DATA.calorie));
+  DATA.food.sort((a,b) => a.Date.localeCompare(b.Date));
+  localStorage.setItem('fittrack_data_food', JSON.stringify(DATA.food));
   
-  document.getElementById('calorieValue').value = '';
-  document.getElementById('calorieDesc').value = '';
-  document.getElementById('modalCalorie').classList.remove('active');
+  document.getElementById('foodCalories').value = '';
+  document.getElementById('foodDesc').value = '';
+  document.getElementById('modalFood').classList.remove('active');
   
   render('calorie');
-  alert('Entry added successfully');
+  alert('Food entry added successfully');
+};
+
+// Save activity entry
+document.getElementById('saveActivity').onclick = () => {
+  const date = document.getElementById('activityDate').value;
+  const activityType = document.getElementById('activityType');
+  const duration = parseFloat(document.getElementById('activityDuration').value);
+  const intensity = parseFloat(document.getElementById('activityIntensity').value);
+  
+  if(!date || !activityType.value || !duration) {
+    return alert('Please enter date, activity type, and duration');
+  }
+  
+  let activityName = '';
+  let calPerMin = 0;
+  
+  if(activityType.value === 'custom'){
+    activityName = document.getElementById('customActivityName').value;
+    calPerMin = parseFloat(document.getElementById('customCalPerMin').value);
+    if(!activityName || !calPerMin) {
+      return alert('Please enter custom activity name and calories per minute');
+    }
+  } else {
+    const selectedOption = activityType.options[activityType.selectedIndex];
+    activityName = selectedOption.text;
+    calPerMin = parseFloat(selectedOption.dataset.cal);
+  }
+  
+  const totalCalories = Math.round(calPerMin * duration * intensity);
+  
+  DATA.activity.push({
+    Date: date,
+    Activity: activityName,
+    Duration: duration,
+    Intensity: intensity,
+    CaloriesPerMin: calPerMin,
+    TotalCalories: totalCalories
+  });
+  
+  DATA.activity.sort((a,b) => a.Date.localeCompare(b.Date));
+  localStorage.setItem('fittrack_data_activity', JSON.stringify(DATA.activity));
+  
+  // Reset form
+  document.getElementById('activityType').value = '';
+  document.getElementById('activityDuration').value = '30';
+  document.getElementById('activityIntensity').value = '1';
+  document.getElementById('customActivityName').value = '';
+  document.getElementById('customCalPerMin').value = '';
+  document.getElementById('customActivityGroup').style.display = 'none';
+  document.getElementById('customCalGroup').style.display = 'none';
+  document.getElementById('estimatedCalories').textContent = '0';
+  document.getElementById('modalActivity').classList.remove('active');
+  
+  render('calorie');
+  alert('Activity added successfully');
 };
 
 // Render functions
@@ -381,27 +497,26 @@ function renderWeightChart(type){
 }
 
 function renderCalorie(){
-  const data = DATA.calorie;
-  const goal = GOALS.calorie.daily;
+  const foodData = DATA.food;
+  const activityData = DATA.activity;
+  const intakeGoal = GOALS.calorie.intake;
+  const burnGoal = GOALS.calorie.burn;
   
-  // Calculate today's total
+  // Calculate today's totals
   const today = new Date().toISOString().slice(0,10);
-  const todayEntries = data.filter(e => e.Date === today);
-  const todayTotal = todayEntries.reduce((sum, e) => sum + e.Calories, 0);
-  const remaining = goal - todayTotal;
-  const progress = ((todayTotal / goal) * 100).toFixed(0);
+  const todayFood = foodData.filter(e => e.Date === today);
+  const todayActivity = activityData.filter(e => e.Date === today);
   
-  // Calculate week stats
-  const weekAgo = new Date();
-  weekAgo.setDate(weekAgo.getDate() - 7);
-  const weekData = data.filter(e => new Date(e.Date) >= weekAgo);
-  const weekTotal = weekData.reduce((sum, e) => sum + e.Calories, 0);
+  const todayIntake = todayFood.reduce((sum, e) => sum + e.Calories, 0);
+  const todayBurned = todayActivity.reduce((sum, e) => sum + e.TotalCalories, 0);
+  const todayNet = todayIntake - todayBurned;
+  const todayActiveMinutes = todayActivity.reduce((sum, e) => sum + e.Duration, 0);
   
-  // Calculate averages
-  const uniqueDates = [...new Set(data.map(e => e.Date))];
-  const avgDaily = uniqueDates.length > 0 ? (data.reduce((sum, e) => sum + e.Calories, 0) / uniqueDates.length).toFixed(0) : 0;
+  const balance = intakeGoal - burnGoal;
+  const balancePercent = balance > 0 ? ((todayNet / balance) * 100).toFixed(0) : 0;
   
   // Calculate streak
+  const uniqueDates = [...new Set([...foodData.map(e => e.Date), ...activityData.map(e => e.Date)])];
   let streak = 0;
   const sortedDates = [...uniqueDates].sort().reverse();
   let checkDate = new Date();
@@ -417,49 +532,80 @@ function renderCalorie(){
   }
   
   // Update stats
-  document.getElementById('calorieToday').textContent = todayTotal;
-  document.getElementById('calorieGoal').textContent = goal;
-  document.getElementById('calorieRemaining').textContent = remaining;
-  document.getElementById('calorieProgress').textContent = progress + '%';
-  document.getElementById('calorieWeek').textContent = weekTotal;
-  document.getElementById('calorieAvg').textContent = avgDaily;
-  document.getElementById('calorieDays').textContent = uniqueDates.length;
+  document.getElementById('calorieIntake').textContent = todayIntake;
+  document.getElementById('calorieBurned').textContent = todayBurned;
+  document.getElementById('calorieNet').textContent = todayNet;
+  document.getElementById('calorieBalance').textContent = balancePercent + '%';
+  document.getElementById('calorieIntakeGoal').textContent = intakeGoal;
+  document.getElementById('calorieBurnGoal').textContent = burnGoal;
+  document.getElementById('activeMinutes').textContent = todayActiveMinutes;
   document.getElementById('calorieStreak').textContent = streak;
   
-  // Render today's entries
-  const list = document.getElementById('calorieEntriesList');
-  if(todayEntries.length === 0){
-    list.innerHTML = '<div class="empty-state"><div class="empty-icon">🍽️</div><div class="empty-text">No entries today</div></div>';
-  } else {
-    list.innerHTML = todayEntries.map(e => `
-      <div class="calorie-entry">
-        <div class="calorie-entry-header">
-          <div class="calorie-entry-time">${e.Description}</div>
-          <div class="calorie-entry-calories">${e.Calories} kcal</div>
-        </div>
-      </div>
-    `).join('');
-  }
+  // Render today's activities
+  renderActivitiesList(todayActivity);
+  
+  // Render today's food entries
+  renderFoodList(todayFood);
   
   // Render chart
   renderCalorieChart();
 }
 
+function renderActivitiesList(activities){
+  const list = document.getElementById('activitiesList');
+  if(activities.length === 0){
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">🏃</div><div class="empty-text">No activities today</div></div>';
+  } else {
+    list.innerHTML = activities.map(a => `
+      <div class="calorie-entry">
+        <div class="calorie-entry-header">
+          <div class="calorie-entry-time">${a.Activity}</div>
+          <div class="calorie-entry-calories">${a.TotalCalories} kcal</div>
+        </div>
+        <div class="calorie-entry-desc" style="font-size:12px;color:#9ca3af;margin-top:4px">
+          ${a.Duration} min • ${a.Intensity === 1 ? 'Normal' : a.Intensity === 0.8 ? 'Light' : a.Intensity === 1.2 ? 'High' : 'Very High'} intensity
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+function renderFoodList(food){
+  const list = document.getElementById('calorieEntriesList');
+  if(food.length === 0){
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">🍽️</div><div class="empty-text">No food entries today</div></div>';
+  } else {
+    list.innerHTML = food.map(f => `
+      <div class="calorie-entry">
+        <div class="calorie-entry-header">
+          <div class="calorie-entry-time">${f.Description}</div>
+          <div class="calorie-entry-calories">${f.Calories} kcal</div>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
 function renderCalorieChart(){
-  const data = DATA.calorie;
-  
   // Get last 7 days
   const days = [];
-  const calories = [];
+  const intakeData = [];
+  const burnData = [];
+  
   for(let i = 6; i >= 0; i--){
     const date = new Date();
     date.setDate(date.getDate() - i);
     const dateStr = date.toISOString().slice(0,10);
-    const dayData = data.filter(e => e.Date === dateStr);
-    const total = dayData.reduce((sum, e) => sum + e.Calories, 0);
+    
+    const dayFood = DATA.food.filter(e => e.Date === dateStr);
+    const dayActivity = DATA.activity.filter(e => e.Date === dateStr);
+    
+    const intake = dayFood.reduce((sum, e) => sum + e.Calories, 0);
+    const burn = dayActivity.reduce((sum, e) => sum + e.TotalCalories, 0);
     
     days.push(formatDate(dateStr));
-    calories.push(total);
+    intakeData.push(intake);
+    burnData.push(burn);
   }
   
   const ctx = document.getElementById('chartCalorie').getContext('2d');
@@ -470,20 +616,17 @@ function renderCalorieChart(){
     data: {
       labels: days,
       datasets: [{
-        label: 'Calories',
-        data: calories,
+        label: 'Intake',
+        data: intakeData,
         backgroundColor: '#f59e0b',
         borderRadius: 6,
-        barThickness: 24
+        barThickness: 20
       },{
-        label: 'Goal',
-        data: Array(7).fill(GOALS.calorie.daily),
-        type: 'line',
-        borderColor: '#10b981',
-        borderWidth: 2,
-        borderDash: [5,5],
-        fill: false,
-        pointRadius: 0
+        label: 'Burned',
+        data: burnData,
+        backgroundColor: '#ef4444',
+        borderRadius: 6,
+        barThickness: 20
       }]
     },
     options: {
@@ -507,9 +650,8 @@ function renderCalorieChart(){
           backgroundColor: '#1a1a1a',
           padding: 10,
           cornerRadius: 8,
-          displayColors: false,
           callbacks: {
-            label: (context) => context.parsed.y + ' kcal'
+            label: (context) => context.dataset.label + ': ' + context.parsed.y + ' kcal'
           }
         }
       },
@@ -543,7 +685,8 @@ function loadData(){
   // Load from localStorage
   DATA.loss = JSON.parse(localStorage.getItem('fittrack_data_loss') || '[]');
   DATA.gain = JSON.parse(localStorage.getItem('fittrack_data_gain') || '[]');
-  DATA.calorie = JSON.parse(localStorage.getItem('fittrack_data_calorie') || '[]');
+  DATA.food = JSON.parse(localStorage.getItem('fittrack_data_food') || '[]');
+  DATA.activity = JSON.parse(localStorage.getItem('fittrack_data_activity') || '[]');
   
   // Load weight.csv for loss tracker
   Papa.parse('./weight.csv', {

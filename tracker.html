@@ -389,17 +389,21 @@
       padding:16px;
       margin-bottom:12px;
       border:1px solid var(--border);
+      transition:all .2s ease;
+    }
+    .calorie-entry:active{
+      background:#f3f4f6;
+      transform:scale(0.98);
     }
     .calorie-entry-header{
       display:flex;
       justify-content:space-between;
       align-items:center;
-      margin-bottom:8px;
     }
     .calorie-entry-time{
-      font-size:13px;
-      color:var(--text-secondary);
-      font-weight:600;
+      font-size:14px;
+      color:var(--text);
+      font-weight:700;
     }
     .calorie-entry-calories{
       font-size:18px;
@@ -407,8 +411,9 @@
       color:var(--primary);
     }
     .calorie-entry-desc{
-      font-size:14px;
-      color:var(--text);
+      font-size:12px;
+      color:var(--text-secondary);
+      margin-top:4px;
     }
 
     /* Modal */
@@ -764,29 +769,29 @@
     <div class="tab-content" id="tab-calorie">
       <section class="goal-section calorie">
         <div class="goal-header">
-          <h2 class="goal-title">Daily Calorie Goal</h2>
+          <h2 class="goal-title">Calorie Balance</h2>
           <button class="goal-btn" id="setGoalCalorie">Edit</button>
         </div>
         <div class="goal-stats">
           <div class="goal-stat">
-            <div class="goal-stat-label">Today</div>
-            <div class="goal-stat-value" id="calorieToday">0</div>
+            <div class="goal-stat-label">Intake</div>
+            <div class="goal-stat-value" id="calorieIntake">0</div>
             <div class="goal-stat-unit">kcal</div>
           </div>
           <div class="goal-stat">
-            <div class="goal-stat-label">Goal</div>
-            <div class="goal-stat-value" id="calorieGoal">2000</div>
+            <div class="goal-stat-label">Burned</div>
+            <div class="goal-stat-value" id="calorieBurned">0</div>
             <div class="goal-stat-unit">kcal</div>
           </div>
           <div class="goal-stat">
-            <div class="goal-stat-label">Remaining</div>
-            <div class="goal-stat-value" id="calorieRemaining">2000</div>
+            <div class="goal-stat-label">Net</div>
+            <div class="goal-stat-value" id="calorieNet">0</div>
             <div class="goal-stat-unit">kcal</div>
           </div>
           <div class="goal-stat">
-            <div class="goal-stat-label">Progress</div>
-            <div class="goal-stat-value" id="calorieProgress">0%</div>
-            <div class="goal-stat-unit">complete</div>
+            <div class="goal-stat-label">Balance</div>
+            <div class="goal-stat-value" id="calorieBalance">0%</div>
+            <div class="goal-stat-unit">goal</div>
           </div>
         </div>
       </section>
@@ -794,31 +799,31 @@
       <section class="stats-section">
         <div class="stat-card">
           <div class="stat-header">
-            <div class="stat-icon yellow">🔥</div>
-            <div class="stat-label">This Week</div>
+            <div class="stat-icon yellow">🍽️</div>
+            <div class="stat-label">Intake Goal</div>
           </div>
-          <div class="stat-value" id="calorieWeek">0</div>
-          <div class="stat-change">kcal total</div>
+          <div class="stat-value" id="calorieIntakeGoal">2000</div>
+          <div class="stat-change">kcal/day</div>
         </div>
         <div class="stat-card">
           <div class="stat-header">
-            <div class="stat-icon green">📊</div>
-            <div class="stat-label">Avg/Day</div>
+            <div class="stat-icon red">🔥</div>
+            <div class="stat-label">Burn Goal</div>
           </div>
-          <div class="stat-value" id="calorieAvg">0</div>
-          <div class="stat-change">kcal daily</div>
+          <div class="stat-value" id="calorieBurnGoal">500</div>
+          <div class="stat-change">kcal/day</div>
         </div>
         <div class="stat-card">
           <div class="stat-header">
-            <div class="stat-icon blue">📅</div>
-            <div class="stat-label">Tracked Days</div>
+            <div class="stat-icon blue">⏱️</div>
+            <div class="stat-label">Active Time</div>
           </div>
-          <div class="stat-value" id="calorieDays">0</div>
-          <div class="stat-change">days</div>
+          <div class="stat-value" id="activeMinutes">0</div>
+          <div class="stat-change">min today</div>
         </div>
         <div class="stat-card">
           <div class="stat-header">
-            <div class="stat-icon red">🎯</div>
+            <div class="stat-icon green">🎯</div>
             <div class="stat-label">Streak</div>
           </div>
           <div class="stat-value" id="calorieStreak">0</div>
@@ -829,15 +834,25 @@
       <section class="content">
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">Weekly Calories</h3>
+            <h3 class="card-title">Today's Activities</h3>
+            <button class="btn" id="addActivityBtn" style="padding:6px 14px;font-size:13px">+ Activity</button>
+          </div>
+          <div id="activitiesList"></div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Calorie Intake vs Burn</h3>
           </div>
           <div class="chart-container">
             <canvas id="chartCalorie"></canvas>
           </div>
         </div>
+        
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">Today's Entries</h3>
+            <h3 class="card-title">Food Intake Today</h3>
+            <button class="btn" id="addFoodBtn" style="padding:6px 14px;font-size:13px">+ Food</button>
           </div>
           <div id="calorieEntriesList"></div>
         </div>
@@ -874,30 +889,136 @@
   </div>
 </div>
 
-<!-- Calorie Entry Modal -->
-<div class="modal-overlay" id="modalCalorie">
+<!-- Food Entry Modal -->
+<div class="modal-overlay" id="modalFood">
   <div class="modal">
     <div class="modal-header">
       <div class="modal-handle"></div>
-      <h2 class="modal-title">Add Calorie Entry</h2>
+      <h2 class="modal-title">Add Food Intake</h2>
     </div>
     <div class="modal-body">
       <div class="input-group">
         <label>Date</label>
-        <input type="date" id="calorieDate">
+        <input type="date" id="foodDate">
       </div>
       <div class="input-group">
         <label>Calories (kcal)</label>
-        <input type="number" id="calorieValue" placeholder="500">
+        <input type="number" id="foodCalories" placeholder="500">
       </div>
       <div class="input-group">
         <label>Description</label>
-        <input type="text" id="calorieDesc" placeholder="e.g., Breakfast, Lunch, Snack">
+        <input type="text" id="foodDesc" placeholder="e.g., Breakfast, Lunch, Snack">
       </div>
     </div>
     <div class="button-group">
-      <button class="btn btn-secondary" id="closeCalorieModal">Cancel</button>
-      <button class="btn" id="saveCalorie">Save</button>
+      <button class="btn btn-secondary" id="closeFoodModal">Cancel</button>
+      <button class="btn" id="saveFood">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Activity Entry Modal -->
+<div class="modal-overlay" id="modalActivity">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-handle"></div>
+      <h2 class="modal-title">Add Activity</h2>
+    </div>
+    <div class="modal-body">
+      <div class="input-group">
+        <label>Date</label>
+        <input type="date" id="activityDate">
+      </div>
+      <div class="input-group">
+        <label>Activity Type</label>
+        <select id="activityType">
+          <option value="">Select Activity</option>
+          <optgroup label="🏃 Cardio">
+            <option value="running-light" data-cal="8">Running (Light - 6 km/h)</option>
+            <option value="running-moderate" data-cal="10">Running (Moderate - 8 km/h)</option>
+            <option value="running-fast" data-cal="13">Running (Fast - 10+ km/h)</option>
+            <option value="jogging" data-cal="7">Jogging</option>
+            <option value="walking-slow" data-cal="3">Walking (Slow - 3 km/h)</option>
+            <option value="walking-brisk" data-cal="5">Walking (Brisk - 6 km/h)</option>
+            <option value="cycling-light" data-cal="6">Cycling (Light - 15 km/h)</option>
+            <option value="cycling-moderate" data-cal="8">Cycling (Moderate - 20 km/h)</option>
+            <option value="cycling-intense" data-cal="12">Cycling (Intense - 25+ km/h)</option>
+            <option value="swimming-light" data-cal="6">Swimming (Light)</option>
+            <option value="swimming-moderate" data-cal="9">Swimming (Moderate)</option>
+            <option value="swimming-intense" data-cal="11">Swimming (Intense)</option>
+          </optgroup>
+          <optgroup label="💪 Strength Training">
+            <option value="weightlifting-light" data-cal="4">Weightlifting (Light)</option>
+            <option value="weightlifting-moderate" data-cal="6">Weightlifting (Moderate)</option>
+            <option value="weightlifting-intense" data-cal="8">Weightlifting (Intense)</option>
+            <option value="bodyweight" data-cal="5">Bodyweight Exercises</option>
+            <option value="crossfit" data-cal="10">CrossFit</option>
+            <option value="calisthenics" data-cal="6">Calisthenics</option>
+          </optgroup>
+          <optgroup label="🧘 Flexibility & Mind">
+            <option value="yoga-light" data-cal="3">Yoga (Light)</option>
+            <option value="yoga-vinyasa" data-cal="5">Yoga (Vinyasa)</option>
+            <option value="yoga-power" data-cal="6">Yoga (Power)</option>
+            <option value="pilates" data-cal="4">Pilates</option>
+            <option value="stretching" data-cal="2">Stretching</option>
+            <option value="meditation" data-cal="1">Meditation</option>
+          </optgroup>
+          <optgroup label="⚽ Sports">
+            <option value="football" data-cal="9">Football/Soccer</option>
+            <option value="basketball" data-cal="8">Basketball</option>
+            <option value="tennis" data-cal="7">Tennis</option>
+            <option value="badminton" data-cal="6">Badminton</option>
+            <option value="cricket" data-cal="5">Cricket</option>
+            <option value="volleyball" data-cal="6">Volleyball</option>
+          </optgroup>
+          <optgroup label="🏋️ Gym Activities">
+            <option value="treadmill" data-cal="9">Treadmill</option>
+            <option value="elliptical" data-cal="7">Elliptical</option>
+            <option value="rowing" data-cal="10">Rowing Machine</option>
+            <option value="stairmaster" data-cal="9">StairMaster</option>
+            <option value="spinning" data-cal="11">Spinning Class</option>
+            <option value="zumba" data-cal="8">Zumba</option>
+            <option value="aerobics" data-cal="7">Aerobics</option>
+          </optgroup>
+          <optgroup label="🚶 Daily Activities">
+            <option value="cleaning" data-cal="3">House Cleaning</option>
+            <option value="gardening" data-cal="4">Gardening</option>
+            <option value="dancing" data-cal="5">Dancing</option>
+            <option value="stairs" data-cal="8">Climbing Stairs</option>
+          </optgroup>
+          <option value="custom">Custom Activity</option>
+        </select>
+      </div>
+      <div class="input-group" id="customActivityGroup" style="display:none">
+        <label>Custom Activity Name</label>
+        <input type="text" id="customActivityName" placeholder="e.g., Boxing">
+      </div>
+      <div class="input-group">
+        <label>Duration (minutes)</label>
+        <input type="number" id="activityDuration" placeholder="30" value="30">
+      </div>
+      <div class="input-group" id="customCalGroup" style="display:none">
+        <label>Calories per minute</label>
+        <input type="number" step="0.1" id="customCalPerMin" placeholder="8">
+      </div>
+      <div class="input-group">
+        <label>Intensity</label>
+        <select id="activityIntensity">
+          <option value="0.8">Light (80%)</option>
+          <option value="1" selected>Normal (100%)</option>
+          <option value="1.2">High (120%)</option>
+          <option value="1.5">Very High (150%)</option>
+        </select>
+      </div>
+      <div id="caloriePreview" style="margin-top:16px;padding:16px;background:#f3f4f6;border-radius:12px;text-align:center">
+        <div style="font-size:13px;color:#6b7280;font-weight:600;margin-bottom:6px">Estimated Calories Burned</div>
+        <div style="font-size:28px;font-weight:800;color:#f59e0b" id="estimatedCalories">0</div>
+        <div style="font-size:12px;color:#9ca3af;margin-top:4px">kcal</div>
+      </div>
+    </div>
+    <div class="button-group">
+      <button class="btn btn-secondary" id="closeActivityModal">Cancel</button>
+      <button class="btn" id="saveActivity">Save Activity</button>
     </div>
   </div>
 </div>
