@@ -901,18 +901,143 @@
         <label>Date</label>
         <input type="date" id="foodDate">
       </div>
+      
       <div class="input-group">
-        <label>Calories (kcal)</label>
-        <input type="number" id="foodCalories" placeholder="500">
+        <label>Meal Type</label>
+        <select id="mealType">
+          <option value="Breakfast">🌅 Breakfast</option>
+          <option value="Lunch">☀️ Lunch</option>
+          <option value="Dinner">🌙 Dinner</option>
+          <option value="Snack">🍪 Snack</option>
+          <option value="Drink">🥤 Drink</option>
+        </select>
       </div>
+      
       <div class="input-group">
-        <label>Description</label>
-        <input type="text" id="foodDesc" placeholder="e.g., Breakfast, Lunch, Snack">
+        <label>Food Item</label>
+        <select id="foodItem">
+          <option value="">Select Food</option>
+          <optgroup label="🍳 Breakfast Items">
+            <option value="oats" data-cal="150">Oats (1 bowl)</option>
+            <option value="cornflakes" data-cal="110">Cornflakes (1 bowl)</option>
+            <option value="bread-2" data-cal="160">Bread (2 slices)</option>
+            <option value="paratha" data-cal="250">Paratha (1 piece)</option>
+            <option value="poha" data-cal="180">Poha (1 plate)</option>
+            <option value="upma" data-cal="200">Upma (1 plate)</option>
+            <option value="idli-2" data-cal="80">Idli (2 pieces)</option>
+            <option value="dosa" data-cal="120">Dosa (1 piece)</option>
+            <option value="sandwich" data-cal="300">Sandwich (Veg)</option>
+            <option value="eggs-2" data-cal="140">Eggs (2 boiled)</option>
+            <option value="omelet" data-cal="200">Omelet (2 eggs)</option>
+            <option value="pancake" data-cal="220">Pancake (1 piece)</option>
+          </optgroup>
+          <optgroup label="🍛 Main Course">
+            <option value="rice-plain" data-cal="200">Rice (1 cup plain)</option>
+            <option value="rice-fried" data-cal="350">Fried Rice (1 plate)</option>
+            <option value="biryani" data-cal="400">Biryani (1 plate)</option>
+            <option value="pulao" data-cal="300">Pulao (1 plate)</option>
+            <option value="roti-2" data-cal="140">Roti (2 pieces)</option>
+            <option value="naan" data-cal="280">Naan (1 piece)</option>
+            <option value="dal" data-cal="180">Dal (1 bowl)</option>
+            <option value="rajma" data-cal="220">Rajma (1 bowl)</option>
+            <option value="chole" data-cal="250">Chole (1 bowl)</option>
+            <option value="paneer-curry" data-cal="300">Paneer Curry (1 bowl)</option>
+            <option value="chicken-curry" data-cal="350">Chicken Curry (1 bowl)</option>
+            <option value="fish-curry" data-cal="280">Fish Curry (1 bowl)</option>
+            <option value="mutton-curry" data-cal="400">Mutton Curry (1 bowl)</option>
+          </optgroup>
+          <optgroup label="🍕 Fast Food">
+            <option value="pizza-slice" data-cal="280">Pizza (1 slice)</option>
+            <option value="burger" data-cal="550">Burger (Veg/Chicken)</option>
+            <option value="fries" data-cal="320">French Fries (Medium)</option>
+            <option value="pasta" data-cal="350">Pasta (1 plate)</option>
+            <option value="momos-6" data-cal="200">Momos (6 pieces)</option>
+            <option value="spring-roll" data-cal="150">Spring Roll (2 pieces)</option>
+            <option value="samosa" data-cal="150">Samosa (1 piece)</option>
+            <option value="vada-pav" data-cal="250">Vada Pav (1 piece)</option>
+            <option value="pav-bhaji" data-cal="400">Pav Bhaji (1 plate)</option>
+          </optgroup>
+          <optgroup label="🥗 Salad & Healthy">
+            <option value="salad-green" data-cal="50">Green Salad (1 bowl)</option>
+            <option value="salad-fruit" data-cal="120">Fruit Salad (1 bowl)</option>
+            <option value="soup-veg" data-cal="80">Vegetable Soup (1 bowl)</option>
+            <option value="soup-chicken" data-cal="150">Chicken Soup (1 bowl)</option>
+            <option value="smoothie" data-cal="200">Smoothie (1 glass)</option>
+            <option value="yogurt" data-cal="100">Yogurt (1 cup)</option>
+            <option value="sprouts" data-cal="90">Sprouts (1 bowl)</option>
+          </optgroup>
+          <optgroup label="🍪 Snacks & Desserts">
+            <option value="biscuits-4" data-cal="120">Biscuits (4 pieces)</option>
+            <option value="chips-pack" data-cal="150">Chips (1 small pack)</option>
+            <option value="namkeen" data-cal="180">Namkeen (1 small bowl)</option>
+            <option value="chocolate-bar" data-cal="230">Chocolate Bar</option>
+            <option value="cake-slice" data-cal="350">Cake (1 slice)</option>
+            <option value="ice-cream" data-cal="200">Ice Cream (1 scoop)</option>
+            <option value="gulab-jamun-2" data-cal="300">Gulab Jamun (2 pieces)</option>
+            <option value="jalebi" data-cal="150">Jalebi (3 pieces)</option>
+            <option value="ladoo" data-cal="180">Ladoo (1 piece)</option>
+          </optgroup>
+          <optgroup label="🥤 Drinks">
+            <option value="tea" data-cal="40">Tea (1 cup)</option>
+            <option value="coffee" data-cal="50">Coffee (1 cup)</option>
+            <option value="milk" data-cal="150">Milk (1 glass)</option>
+            <option value="juice-fresh" data-cal="100">Fresh Juice (1 glass)</option>
+            <option value="juice-packed" data-cal="120">Packed Juice (1 glass)</option>
+            <option value="soda" data-cal="140">Soda/Cold Drink (1 can)</option>
+            <option value="lassi" data-cal="180">Lassi (1 glass)</option>
+            <option value="milkshake" data-cal="300">Milkshake (1 glass)</option>
+            <option value="protein-shake" data-cal="200">Protein Shake (1 glass)</option>
+          </optgroup>
+          <optgroup label="🍎 Fruits">
+            <option value="apple" data-cal="95">Apple (1 medium)</option>
+            <option value="banana" data-cal="105">Banana (1 medium)</option>
+            <option value="orange" data-cal="60">Orange (1 medium)</option>
+            <option value="mango" data-cal="150">Mango (1 medium)</option>
+            <option value="grapes" data-cal="100">Grapes (1 cup)</option>
+            <option value="watermelon" data-cal="80">Watermelon (2 cups)</option>
+            <option value="papaya" data-cal="60">Papaya (1 cup)</option>
+          </optgroup>
+          <optgroup label="🥜 Nuts & Dry Fruits">
+            <option value="almonds-10" data-cal="70">Almonds (10 pieces)</option>
+            <option value="cashews-10" data-cal="90">Cashews (10 pieces)</option>
+            <option value="peanuts" data-cal="160">Peanuts (1/4 cup)</option>
+            <option value="walnuts-5" data-cal="65">Walnuts (5 halves)</option>
+            <option value="dates-3" data-cal="80">Dates (3 pieces)</option>
+            <option value="raisins" data-cal="130">Raisins (1/4 cup)</option>
+          </optgroup>
+          <option value="custom">➕ Custom Food Item</option>
+        </select>
+      </div>
+      
+      <div class="input-group" id="customFoodGroup" style="display:none">
+        <label>Custom Food Name</label>
+        <input type="text" id="customFoodName" placeholder="e.g., Homemade Curry">
+      </div>
+      
+      <div class="input-group">
+        <label>Portion Size</label>
+        <select id="portionSize">
+          <option value="0.5">Small (50%)</option>
+          <option value="1" selected>Regular (100%)</option>
+          <option value="1.5">Large (150%)</option>
+          <option value="2">Extra Large (200%)</option>
+        </select>
+      </div>
+      
+      <div class="input-group" id="customFoodCalGroup" style="display:none">
+        <label>Calories (kcal)</label>
+        <input type="number" id="customFoodCal" placeholder="300">
+      </div>
+      
+      <div id="foodCaloriePreview" style="margin-top:16px;padding:16px;background:#fef3c7;border-radius:12px;text-align:center;border:2px solid #fbbf24">
+        <div style="font-size:13px;color:#92400e;font-weight:600;margin-bottom:6px">Total Calories</div>
+        <div style="font-size:32px;font-weight:800;color:#f59e0b" id="estimatedFoodCalories">0</div>
+        <div style="font-size:12px;color:#b45309;margin-top:4px">kcal</div>
       </div>
     </div>
     <div class="button-group">
       <button class="btn btn-secondary" id="closeFoodModal">Cancel</button>
-      <button class="btn" id="saveFood">Save</button>
+      <button class="btn" id="saveFood">Save Food</button>
     </div>
   </div>
 </div>

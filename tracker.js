@@ -127,6 +127,42 @@ document.getElementById('modalGoal').onclick = (e) => {
     document.getElementById('modalGoal').classList.remove('active');
 };
 
+// Food item change handler
+document.getElementById('foodItem').onchange = function(){
+  const customGroup = document.getElementById('customFoodGroup');
+  const customCalGroup = document.getElementById('customFoodCalGroup');
+  
+  if(this.value === 'custom'){
+    customGroup.style.display = 'block';
+    customCalGroup.style.display = 'block';
+  } else {
+    customGroup.style.display = 'none';
+    customCalGroup.style.display = 'none';
+  }
+  
+  updateFoodCaloriePreview();
+};
+
+document.getElementById('portionSize').onchange = updateFoodCaloriePreview;
+document.getElementById('customFoodCal').oninput = updateFoodCaloriePreview;
+
+function updateFoodCaloriePreview(){
+  const foodItem = document.getElementById('foodItem');
+  const portion = parseFloat(document.getElementById('portionSize').value) || 1;
+  
+  let baseCal = 0;
+  
+  if(foodItem.value === 'custom'){
+    baseCal = parseFloat(document.getElementById('customFoodCal').value) || 0;
+  } else if(foodItem.value){
+    const selectedOption = foodItem.options[foodItem.selectedIndex];
+    baseCal = parseFloat(selectedOption.dataset.cal) || 0;
+  }
+  
+  const totalCal = Math.round(baseCal * portion);
+  document.getElementById('estimatedFoodCalories').textContent = totalCal;
+}
+
 // Activity type change handler
 document.getElementById('activityType').onchange = function(){
   const customGroup = document.getElementById('customActivityGroup');
@@ -254,22 +290,58 @@ document.getElementById('saveWeight').onclick = () => {
 // Save food entry
 document.getElementById('saveFood').onclick = () => {
   const date = document.getElementById('foodDate').value;
-  const calories = parseInt(document.getElementById('foodCalories').value);
-  const desc = document.getElementById('foodDesc').value;
+  const mealType = document.getElementById('mealType').value;
+  const foodItem = document.getElementById('foodItem');
+  const portion = parseFloat(document.getElementById('portionSize').value);
   
-  if(!date || !calories) return alert('Please enter date and calories');
+  if(!date || !foodItem.value) {
+    return alert('Please select date and food item');
+  }
+  
+  let foodName = '';
+  let baseCal = 0;
+  
+  if(foodItem.value === 'custom'){
+    foodName = document.getElementById('customFoodName').value;
+    baseCal = parseFloat(document.getElementById('customFoodCal').value);
+    if(!foodName || !baseCal) {
+      return alert('Please enter custom food name and calories');
+    }
+  } else {
+    const selectedOption = foodItem.options[foodItem.selectedIndex];
+    foodName = selectedOption.text;
+    baseCal = parseFloat(selectedOption.dataset.cal);
+  }
+  
+  const totalCalories = Math.round(baseCal * portion);
+  
+  // Create portion label
+  let portionLabel = '';
+  if(portion === 0.5) portionLabel = ' (Small)';
+  else if(portion === 1) portionLabel = '';
+  else if(portion === 1.5) portionLabel = ' (Large)';
+  else if(portion === 2) portionLabel = ' (XL)';
   
   DATA.food.push({
     Date: date,
-    Calories: calories,
-    Description: desc || 'Food'
+    MealType: mealType,
+    FoodName: foodName,
+    Portion: portion,
+    Calories: totalCalories,
+    Description: mealType + ': ' + foodName + portionLabel
   });
   
   DATA.food.sort((a,b) => a.Date.localeCompare(b.Date));
   localStorage.setItem('fittrack_data_food', JSON.stringify(DATA.food));
   
-  document.getElementById('foodCalories').value = '';
-  document.getElementById('foodDesc').value = '';
+  // Reset form
+  document.getElementById('foodItem').value = '';
+  document.getElementById('portionSize').value = '1';
+  document.getElementById('customFoodName').value = '';
+  document.getElementById('customFoodCal').value = '';
+  document.getElementById('customFoodGroup').style.display = 'none';
+  document.getElementById('customFoodCalGroup').style.display = 'none';
+  document.getElementById('estimatedFoodCalories').textContent = '0';
   document.getElementById('modalFood').classList.remove('active');
   
   render('calorie');
@@ -575,14 +647,54 @@ function renderFoodList(food){
   if(food.length === 0){
     list.innerHTML = '<div class="empty-state"><div class="empty-icon">🍽️</div><div class="empty-text">No food entries today</div></div>';
   } else {
-    list.innerHTML = food.map(f => `
-      <div class="calorie-entry">
-        <div class="calorie-entry-header">
-          <div class="calorie-entry-time">${f.Description}</div>
-          <div class="calorie-entry-calories">${f.Calories} kcal</div>
-        </div>
-      </div>
-    `).join('');
+    // Group by meal type
+    const meals = {
+      'Breakfast': [],
+      'Lunch': [],
+      'Dinner': [],
+      'Snack': [],
+      'Drink': []
+    };
+    
+    food.forEach(f => {
+      const mealType = f.MealType || 'Snack';
+      if(meals[mealType]) {
+        meals[mealType].push(f);
+      } else {
+        meals['Snack'].push(f);
+      }
+    });
+    
+    let html = '';
+    Object.keys(meals).forEach(mealType => {
+      if(meals[mealType].length > 0){
+        const mealIcon = mealType === 'Breakfast' ? '🌅' : 
+                        mealType === 'Lunch' ? '☀️' : 
+                        mealType === 'Dinner' ? '🌙' : 
+                        mealType === 'Drink' ? '🥤' : '🍪';
+        
+        const mealTotal = meals[mealType].reduce((sum, f) => sum + f.Calories, 0);
+        
+        html += `
+          <div style="margin-bottom:20px">
+            <div style="font-size:13px;font-weight:700;color:#6b7280;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+              <span>${mealIcon} ${mealType}</span>
+              <span style="color:#f59e0b">${mealTotal} kcal</span>
+            </div>
+            ${meals[mealType].map(f => `
+              <div class="calorie-entry">
+                <div class="calorie-entry-header">
+                  <div class="calorie-entry-time">${f.FoodName || f.Description}</div>
+                  <div class="calorie-entry-calories">${f.Calories} kcal</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+    });
+    
+    list.innerHTML = html;
   }
 }
 
