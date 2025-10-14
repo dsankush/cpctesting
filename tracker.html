@@ -2,640 +2,508 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>🎯 FitTrack — Your Weight Journey 🚀</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>FitTrack — Weight Tracker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fredoka:wght@400;500;600;700&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
   <style>
     :root{
-      --bg:#0d0221;
-      --bg-secondary:#1a0b2e;
-      --card:#2d1b4e;
-      --text:#f4f1ff;
-      --text-secondary:#b8a4d4;
-      --pink:#ff006e;
-      --yellow:#ffbe0b;
-      --cyan:#00f5ff;
-      --purple:#8338ec;
-      --green:#06ffa5;
-      --orange:#fb5607;
+      --bg:#f8f9fa;
+      --bg-secondary:#ffffff;
+      --card:#ffffff;
+      --text:#1a1a1a;
+      --text-secondary:#6b7280;
+      --text-tertiary:#9ca3af;
+      --primary:#6366f1;
+      --primary-dark:#4f46e5;
+      --success:#10b981;
+      --warning:#f59e0b;
+      --danger:#ef4444;
+      --border:#e5e7eb;
+      --shadow:rgba(0,0,0,0.05);
+      --shadow-lg:rgba(0,0,0,0.1);
     }
+    
     *{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%;overflow-x:hidden}
+    html,body{
+      height:100%;
+      overflow-x:hidden;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
     body{
-      font-family:'Fredoka',sans-serif;
+      font-family:'Inter',sans-serif;
       background:var(--bg);
       color:var(--text);
-      background-image:
-        radial-gradient(circle at 15% 20%, rgba(255,0,110,.15) 0%, transparent 40%),
-        radial-gradient(circle at 85% 60%, rgba(131,56,236,.15) 0%, transparent 40%),
-        radial-gradient(circle at 50% 90%, rgba(0,245,255,.12) 0%, transparent 50%);
-      background-attachment:fixed;
-      position:relative;
     }
     
-    /* Quirky floating shapes */
-    body::before,
-    body::after{
-      content:'';
-      position:fixed;
-      border-radius:50%;
-      pointer-events:none;
-      z-index:0;
-    }
-    body::before{
-      width:300px;height:300px;
-      background:radial-gradient(circle, rgba(255,190,11,.2), transparent 70%);
-      top:-150px;right:-150px;
-      animation:float1 20s ease-in-out infinite;
-    }
-    body::after{
-      width:400px;height:400px;
-      background:radial-gradient(circle, rgba(131,56,236,.15), transparent 70%);
-      bottom:-200px;left:-200px;
-      animation:float2 25s ease-in-out infinite;
-    }
-    @keyframes float1{
-      0%,100%{transform:translate(0,0) rotate(0deg)}
-      50%{transform:translate(-100px,100px) rotate(180deg)}
-    }
-    @keyframes float2{
-      0%,100%{transform:translate(0,0) rotate(0deg)}
-      50%{transform:translate(100px,-100px) rotate(-180deg)}
+    .app{
+      display:flex;
+      flex-direction:column;
+      min-height:100vh;
+      max-width:480px;
+      margin:0 auto;
+      background:var(--bg-secondary);
+      box-shadow:0 0 40px rgba(0,0,0,0.08);
     }
     
-    .app{display:grid;grid-template-rows:auto 1fr auto;min-height:100vh;position:relative;z-index:1}
-    
-    /* Header - Quirky Style */
+    /* Header */
     header{
-      position:sticky;top:0;z-index:30;
-      backdrop-filter:saturate(200%) blur(25px);
-      background:rgba(13,2,33,.95);
-      border-bottom:4px solid;
-      border-image:linear-gradient(90deg,var(--pink),var(--yellow),var(--cyan),var(--purple)) 1;
-      box-shadow:0 10px 40px rgba(255,0,110,.25);
+      position:sticky;
+      top:0;
+      z-index:30;
+      background:var(--bg-secondary);
+      border-bottom:1px solid var(--border);
+      backdrop-filter:blur(20px);
+      background:rgba(255,255,255,0.95);
     }
     .bar{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:16px;
-      padding:16px 24px;
-      flex-wrap:wrap;
+      padding:16px 20px;
     }
     .logo{
       display:flex;
       align-items:center;
-      gap:12px;
-      padding:12px 24px;
-      border-radius:50px;
-      background:linear-gradient(135deg, rgba(255,0,110,.25), rgba(131,56,236,.25));
-      border:3px solid rgba(255,0,110,.5);
-      box-shadow:0 0 30px rgba(255,0,110,.4), inset 0 0 20px rgba(255,255,255,.1);
-      position:relative;
-      overflow:hidden;
-    }
-    .logo::before{
-      content:'';
-      position:absolute;
-      inset:0;
-      background:linear-gradient(45deg, transparent, rgba(255,255,255,.2), transparent);
-      transform:translateX(-100%);
-      animation:shine 3s infinite;
-    }
-    @keyframes shine{
-      0%{transform:translateX(-100%)}
-      100%{transform:translateX(200%)}
+      gap:10px;
     }
     .logo-icon{
-      font-size:2rem;
-      animation:wiggle 2s ease-in-out infinite;
-    }
-    @keyframes wiggle{
-      0%,100%{transform:rotate(-15deg) scale(1)}
-      25%{transform:rotate(15deg) scale(1.1)}
-      50%{transform:rotate(-15deg) scale(1)}
-      75%{transform:rotate(15deg) scale(1.1)}
+      width:32px;
+      height:32px;
+      background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+      border-radius:8px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:18px;
     }
     .title{
-      font-size:1.5rem;
-      margin:0;
+      font-size:18px;
       font-weight:700;
-      font-family:'Fredoka',sans-serif;
-      background:linear-gradient(135deg,var(--pink),var(--yellow),var(--cyan));
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-      background-clip:text;
-      background-size:200% 200%;
-      animation:gradientShift 4s ease infinite;
-    }
-    @keyframes gradientShift{
-      0%,100%{background-position:0% 50%}
-      50%{background-position:100% 50%}
+      color:var(--text);
+      letter-spacing:-0.3px;
     }
     .btn{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      gap:8px;
-      padding:12px 24px;
-      border-radius:50px;
-      border:3px solid;
-      background:linear-gradient(135deg,var(--pink),var(--purple));
-      border-color:rgba(255,255,255,.3);
+      gap:6px;
+      padding:10px 18px;
+      border-radius:10px;
+      border:none;
+      background:var(--primary);
       color:white;
-      font-weight:700;
+      font-weight:600;
       cursor:pointer;
       font-size:14px;
-      transition:all .3s cubic-bezier(0.68,-0.55,0.265,1.55);
-      box-shadow:0 6px 25px rgba(255,0,110,.4);
-      font-family:'Fredoka',sans-serif;
-      position:relative;
-      overflow:hidden;
+      transition:all .2s ease;
+      font-family:'Inter',sans-serif;
+      box-shadow:0 2px 8px rgba(99,102,241,0.25);
     }
-    .btn::before{
-      content:'';
-      position:absolute;
-      inset:0;
-      background:linear-gradient(135deg,transparent,rgba(255,255,255,.3),transparent);
-      transform:translateX(-100%);
-      transition:transform .5s;
-    }
-    .btn:hover::before{transform:translateX(100%)}
     .btn:hover{
-      transform:translateY(-4px) scale(1.05);
-      box-shadow:0 12px 40px rgba(255,0,110,.6);
+      background:var(--primary-dark);
+      transform:translateY(-1px);
+      box-shadow:0 4px 12px rgba(99,102,241,0.35);
     }
     .btn:active{
-      transform:translateY(-1px) scale(0.98);
+      transform:translateY(0);
+    }
+    .btn-secondary{
+      background:var(--bg);
+      color:var(--text);
+      box-shadow:0 1px 3px var(--shadow);
+    }
+    .btn-secondary:hover{
+      background:#f3f4f6;
     }
 
-    /* Main Layout */
+    /* Main */
     .main{
-      display:flex;
-      flex-direction:column;
-      gap:24px;
-      padding:24px 16px;
-      max-width:1600px;
-      margin:0 auto;
-      width:100%;
+      flex:1;
+      padding:0 0 80px;
+      overflow-y:auto;
     }
 
-    /* Goal Setting Section */
+    /* Goal Section */
     .goal-section{
-      background:linear-gradient(135deg, rgba(45,27,78,.9) 0%, rgba(26,11,46,.9) 100%);
-      border:3px solid;
-      border-image:linear-gradient(135deg,var(--pink),var(--yellow),var(--cyan)) 1;
-      border-radius:32px;
-      padding:24px;
-      box-shadow:0 15px 50px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1);
+      background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+      padding:24px 20px;
+      color:white;
       position:relative;
       overflow:hidden;
     }
     .goal-section::before{
-      content:'🎯';
+      content:'';
       position:absolute;
-      font-size:15rem;
-      opacity:.05;
-      top:50%;
-      left:50%;
-      transform:translate(-50%,-50%) rotate(-15deg);
-      pointer-events:none;
+      top:0;
+      right:0;
+      width:200px;
+      height:200px;
+      background:radial-gradient(circle,rgba(255,255,255,0.1),transparent);
+      border-radius:50%;
+      transform:translate(50%,-50%);
     }
     .goal-header{
       display:flex;
       justify-content:space-between;
       align-items:center;
-      margin-bottom:24px;
-      flex-wrap:wrap;
-      gap:16px;
+      margin-bottom:20px;
       position:relative;
       z-index:2;
     }
     .goal-title{
-      font-size:1.8rem;
+      font-size:20px;
       font-weight:700;
-      font-family:'Fredoka',sans-serif;
-      background:linear-gradient(135deg,var(--yellow),var(--pink),var(--cyan));
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-      background-clip:text;
       display:flex;
       align-items:center;
-      gap:12px;
+      gap:8px;
+    }
+    .goal-btn{
+      background:rgba(255,255,255,0.2);
+      color:white;
+      padding:8px 16px;
+      border-radius:8px;
+      font-size:13px;
+      font-weight:600;
+      border:1px solid rgba(255,255,255,0.3);
+      backdrop-filter:blur(10px);
+    }
+    .goal-btn:hover{
+      background:rgba(255,255,255,0.3);
     }
     .goal-stats{
       display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-      gap:16px;
+      grid-template-columns:repeat(2,1fr);
+      gap:12px;
       position:relative;
       z-index:2;
     }
     .goal-stat{
-      background:rgba(255,255,255,.08);
-      border:3px solid var(--stat-border);
-      border-radius:24px;
-      padding:20px 16px;
+      background:rgba(255,255,255,0.15);
+      backdrop-filter:blur(10px);
+      border:1px solid rgba(255,255,255,0.2);
+      border-radius:16px;
+      padding:16px;
       text-align:center;
-      transition:all .4s cubic-bezier(0.68,-0.55,0.265,1.55);
-      position:relative;
-      overflow:hidden;
-    }
-    .goal-stat::before{
-      content:attr(data-emoji);
-      position:absolute;
-      font-size:4rem;
-      opacity:.15;
-      top:50%;
-      left:50%;
-      transform:translate(-50%,-50%) rotate(-10deg);
-      pointer-events:none;
-    }
-    .goal-stat:hover{
-      transform:translateY(-8px) rotate(2deg);
-      border-color:var(--stat-glow);
-      box-shadow:0 15px 40px var(--stat-shadow);
     }
     .goal-stat-label{
       font-size:11px;
-      color:var(--text-secondary);
       text-transform:uppercase;
-      letter-spacing:1px;
-      font-weight:700;
-      margin-bottom:10px;
-      position:relative;
-      z-index:2;
+      letter-spacing:0.5px;
+      font-weight:600;
+      opacity:0.9;
+      margin-bottom:8px;
     }
     .goal-stat-value{
-      font-size:2rem;
-      font-weight:700;
-      font-family:'Fredoka',sans-serif;
-      color:var(--stat-color);
-      line-height:1.2;
-      text-shadow:0 0 20px var(--stat-shadow);
-      position:relative;
-      z-index:2;
+      font-size:28px;
+      font-weight:800;
+      line-height:1;
     }
-    .goal-stat:nth-child(1){--stat-color:var(--pink);--stat-border:var(--pink);--stat-glow:var(--pink);--stat-shadow:rgba(255,0,110,.5)}
-    .goal-stat:nth-child(2){--stat-color:var(--cyan);--stat-border:var(--cyan);--stat-glow:var(--cyan);--stat-shadow:rgba(0,245,255,.5)}
-    .goal-stat:nth-child(3){--stat-color:var(--yellow);--stat-border:var(--yellow);--stat-glow:var(--yellow);--stat-shadow:rgba(255,190,11,.5)}
-    .goal-stat:nth-child(4){--stat-color:var(--green);--stat-border:var(--green);--stat-glow:var(--green);--stat-shadow:rgba(6,255,165,.5)}
+    .goal-stat-unit{
+      font-size:13px;
+      font-weight:500;
+      opacity:0.9;
+      margin-top:4px;
+    }
 
-    /* Quick Stats Hero */
-    .hero-stats{
+    /* Stats Cards */
+    .stats-section{
+      padding:20px;
       display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-      gap:16px;
+      grid-template-columns:repeat(2,1fr);
+      gap:12px;
     }
     .stat-card{
-      background:linear-gradient(135deg, rgba(45,27,78,.9) 0%, rgba(26,11,46,.9) 100%);
-      border:3px solid var(--stat-color);
-      border-radius:28px;
-      padding:24px 16px;
-      position:relative;
-      overflow:hidden;
-      transition:all .4s cubic-bezier(0.68,-0.55,0.265,1.55);
-      box-shadow:0 10px 35px rgba(0,0,0,.4);
-      text-align:center;
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:16px;
+      transition:all .2s ease;
     }
-    .stat-card::before{
-      content:'';
-      position:absolute;
-      top:-50%;
-      right:-50%;
-      width:200%;
-      height:200%;
-      background:radial-gradient(circle, var(--stat-glow) 0%, transparent 70%);
-      animation:rotate 10s linear infinite;
+    .stat-card:active{
+      transform:scale(0.98);
     }
-    @keyframes rotate{
-      0%{transform:rotate(0deg)}
-      100%{transform:rotate(360deg)}
-    }
-    .stat-card:hover{
-      transform:translateY(-12px) rotate(-2deg) scale(1.05);
-      box-shadow:0 20px 60px var(--stat-shadow);
+    .stat-header{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:12px;
     }
     .stat-icon{
-      font-size:3rem;
-      margin-bottom:12px;
-      filter:drop-shadow(0 6px 20px var(--stat-shadow));
-      animation:bounce 2s ease-in-out infinite;
-      position:relative;
-      z-index:2;
-    }
-    @keyframes bounce{
-      0%,100%{transform:translateY(0) rotate(0deg)}
-      25%{transform:translateY(-15px) rotate(-10deg)}
-      50%{transform:translateY(0) rotate(0deg)}
-      75%{transform:translateY(-8px) rotate(10deg)}
-    }
-    .stat-label{
-      font-size:11px;
-      color:var(--text-secondary);
-      text-transform:uppercase;
-      letter-spacing:1.2px;
-      font-weight:700;
-      margin-bottom:10px;
-      position:relative;
-      z-index:2;
-    }
-    .stat-value{
-      font-size:2.5rem;
-      font-weight:700;
-      font-family:'Fredoka',sans-serif;
-      color:var(--stat-color);
-      line-height:1;
-      margin-bottom:10px;
-      text-shadow:0 0 25px var(--stat-shadow);
-      position:relative;
-      z-index:2;
-    }
-    .stat-change{
-      font-size:13px;
-      font-weight:600;
+      width:36px;
+      height:36px;
+      border-radius:10px;
       display:flex;
       align-items:center;
       justify-content:center;
-      gap:6px;
-      position:relative;
-      z-index:2;
+      font-size:18px;
+    }
+    .stat-icon.red{background:rgba(239,68,68,0.1);color:var(--danger)}
+    .stat-icon.green{background:rgba(16,185,129,0.1);color:var(--success)}
+    .stat-icon.blue{background:rgba(99,102,241,0.1);color:var(--primary)}
+    .stat-icon.yellow{background:rgba(245,158,11,0.1);color:var(--warning)}
+    .stat-label{
+      font-size:12px;
+      color:var(--text-secondary);
+      font-weight:600;
+    }
+    .stat-value{
+      font-size:24px;
+      font-weight:800;
+      color:var(--text);
+      line-height:1.2;
+    }
+    .stat-change{
+      font-size:12px;
+      color:var(--text-tertiary);
+      margin-top:4px;
+      font-weight:500;
     }
 
-    .stat-card:nth-child(1){--stat-color:var(--pink);--stat-glow:rgba(255,0,110,.3);--stat-shadow:rgba(255,0,110,.6)}
-    .stat-card:nth-child(2){--stat-color:var(--cyan);--stat-glow:rgba(0,245,255,.3);--stat-shadow:rgba(0,245,255,.6)}
-    .stat-card:nth-child(3){--stat-color:var(--yellow);--stat-glow:rgba(255,190,11,.3);--stat-shadow:rgba(255,190,11,.6)}
-    .stat-card:nth-child(4){--stat-color:var(--green);--stat-glow:rgba(6,255,165,.3);--stat-shadow:rgba(6,255,165,.6)}
-
-    /* Content Grid */
+    /* Content Sections */
     .content{
       display:flex;
       flex-direction:column;
-      gap:16px;
+      gap:12px;
+      padding:0 20px 20px;
     }
     .card{
-      background:linear-gradient(135deg, rgba(45,27,78,.95) 0%, rgba(26,11,46,.95) 100%);
-      border:3px solid rgba(255,0,110,.4);
-      border-radius:28px;
-      padding:24px;
-      box-shadow:0 12px 40px rgba(0,0,0,.5);
-      transition:all .3s ease;
-      position:relative;
-      overflow:hidden;
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:20px;
+      box-shadow:0 1px 3px var(--shadow);
     }
-    .card::after{
-      content:'';
-      position:absolute;
-      top:50%;
-      left:50%;
-      width:500px;
-      height:500px;
-      background:radial-gradient(circle, rgba(255,0,110,.08) 0%, transparent 70%);
-      transform:translate(-50%,-50%);
-      pointer-events:none;
+    .card-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:16px;
     }
-    .card:hover{
-      border-color:var(--pink);
-      transform:translateY(-6px);
-      box-shadow:0 20px 60px rgba(255,0,110,.4);
-    }
-    .card h3{
-      margin:0 0 20px;
-      font-size:1.3rem;
-      color:var(--text);
+    .card-title{
+      font-size:16px;
       font-weight:700;
-      font-family:'Fredoka',sans-serif;
+      color:var(--text);
       display:flex;
       align-items:center;
-      gap:10px;
-      position:relative;
-      z-index:2;
+      gap:8px;
     }
-    
-    /* Chart Containers */
+    .card-action{
+      font-size:13px;
+      color:var(--primary);
+      font-weight:600;
+      cursor:pointer;
+    }
+
+    /* Chart Container */
     .chart-container{
       position:relative;
       width:100%;
-      height:300px;
-      z-index:2;
+      height:220px;
     }
     .chart-container canvas{
       width:100% !important;
       height:100% !important;
     }
 
-    /* Weight Entry Table */
+    /* Table */
     .table-container{
-      overflow-x:auto;
-      position:relative;
-      z-index:2;
-      margin:0 -12px;
-      padding:0 12px;
+      margin:-8px -20px 0;
     }
     .weight-table{
       width:100%;
-      border-collapse:separate;
-      border-spacing:0 10px;
-      min-width:600px;
+      border-collapse:collapse;
     }
     .weight-table thead th{
       text-align:left;
-      padding:12px 16px;
+      padding:12px 20px;
       font-size:11px;
-      color:var(--text-secondary);
+      color:var(--text-tertiary);
       text-transform:uppercase;
-      letter-spacing:1px;
+      letter-spacing:0.5px;
       font-weight:700;
-      border-bottom:3px solid rgba(255,0,110,.3);
+      border-bottom:1px solid var(--border);
+      background:var(--bg);
     }
     .weight-table tbody tr{
-      background:rgba(255,255,255,.05);
-      transition:all .3s cubic-bezier(0.68,-0.55,0.265,1.55);
-      cursor:pointer;
+      border-bottom:1px solid var(--border);
+      transition:background .15s ease;
     }
-    .weight-table tbody tr:hover{
-      background:rgba(255,0,110,.15);
-      transform:translateX(8px) scale(1.02);
+    .weight-table tbody tr:active{
+      background:var(--bg);
     }
     .weight-table tbody td{
-      padding:16px;
-      border-top:2px solid rgba(255,0,110,.2);
-      border-bottom:2px solid rgba(255,0,110,.2);
+      padding:14px 20px;
       font-size:14px;
-      font-weight:600;
     }
     .weight-table tbody td:first-child{
-      border-left:2px solid rgba(255,0,110,.2);
-      border-radius:16px 0 0 16px;
-      color:var(--cyan);
-      font-weight:700;
-    }
-    .weight-table tbody td:last-child{
-      border-right:2px solid rgba(255,0,110,.2);
-      border-radius:0 16px 16px 0;
+      color:var(--text-secondary);
+      font-weight:600;
+      font-size:13px;
     }
     .weight-value{
-      font-size:1.5rem;
+      font-size:16px;
       font-weight:700;
-      font-family:'Fredoka',sans-serif;
-      background:linear-gradient(135deg,var(--pink),var(--cyan));
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-      background-clip:text;
-    }
-
-    /* Input Groups */
-    .input-group{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      margin-bottom:20px;
-    }
-    .input-group label{
-      font-size:12px;
-      color:var(--text-secondary);
-      font-weight:700;
-      text-transform:uppercase;
-      letter-spacing:1px;
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
-    .input-group input,
-    .input-group select,
-    .input-group textarea{
-      padding:14px 18px;
-      border-radius:16px;
-      border:3px solid rgba(255,0,110,.3);
-      background:rgba(255,255,255,.08);
       color:var(--text);
-      font-size:15px;
-      font-family:'Fredoka',sans-serif;
+    }
+    .weight-change{
       font-weight:600;
-      transition:all .3s ease;
+      font-size:13px;
     }
-    .input-group input:focus,
-    .input-group select:focus,
-    .input-group textarea:focus{
-      outline:none;
-      border-color:var(--pink);
-      background:rgba(255,0,110,.15);
-      box-shadow:0 0 0 4px rgba(255,0,110,.2);
-    }
-
-    /* Footer */
-    .footer{
-      padding:24px;
-      color:var(--text-secondary);
-      border-top:3px solid;
-      border-image:linear-gradient(90deg,var(--pink),var(--purple),var(--cyan)) 1;
-      text-align:center;
-      font-size:14px;
-      background:rgba(13,2,33,.95);
-      font-weight:600;
-    }
+    .weight-change.positive{color:var(--success)}
+    .weight-change.negative{color:var(--danger)}
+    .weight-change.neutral{color:var(--text-tertiary)}
 
     /* Modal */
     .modal-overlay{
       position:fixed;
       inset:0;
-      background:rgba(13,2,33,.98);
-      backdrop-filter:blur(20px);
+      background:rgba(0,0,0,0.5);
+      backdrop-filter:blur(4px);
       display:none;
-      align-items:center;
+      align-items:flex-end;
       justify-content:center;
       z-index:100;
-      padding:16px;
+      padding:0;
     }
     .modal-overlay.active{display:flex}
     .modal{
-      background:linear-gradient(135deg, rgba(45,27,78,.98) 0%, rgba(26,11,46,.98) 100%);
-      border:4px solid var(--pink);
-      border-radius:32px;
-      padding:32px;
-      max-width:500px;
+      background:var(--bg-secondary);
+      border-radius:20px 20px 0 0;
+      max-width:480px;
       width:100%;
-      max-height:90vh;
+      max-height:85vh;
       overflow-y:auto;
-      box-shadow:0 30px 90px rgba(0,0,0,.8), 0 0 0 1px rgba(255,0,110,.3);
-      animation:popIn .4s cubic-bezier(0.68,-0.55,0.265,1.55);
-      position:relative;
+      box-shadow:0 -10px 40px rgba(0,0,0,0.2);
+      animation:slideUp .3s cubic-bezier(0.4,0,0.2,1);
     }
-    .modal::before{
-      content:'';
-      position:absolute;
-      top:0;left:0;right:0;
-      height:5px;
-      background:linear-gradient(90deg,var(--pink),var(--yellow),var(--cyan),var(--purple));
-      background-size:200% 100%;
-      animation:gradientMove 3s linear infinite;
+    @keyframes slideUp{
+      from{transform:translateY(100%)}
+      to{transform:translateY(0)}
     }
-    @keyframes popIn{
-      0%{opacity:0;transform:scale(0.5) rotate(-10deg)}
-      70%{transform:scale(1.05) rotate(2deg)}
-      100%{opacity:1;transform:scale(1) rotate(0)}
+    .modal-header{
+      position:sticky;
+      top:0;
+      background:var(--bg-secondary);
+      padding:20px 20px 16px;
+      border-bottom:1px solid var(--border);
+      z-index:10;
     }
-    @keyframes gradientMove{
-      0%{background-position:0% 0%}
-      100%{background-position:200% 0%}
+    .modal-handle{
+      width:36px;
+      height:4px;
+      background:var(--border);
+      border-radius:2px;
+      margin:0 auto 16px;
     }
-    .modal h2{
-      margin:0 0 24px;
-      font-size:2rem;
+    .modal-title{
+      font-size:20px;
       font-weight:700;
-      font-family:'Fredoka',sans-serif;
-      background:linear-gradient(135deg,var(--pink),var(--yellow),var(--cyan));
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-      background-clip:text;
-      display:flex;
-      align-items:center;
-      gap:12px;
+      color:var(--text);
+      text-align:center;
+    }
+    .modal-body{
+      padding:20px;
     }
 
-    /* Responsive */
-    @media (max-width: 768px){
-      .main{padding:16px 12px}
-      .bar{padding:12px 16px}
-      .logo{padding:10px 16px;gap:8px}
-      .logo-icon{font-size:1.5rem}
-      .title{font-size:1.1rem}
-      .btn{padding:10px 20px;font-size:13px}
-      .goal-section{padding:20px 16px;border-radius:24px}
-      .goal-title{font-size:1.4rem}
-      .goal-stats{grid-template-columns:repeat(2,1fr)}
-      .goal-stat{padding:16px 12px}
-      .goal-stat-value{font-size:1.6rem}
-      .hero-stats{grid-template-columns:repeat(2,1fr)}
-      .stat-card{padding:20px 12px}
-      .stat-icon{font-size:2.5rem}
-      .stat-value{font-size:2rem}
-      .stat-label{font-size:10px}
-      .stat-change{font-size:12px}
-      .card{padding:20px 16px;border-radius:24px}
-      .card h3{font-size:1.1rem}
-      .modal{padding:24px 20px}
-      .modal h2{font-size:1.5rem}
-      .weight-table{font-size:13px}
-      .weight-table thead th{padding:10px 12px;font-size:10px}
-      .weight-table tbody td{padding:12px}
-      .weight-value{font-size:1.2rem}
-      .chart-container{height:250px}
+    /* Input Groups */
+    .input-group{
+      margin-bottom:20px;
     }
-    
-    @media (max-width: 480px){
-      .bar{flex-direction:column;gap:12px}
-      .logo{width:100%;justify-content:center}
-      .header-actions{width:100%}
-      .btn{width:100%;justify-content:center}
-      .goal-header{flex-direction:column;align-items:stretch}
-      .goal-stats{grid-template-columns:1fr}
-      .hero-stats{grid-template-columns:1fr}
-      .chart-container{height:220px}
+    .input-group label{
+      display:block;
+      font-size:13px;
+      color:var(--text-secondary);
+      font-weight:600;
+      margin-bottom:8px;
+    }
+    .input-group input,
+    .input-group select,
+    .input-group textarea{
+      width:100%;
+      padding:12px 16px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:var(--bg);
+      color:var(--text);
+      font-size:15px;
+      font-family:'Inter',sans-serif;
+      font-weight:500;
+      transition:all .2s ease;
+    }
+    .input-group input:focus,
+    .input-group select:focus,
+    .input-group textarea:focus{
+      outline:none;
+      border-color:var(--primary);
+      background:var(--bg-secondary);
+      box-shadow:0 0 0 3px rgba(99,102,241,0.1);
+    }
+
+    /* Button Group */
+    .button-group{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      padding:20px;
+      border-top:1px solid var(--border);
+      background:var(--bg-secondary);
+      position:sticky;
+      bottom:0;
+    }
+
+    /* Empty State */
+    .empty-state{
+      text-align:center;
+      padding:40px 20px;
+      color:var(--text-tertiary);
+    }
+    .empty-icon{
+      font-size:48px;
+      margin-bottom:12px;
+      opacity:0.5;
+    }
+    .empty-text{
+      font-size:14px;
+      font-weight:500;
+    }
+
+    /* Responsive - Tablet & Desktop */
+    @media (min-width: 481px){
+      .app{
+        margin:40px auto;
+        border-radius:20px;
+        overflow:hidden;
+      }
+      header{
+        border-radius:20px 20px 0 0;
+      }
+      .modal{
+        border-radius:20px;
+        max-height:90vh;
+      }
+      .modal-overlay{
+        align-items:center;
+        padding:20px;
+      }
+    }
+
+    /* Small Mobile */
+    @media (max-width: 360px){
+      .goal-stats{gap:8px}
+      .goal-stat{padding:12px}
+      .goal-stat-value{font-size:24px}
+      .stats-section{gap:8px;padding:16px}
+      .stat-card{padding:12px}
+      .stat-value{font-size:20px}
+      .content{padding:0 16px 16px}
+      .card{padding:16px}
+      .chart-container{height:200px}
     }
   </style>
 </head>
@@ -644,104 +512,118 @@
   <header>
     <div class="bar">
       <div class="logo">
-        <span class="logo-icon">🎯</span>
+        <div class="logo-icon">⚖️</div>
         <h1 class="title">FitTrack</h1>
       </div>
-      <div class="header-actions">
-        <button class="btn" id="addEntryBtn">➕ Add Weight</button>
-      </div>
+      <button class="btn" id="addEntryBtn">+ Add Entry</button>
     </div>
   </header>
 
   <main class="main">
-    <!-- Goal Setting Section -->
+    <!-- Goal Section -->
     <section class="goal-section">
       <div class="goal-header">
-        <h2 class="goal-title">🎯 Your Goal</h2>
-        <button class="btn" id="setGoalBtn">⚙️ Set Goal</button>
+        <h2 class="goal-title">Your Goal</h2>
+        <button class="goal-btn" id="setGoalBtn">Edit</button>
       </div>
       
       <div class="goal-stats">
-        <div class="goal-stat" data-emoji="🏁">
-          <div class="goal-stat-label">🏁 Start</div>
+        <div class="goal-stat">
+          <div class="goal-stat-label">Start</div>
           <div class="goal-stat-value" id="startWeight">145</div>
+          <div class="goal-stat-unit">kg</div>
         </div>
-        <div class="goal-stat" data-emoji="⚖️">
-          <div class="goal-stat-label">⚖️ Current</div>
+        <div class="goal-stat">
+          <div class="goal-stat-label">Current</div>
           <div class="goal-stat-value" id="currentWeight">133.4</div>
+          <div class="goal-stat-unit">kg</div>
         </div>
-        <div class="goal-stat" data-emoji="🎯">
-          <div class="goal-stat-label">🎯 Target</div>
+        <div class="goal-stat">
+          <div class="goal-stat-label">Target</div>
           <div class="goal-stat-value" id="targetWeight">125</div>
+          <div class="goal-stat-unit">kg</div>
         </div>
-        <div class="goal-stat" data-emoji="📊">
-          <div class="goal-stat-label">📊 Progress</div>
+        <div class="goal-stat">
+          <div class="goal-stat-label">Progress</div>
           <div class="goal-stat-value" id="progressPercent">58%</div>
+          <div class="goal-stat-unit">complete</div>
         </div>
       </div>
     </section>
 
-    <!-- Quick Stats Hero -->
-    <section class="hero-stats">
+    <!-- Stats Section -->
+    <section class="stats-section">
       <div class="stat-card">
-        <div class="stat-icon">🔥</div>
-        <div class="stat-label">Total Lost</div>
+        <div class="stat-header">
+          <div class="stat-icon red">📉</div>
+          <div class="stat-label">Lost</div>
+        </div>
         <div class="stat-value" id="totalLost">11.6</div>
-        <div class="stat-change">kg lost! 🎉</div>
+        <div class="stat-change">kg total</div>
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">🚀</div>
-        <div class="stat-label">To Goal</div>
+        <div class="stat-header">
+          <div class="stat-icon green">🎯</div>
+          <div class="stat-label">To Goal</div>
+        </div>
         <div class="stat-value" id="toGo">8.4</div>
-        <div class="stat-change">kg to go!</div>
+        <div class="stat-change">kg remaining</div>
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">⏰</div>
-        <div class="stat-label">Journey</div>
+        <div class="stat-header">
+          <div class="stat-icon blue">📅</div>
+          <div class="stat-label">Journey</div>
+        </div>
         <div class="stat-value" id="journeyDays">74</div>
-        <div class="stat-change">days 💪</div>
+        <div class="stat-change">days</div>
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">📈</div>
-        <div class="stat-label">Avg/Week</div>
+        <div class="stat-header">
+          <div class="stat-icon yellow">📊</div>
+          <div class="stat-label">Avg/Week</div>
+        </div>
         <div class="stat-value" id="avgLoss">1.1</div>
         <div class="stat-change">kg/week</div>
       </div>
     </section>
 
-    <!-- Content Grid -->
+    <!-- Content -->
     <section class="content">
-      <!-- Weight Progress Chart -->
+      <!-- Weight Chart -->
       <div class="card">
-        <h3>📊 Weight Journey</h3>
+        <div class="card-header">
+          <h3 class="card-title">Weight Progress</h3>
+        </div>
         <div class="chart-container">
           <canvas id="weightChart"></canvas>
         </div>
       </div>
 
-      <!-- Weight Change Chart -->
+      <!-- Change Chart -->
       <div class="card">
-        <h3>📉 Weekly Changes</h3>
+        <div class="card-header">
+          <h3 class="card-title">Weekly Changes</h3>
+        </div>
         <div class="chart-container">
           <canvas id="changeChart"></canvas>
         </div>
       </div>
 
-      <!-- Weight Data Table -->
+      <!-- History Table -->
       <div class="card">
-        <h3>📋 Weight History</h3>
+        <div class="card-header">
+          <h3 class="card-title">History</h3>
+        </div>
         <div class="table-container">
-          <table class="weight-table" id="weightTable">
+          <table class="weight-table">
             <thead>
               <tr>
-                <th>📅 Date</th>
-                <th>⚖️ Weight</th>
-                <th>📉 Change</th>
-                <th>📊 From Start</th>
-                <th>🎯 To Goal</th>
+                <th>Date</th>
+                <th>Weight</th>
+                <th>Change</th>
               </tr>
             </thead>
             <tbody id="weightTableBody">
@@ -752,35 +634,34 @@
       </div>
     </section>
   </main>
-
-  <div class="footer">
-    🎯 FitTrack © 2025 — Keep Going! You Got This! 💪🔥
-  </div>
 </div>
 
 <!-- Add Entry Modal -->
 <div class="modal-overlay" id="entryModal">
   <div class="modal">
-    <h2>➕ Add Weight</h2>
-    
-    <div class="input-group">
-      <label>📅 Date</label>
-      <input type="date" id="entryDate" value="">
+    <div class="modal-header">
+      <div class="modal-handle"></div>
+      <h2 class="modal-title">Add Weight Entry</h2>
     </div>
+    <div class="modal-body">
+      <div class="input-group">
+        <label>Date</label>
+        <input type="date" id="entryDate">
+      </div>
 
-    <div class="input-group">
-      <label>⚖️ Weight (kg)</label>
-      <input type="number" step="0.1" id="entryWeight" placeholder="75.5">
+      <div class="input-group">
+        <label>Weight (kg)</label>
+        <input type="number" step="0.1" id="entryWeight" placeholder="75.5">
+      </div>
+
+      <div class="input-group">
+        <label>Notes (optional)</label>
+        <textarea id="entryNotes" rows="3" placeholder="How are you feeling?"></textarea>
+      </div>
     </div>
-
-    <div class="input-group">
-      <label>📝 Notes (Optional)</label>
-      <textarea id="entryNotes" rows="3" placeholder="How are you feeling?"></textarea>
-    </div>
-
-    <div style="display:flex;gap:12px;margin-top:24px;flex-wrap:wrap">
-      <button class="btn" id="saveEntryBtn" style="flex:1;min-width:120px">💾 Save</button>
-      <button class="btn" id="closeEntryModalBtn" style="flex:1;min-width:120px;background:linear-gradient(135deg,#666,#444)">✖️ Cancel</button>
+    <div class="button-group">
+      <button class="btn btn-secondary" id="closeEntryModalBtn">Cancel</button>
+      <button class="btn" id="saveEntryBtn">Save Entry</button>
     </div>
   </div>
 </div>
@@ -788,26 +669,29 @@
 <!-- Set Goal Modal -->
 <div class="modal-overlay" id="goalModal">
   <div class="modal">
-    <h2>🎯 Set Goal</h2>
-    
-    <div class="input-group">
-      <label>🏁 Start Weight (kg)</label>
-      <input type="number" step="0.1" id="goalStartWeight" placeholder="145">
+    <div class="modal-header">
+      <div class="modal-handle"></div>
+      <h2 class="modal-title">Set Your Goal</h2>
     </div>
+    <div class="modal-body">
+      <div class="input-group">
+        <label>Starting Weight (kg)</label>
+        <input type="number" step="0.1" id="goalStartWeight" placeholder="145">
+      </div>
 
-    <div class="input-group">
-      <label>🎯 Target Weight (kg)</label>
-      <input type="number" step="0.1" id="goalTargetWeight" placeholder="125">
+      <div class="input-group">
+        <label>Target Weight (kg)</label>
+        <input type="number" step="0.1" id="goalTargetWeight" placeholder="125">
+      </div>
+
+      <div class="input-group">
+        <label>Target Date (optional)</label>
+        <input type="date" id="goalTargetDate">
+      </div>
     </div>
-
-    <div class="input-group">
-      <label>📅 Target Date (Optional)</label>
-      <input type="date" id="goalTargetDate">
-    </div>
-
-    <div style="display:flex;gap:12px;margin-top:24px;flex-wrap:wrap">
-      <button class="btn" id="saveGoalBtn" style="flex:1;min-width:120px">💾 Save</button>
-      <button class="btn" id="closeGoalModalBtn" style="flex:1;min-width:120px;background:linear-gradient(135deg,#666,#444)">✖️ Cancel</button>
+    <div class="button-group">
+      <button class="btn btn-secondary" id="closeGoalModalBtn">Cancel</button>
+      <button class="btn" id="saveGoalBtn">Save Goal</button>
     </div>
   </div>
 </div>
@@ -868,7 +752,7 @@
     const d = new Date(dateKey);
     if(isNaN(d)) return dateKey;
     
-    const options = { month: 'short', day: 'numeric', year: 'numeric' };
+    const options = { month: 'short', day: 'numeric' };
     return d.toLocaleDateString('en-US', options);
   };
 
@@ -900,11 +784,10 @@
     const notes = document.getElementById('entryNotes').value;
     
     if(!date || !weight){
-      alert('⚠️ Please enter both date and weight!');
+      alert('Please enter both date and weight');
       return;
     }
 
-    // Add to data
     const newEntry = {
       Date: date,
       'Weight in Kg': weight,
@@ -913,26 +796,21 @@
     
     WEIGHT_DATA.push(newEntry);
     
-    // Sort by date
     WEIGHT_DATA.sort((a,b) => {
       const dateA = parseWeightDate(a.Date);
       const dateB = parseWeightDate(b.Date);
       return dateA.localeCompare(dateB);
     });
     
-    // Save to localStorage
     localStorage.setItem('fittrack_entries', JSON.stringify(WEIGHT_DATA));
     
-    // Clear form
     document.getElementById('entryWeight').value = '';
     document.getElementById('entryNotes').value = '';
     
     entryModal.classList.remove('active');
-    
-    // Re-render
     render();
     
-    alert('✅ Weight entry added successfully!');
+    alert('Weight entry added successfully');
   };
 
   // Save Goal
@@ -942,7 +820,7 @@
     const targetDate = document.getElementById('goalTargetDate').value;
     
     if(!startWeight || !targetWeight){
-      alert('⚠️ Please enter both starting and target weight!');
+      alert('Please enter both starting and target weight');
       return;
     }
 
@@ -953,11 +831,10 @@
     };
     
     localStorage.setItem('fittrack_goal', JSON.stringify(GOAL));
-    
     goalModal.classList.remove('active');
     render();
     
-    alert('🎯 Goal updated successfully!');
+    alert('Goal updated successfully');
   };
 
   // Charts
@@ -976,22 +853,18 @@
     const toGo = currentWeight - targetWeight;
     const progress = ((startWeight - currentWeight) / (startWeight - targetWeight) * 100).toFixed(0);
     
-    // Calculate journey days
     const firstDate = new Date(parseWeightDate(WEIGHT_DATA[0].Date));
     const lastDate = new Date(parseWeightDate(WEIGHT_DATA[WEIGHT_DATA.length - 1].Date));
     const journeyDays = Math.ceil((lastDate - firstDate) / (1000 * 60 * 60 * 24));
     
-    // Average loss per week
     const weeks = journeyDays / 7;
     const avgLoss = weeks > 0 ? (totalLost / weeks).toFixed(1) : 0;
     
-    // Update goal stats
     document.getElementById('startWeight').textContent = startWeight.toFixed(1);
     document.getElementById('currentWeight').textContent = currentWeight.toFixed(1);
     document.getElementById('targetWeight').textContent = targetWeight.toFixed(1);
     document.getElementById('progressPercent').textContent = progress + '%';
     
-    // Update hero stats
     document.getElementById('totalLost').textContent = totalLost.toFixed(1);
     document.getElementById('toGo').textContent = toGo.toFixed(1);
     document.getElementById('journeyDays').textContent = journeyDays;
@@ -1003,36 +876,26 @@
     tbody.innerHTML = '';
     
     if(WEIGHT_DATA.length === 0){
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-secondary)">📊 No entries yet! Click "Add Weight" to start! 🚀</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="3" class="empty-state"><div class="empty-icon">📊</div><div class="empty-text">No entries yet</div></td></tr>';
       return;
     }
     
     const startWeight = GOAL.startWeight;
-    const targetWeight = GOAL.targetWeight;
     
-    WEIGHT_DATA.forEach((entry, i) => {
+    WEIGHT_DATA.slice().reverse().forEach((entry, i) => {
+      const idx = WEIGHT_DATA.length - 1 - i;
       const weight = parseFloat(entry['Weight in Kg']);
-      const prevWeight = i > 0 ? parseFloat(WEIGHT_DATA[i-1]['Weight in Kg']) : startWeight;
+      const prevWeight = idx > 0 ? parseFloat(WEIGHT_DATA[idx-1]['Weight in Kg']) : startWeight;
       const change = weight - prevWeight;
-      const fromStart = weight - startWeight;
-      const toGoal = weight - targetWeight;
       
-      const changeColor = change < 0 ? 'var(--cyan)' : change > 0 ? 'var(--pink)' : 'var(--text-secondary)';
-      const changeArrow = change < 0 ? '↓' : change > 0 ? '↑' : '→';
+      const changeClass = change < 0 ? 'negative' : change > 0 ? 'positive' : 'neutral';
+      const changeIcon = change < 0 ? '↓' : change > 0 ? '↑' : '→';
       
       const row = document.createElement('tr');
       row.innerHTML = `
         <td>${formatDisplayDate(parseWeightDate(entry.Date))}</td>
         <td><span class="weight-value">${weight.toFixed(1)}</span> kg</td>
-        <td style="color:${changeColor};font-weight:700">
-          ${change !== 0 ? changeArrow + ' ' + Math.abs(change).toFixed(1) + ' kg' : '—'}
-        </td>
-        <td style="color:var(--cyan);font-weight:700">
-          ${fromStart < 0 ? '↓ ' + Math.abs(fromStart).toFixed(1) : fromStart > 0 ? '↑ ' + fromStart.toFixed(1) : '0'} kg
-        </td>
-        <td style="color:var(--yellow);font-weight:700">
-          ${toGoal.toFixed(1)} kg
-        </td>
+        <td><span class="weight-change ${changeClass}">${change !== 0 ? changeIcon + ' ' + Math.abs(change).toFixed(1) + ' kg' : '—'}</span></td>
       `;
       tbody.appendChild(row);
     });
@@ -1046,9 +909,6 @@
     
     // Weight Chart
     const weightCtx = document.getElementById('weightChart').getContext('2d');
-    const weightGradient = weightCtx.createLinearGradient(0, 0, 0, 280);
-    weightGradient.addColorStop(0, 'rgba(255,0,110,0.6)');
-    weightGradient.addColorStop(1, 'rgba(131,56,236,0.1)');
     
     if(weightChart) weightChart.destroy();
     weightChart = new Chart(weightCtx, {
@@ -1056,26 +916,24 @@
       data: {
         labels: dates,
         datasets: [{
-          label: 'Weight (kg)',
+          label: 'Weight',
           data: weights,
-          borderColor: '#ff006e',
-          backgroundColor: weightGradient,
-          borderWidth: 4,
-          tension: 0.4,
+          borderColor: '#6366f1',
+          backgroundColor: 'rgba(99,102,241,0.05)',
+          borderWidth: 2,
+          tension: 0.3,
           fill: true,
-          pointRadius: 7,
-          pointBackgroundColor: '#ff006e',
+          pointRadius: 4,
+          pointBackgroundColor: '#6366f1',
           pointBorderColor: '#fff',
-          pointBorderWidth: 3,
-          pointHoverRadius: 10,
-          pointHoverBackgroundColor: '#ff006e',
-          pointHoverBorderWidth: 4
+          pointBorderWidth: 2,
+          pointHoverRadius: 6
         },{
           label: 'Goal',
           data: Array(weights.length).fill(GOAL.targetWeight),
-          borderColor: '#00f5ff',
-          borderWidth: 3,
-          borderDash: [10,5],
+          borderColor: '#10b981',
+          borderWidth: 2,
+          borderDash: [5,5],
           fill: false,
           pointRadius: 0
         }]
@@ -1087,50 +945,50 @@
           legend: {
             display: true,
             position: 'top',
+            align: 'end',
             labels: {
-              color: '#f4f1ff',
-              font: {size: 12, weight: '700', family: 'Fredoka'},
-              usePointStyle: true,
-              padding: 12,
-              boxWidth: 8,
-              boxHeight: 8
+              boxWidth: 12,
+              boxHeight: 12,
+              padding: 10,
+              font: {size: 11, weight: '600'},
+              color: '#6b7280',
+              usePointStyle: true
             }
           },
           tooltip: {
-            backgroundColor: 'rgba(45,27,78,0.98)',
-            titleColor: '#f4f1ff',
-            titleFont: {size: 13, weight: '700'},
-            bodyColor: '#f4f1ff',
-            bodyFont: {size: 15, weight: '700', family: 'Fredoka'},
-            padding: 12,
-            borderColor: '#ff006e',
-            borderWidth: 2,
-            cornerRadius: 10
+            backgroundColor: '#1a1a1a',
+            titleColor: '#fff',
+            bodyColor: '#fff',
+            padding: 10,
+            cornerRadius: 8,
+            displayColors: false,
+            callbacks: {
+              label: (context) => context.parsed.y.toFixed(1) + ' kg'
+            }
           }
         },
         scales: {
           x: {
+            grid: {display: false},
             ticks: {
-              color: '#b8a4d4',
-              font: {weight: '600', size: 10},
-              maxRotation: 45,
-              minRotation: 0
-            },
-            grid: {color: 'rgba(255,255,255,0.05)'}
+              font: {size: 10, weight: '500'},
+              color: '#9ca3af',
+              maxRotation: 0
+            }
           },
           y: {
+            grid: {color: '#f3f4f6'},
             ticks: {
-              color: '#b8a4d4',
-              font: {weight: '700', size: 11, family: 'Fredoka'},
+              font: {size: 11, weight: '600'},
+              color: '#6b7280',
               callback: (value) => value + ' kg'
-            },
-            grid: {color: 'rgba(255,255,255,0.05)'}
+            }
           }
         }
       }
     });
 
-    // Weight Change Chart
+    // Change Chart
     const changes = [];
     for(let i = 1; i < weights.length; i++){
       changes.push(weights[i] - weights[i-1]);
@@ -1145,9 +1003,9 @@
         datasets: [{
           label: 'Change',
           data: changes,
-          backgroundColor: changes.map(c => c < 0 ? '#00f5ff' : '#ff006e'),
-          borderRadius: 12,
-          barThickness: 20
+          backgroundColor: changes.map(c => c < 0 ? '#10b981' : '#ef4444'),
+          borderRadius: 6,
+          barThickness: 16
         }]
       },
       options: {
@@ -1156,14 +1014,10 @@
         plugins: {
           legend: {display: false},
           tooltip: {
-            backgroundColor: 'rgba(45,27,78,0.98)',
-            titleColor: '#f4f1ff',
-            bodyColor: '#f4f1ff',
-            bodyFont: {size: 14, weight: '700', family: 'Fredoka'},
-            padding: 12,
-            borderColor: '#ff006e',
-            borderWidth: 2,
-            cornerRadius: 10,
+            backgroundColor: '#1a1a1a',
+            padding: 10,
+            cornerRadius: 8,
+            displayColors: false,
             callbacks: {
               label: (context) => {
                 const val = context.parsed.y;
@@ -1174,21 +1028,20 @@
         },
         scales: {
           x: {
+            grid: {display: false},
             ticks: {
-              color: '#b8a4d4',
-              font: {weight: '600', size: 10},
-              maxRotation: 45,
-              minRotation: 0
-            },
-            grid: {display: false}
+              font: {size: 10, weight: '500'},
+              color: '#9ca3af',
+              maxRotation: 0
+            }
           },
           y: {
+            grid: {color: '#f3f4f6'},
             ticks: {
-              color: '#b8a4d4',
-              font: {weight: '700', size: 11, family: 'Fredoka'},
+              font: {size: 11, weight: '600'},
+              color: '#6b7280',
               callback: (value) => value.toFixed(1) + ' kg'
-            },
-            grid: {color: 'rgba(255,255,255,0.05)'}
+            }
           }
         }
       }
@@ -1209,7 +1062,6 @@
     complete: (res) => {
       WEIGHT_DATA = res.data;
       
-      // Merge with localStorage entries
       const localEntries = JSON.parse(localStorage.getItem('fittrack_entries') || '[]');
       if(localEntries.length > 0){
         const formattedLocal = localEntries.map(e => ({
@@ -1219,20 +1071,17 @@
         WEIGHT_DATA = [...WEIGHT_DATA, ...formattedLocal];
       }
       
-      // Sort by date
       WEIGHT_DATA.sort((a,b) => {
         const dateA = parseWeightDate(a.Date);
         const dateB = parseWeightDate(b.Date);
         return dateA.localeCompare(dateB);
       });
       
-      console.log('✅ Weight data loaded:', WEIGHT_DATA.length, 'entries');
-      
+      console.log('Weight data loaded:', WEIGHT_DATA.length, 'entries');
       render();
     },
     error: (err) => {
       console.error('CSV load error', err);
-      alert('⚠️ Failed to load weight.csv');
     }
   });
 </script>
