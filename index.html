@@ -2314,12 +2314,27 @@
       }
       
       if(REFERENCE_DATA.length > 0){
+        const firstRow = REFERENCE_DATA[0];
+        const hasDateColumn = 'Date Processed' in firstRow;
+        
         console.log('✅ reference.csv loaded:', {
           totalPTs: REFERENCE_DATA.length,
-          columns: Object.keys(REFERENCE_DATA[0]),
-          sample: REFERENCE_DATA[0],
-          hasGrandTotal: !!REFERENCE_GRAND_TOTAL
+          columns: Object.keys(firstRow),
+          sample: firstRow,
+          hasGrandTotal: !!REFERENCE_GRAND_TOTAL,
+          hasDateColumn: hasDateColumn
         });
+        
+        // Test date parsing if Date Processed column exists
+        if(hasDateColumn && firstRow['Date Processed']){
+          const sampleDate = firstRow['Date Processed'];
+          const parsedDate = parseReferenceDate(sampleDate);
+          console.log('📅 Date Parsing Test:', {
+            originalFormat: sampleDate,
+            parsedToYYYYMMDD: parsedDate,
+            willWorkWithFilters: !!parsedDate
+          });
+        }
         
         // Calculate totals from PT data (excluding Grand Total)
         let totalMissed = 0, totalUnique = 0;
@@ -2333,7 +2348,8 @@
           calculatedTotal: totalMissed.toLocaleString(),
           calculatedUnique: totalUnique.toLocaleString(),
           grandTotalRow: REFERENCE_GRAND_TOTAL ? `${REFERENCE_GRAND_TOTAL.total.toLocaleString()} total, ${REFERENCE_GRAND_TOTAL.unique.toLocaleString()} unique` : 'Not found',
-          states: [...new Set(REFERENCE_DATA.map(r=>r.State))].length
+          states: [...new Set(REFERENCE_DATA.map(r=>r.State))].length,
+          dateFilterSupport: hasDateColumn ? 'Enabled ✅' : 'Disabled (no Date Processed column)'
         });
       }
       
