@@ -783,11 +783,6 @@
       </div>
 
       <div class="group">
-        <label for="name">👤 PT Name</label>
-        <select id="name"></select>
-      </div>
-
-      <div class="group">
         <label for="hq">🏢 HQ</label>
         <select id="hq"></select>
       </div>
@@ -1103,7 +1098,7 @@
   // State
   let RAW = [];
   let REFERENCE_DATA = []; // PT/Missed Calls reference data
-  let FILTERS = { dateFrom:'', dateTo:'', state:'', district:'', retailer:'', product:'', unit:'', status:'', source:'', pt:'', zone:'', name:'', hq:'' };
+  let FILTERS = { dateFrom:'', dateTo:'', state:'', district:'', retailer:'', product:'', unit:'', status:'', source:'', pt:'', zone:'', hq:'' };
 
   // DOM
   const selDateFrom = document.getElementById('dateFrom');
@@ -1118,7 +1113,6 @@
   const selSource = document.getElementById('source');
   const selPT = document.getElementById('pt');
   const selZone = document.getElementById('zone');
-  const selName = document.getElementById('name');
   const selHQ = document.getElementById('hq');
   
   flatpickr("#dateRange",{
@@ -1136,13 +1130,12 @@
   });
 
   document.getElementById('resetBtn').addEventListener('click', ()=>{
-    FILTERS = { dateFrom:'', dateTo:'', state:'', district:'', retailer:'', product:'', unit:'', status:'', source:'', pt:'', zone:'', name:'', hq:'' };
+    FILTERS = { dateFrom:'', dateTo:'', state:'', district:'', retailer:'', product:'', unit:'', status:'', source:'', pt:'', zone:'', hq:'' };
     selDateFrom.value = selDateTo.value = '';
     selDateRange._flatpickr && selDateRange._flatpickr.clear();
     selState.value = selDistrict.value = selRetailer.value = selProduct.value = selUnit.value = selStatus.value = '';
-    selSource.value = selPT.value = selZone.value = selName.value = selHQ.value = '';
-    populateFilters(RAW);
-    populateReferenceFilters(REFERENCE_DATA);
+    selSource.value = selPT.value = selZone.value = selHQ.value = '';
+    populateFilters(RAW, REFERENCE_DATA);
     render();
   });
 
@@ -1248,11 +1241,11 @@
     
     // Calculate Missed Calls from reference.csv (dynamic based on filters)
     const filteredReferenceData = REFERENCE_DATA.filter(r => {
-      // Apply common filters: State, Zone, PT (from Name column)
+      // Apply common filters: State, Zone, PT
       if(FILTERS.state && trim(r.State) !== FILTERS.state) return false;
       if(FILTERS.zone && trim(r.ZONE) !== FILTERS.zone) return false;
-      // Name filter (PT Name from reference.csv)
-      if(FILTERS.name && trim(r.Name) !== FILTERS.name) return false;
+      // PT filter (maps to Name column in reference.csv)
+      if(FILTERS.pt && trim(r.Name) !== FILTERS.pt) return false;
       // HQ filter (unique to reference data)
       if(FILTERS.hq && trim(r.HQ) !== FILTERS.hq) return false;
       return true;
@@ -1866,7 +1859,7 @@
     setTimeout(() => { indiaMap.fitBounds([[8, 68],[37, 97]]); }, 100);
   }
 
-  function populateFilters(rows){
+  function populateFilters(rows, refData = []){
     const states = uniqSorted(rows.map(r=>trim(r.State)));
     const dists  = uniqSorted(rows.map(r=>trim(r.District)));
     const rets   = uniqSorted(rows.map(r=>trim(r['Retailer Name'])));
@@ -1874,8 +1867,16 @@
     const unitsAll = uniqSorted(rows.flatMap(r=>parseCartItems(r['Cart Items']).map(it=>it.unit).filter(Boolean)));
     const statuses = ['','Yes','No','Pending'];
     const sources = uniqSorted(rows.map(r=>trim(r.Source||'')).filter(Boolean));
-    const pts = uniqSorted(rows.map(r=>trim(r.PT||'')).filter(Boolean));
+    
+    // Combine PT names from both data.csv (PT column) and reference.csv (Name column)
+    const ptsFromData = rows.map(r=>trim(r.PT||'')).filter(Boolean);
+    const ptsFromRef = refData.map(r=>trim(r.Name||'')).filter(Boolean);
+    const pts = uniqSorted([...ptsFromData, ...ptsFromRef]);
+    
     const zones = uniqSorted(rows.map(r=>trim(r.Zone||'')).filter(Boolean));
+    
+    // HQ filter is unique to reference.csv
+    const hqs = uniqSorted(refData.map(r=>trim(r.HQ||'')).filter(Boolean));
 
     function fill(sel, items){ 
       sel.innerHTML = ''; 
@@ -1893,20 +1894,6 @@
     fill(selSource, sources);
     fill(selPT, pts);
     fill(selZone, zones);
-  }
-
-  function populateReferenceFilters(refData){
-    const names = uniqSorted(refData.map(r=>trim(r.Name||'')).filter(Boolean));
-    const hqs = uniqSorted(refData.map(r=>trim(r.HQ||'')).filter(Boolean));
-
-    function fill(sel, items){ 
-      sel.innerHTML = ''; 
-      const opt0 = document.createElement('option'); 
-      opt0.value=''; opt0.textContent='All'; sel.appendChild(opt0); 
-      for(const v of items){ const o=document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o); }
-    }
-
-    fill(selName, names);
     fill(selHQ, hqs);
   }
 
@@ -1975,7 +1962,6 @@
     selSource.onchange = ()=>{ FILTERS.source = selSource.value; render(); };
     selPT.onchange = ()=>{ FILTERS.pt = selPT.value; render(); };
     selZone.onchange = ()=>{ FILTERS.zone = selZone.value; render(); };
-    selName.onchange = ()=>{ FILTERS.name = selName.value; render(); };
     selHQ.onchange = ()=>{ FILTERS.hq = selHQ.value; render(); };
   }
 
@@ -2018,8 +2004,7 @@
 
   function checkBothLoaded(){
     if(csvLoaded && referenceLoaded){
-      populateFilters(RAW);
-      populateReferenceFilters(REFERENCE_DATA);
+      populateFilters(RAW, REFERENCE_DATA);
       attachFilterHandlers();
       render();
       console.log('✅ Both CSV files loaded successfully!');
