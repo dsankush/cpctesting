@@ -531,7 +531,6 @@
       </div>
       <div class="header-actions">
         <button class="btn btn-secondary" id="addEntryBtn">➕ Add Weight Entry</button>
-        <button class="btn btn-outline" id="downloadCSVBtn">📥 Download Data</button>
       </div>
     </div>
   </header>
@@ -839,22 +838,6 @@
     alert('🎯 Goal updated successfully!');
   };
 
-  // Download CSV
-  document.getElementById('downloadCSVBtn').onclick = () => {
-    if(WEIGHT_DATA.length === 0){
-      alert('⚠️ No data to download!');
-      return;
-    }
-    
-    const csv = Papa.unparse(WEIGHT_DATA);
-    const blob = new Blob([csv], {type: 'text/csv'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'weight_data_' + new Date().toISOString().slice(0,10) + '.csv';
-    a.click();
-    URL.revokeObjectURL(url);
-  };
 
   // Charts
   let weightChart = null;
