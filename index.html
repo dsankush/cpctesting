@@ -781,6 +781,17 @@
         <label for="zone">🌐 Zone</label>
         <select id="zone"></select>
       </div>
+
+      <div class="group">
+        <label for="name">👤 PT Name</label>
+        <select id="name"></select>
+      </div>
+
+      <div class="group">
+        <label for="hq">🏢 HQ</label>
+        <select id="hq"></select>
+      </div>
+
       <div class="group" style="display:flex;align-items:flex-end">
         <button class="btn" id="resetBtn" style="width:100%">🔄 Reset</button>
       </div>
@@ -975,6 +986,7 @@
 
 <script>
   const CSV_URL = './data.csv';
+  const REFERENCE_CSV_URL = './reference.csv';
 
   // Login
   const USERS = {
@@ -1090,7 +1102,8 @@
 
   // State
   let RAW = [];
-  let FILTERS = { dateFrom:'', dateTo:'', state:'', district:'', retailer:'', product:'', unit:'', status:'', source:'', pt:'', zone:'' };
+  let REFERENCE_DATA = []; // PT/Missed Calls reference data
+  let FILTERS = { dateFrom:'', dateTo:'', state:'', district:'', retailer:'', product:'', unit:'', status:'', source:'', pt:'', zone:'', name:'', hq:'' };
 
   // DOM
   const selDateFrom = document.getElementById('dateFrom');
@@ -1105,6 +1118,8 @@
   const selSource = document.getElementById('source');
   const selPT = document.getElementById('pt');
   const selZone = document.getElementById('zone');
+  const selName = document.getElementById('name');
+  const selHQ = document.getElementById('hq');
   
   flatpickr("#dateRange",{
     mode:"range",
@@ -1121,12 +1136,13 @@
   });
 
   document.getElementById('resetBtn').addEventListener('click', ()=>{
-    FILTERS = { dateFrom:'', dateTo:'', state:'', district:'', retailer:'', product:'', unit:'', status:'', source:'', pt:'', zone:'' };
+    FILTERS = { dateFrom:'', dateTo:'', state:'', district:'', retailer:'', product:'', unit:'', status:'', source:'', pt:'', zone:'', name:'', hq:'' };
     selDateFrom.value = selDateTo.value = '';
     selDateRange._flatpickr && selDateRange._flatpickr.clear();
     selState.value = selDistrict.value = selRetailer.value = selProduct.value = selUnit.value = selStatus.value = '';
-    selSource.value = selPT.value = selZone.value = '';
+    selSource.value = selPT.value = selZone.value = selName.value = selHQ.value = '';
     populateFilters(RAW);
+    populateReferenceFilters(REFERENCE_DATA);
     render();
   });
 
@@ -1230,31 +1246,32 @@
       }
     }
     
-    // Hardcoded Missed Calls Data (affected by state filter)
-    const MISSED_CALLS_DATA = {
-      'Andhra Pradesh': { total: 12962, unique: 10059 },
-      'Karnataka': { total: 5609, unique: 4313 },
-      'Maharashtra': { total: 8690, unique: 6577 },
-      'Telangana': { total: 8113, unique: 6297 },
-      'West Bengal': { total: 6, unique: 6 }
-    };
+    // Calculate Missed Calls from reference.csv (dynamic based on filters)
+    const filteredReferenceData = REFERENCE_DATA.filter(r => {
+      // Apply common filters: State, Zone, PT (from Name column)
+      if(FILTERS.state && trim(r.State) !== FILTERS.state) return false;
+      if(FILTERS.zone && trim(r.ZONE) !== FILTERS.zone) return false;
+      // Name filter (PT Name from reference.csv)
+      if(FILTERS.name && trim(r.Name) !== FILTERS.name) return false;
+      // HQ filter (unique to reference data)
+      if(FILTERS.hq && trim(r.HQ) !== FILTERS.hq) return false;
+      return true;
+    });
     
-    let missedCallsTotal = 35380;
-    let missedCallsUnique = 27240;
     let missedCallsDisplay = 0;
     let missedCallsUniqueDisplay = 0;
     
-    if(FILTERS.state && MISSED_CALLS_DATA[FILTERS.state]){
-      missedCallsTotal = MISSED_CALLS_DATA[FILTERS.state].total;
-      missedCallsUnique = MISSED_CALLS_DATA[FILTERS.state].unique;
-      // For display, show the filtered value (could be from data if available)
-      // For now, display the hardcoded value when state is selected
-      missedCallsDisplay = missedCallsTotal;
-      missedCallsUniqueDisplay = missedCallsUnique;
-    } else {
-      // Show grand total when no state filter
-      missedCallsDisplay = missedCallsTotal;
-      missedCallsUniqueDisplay = missedCallsUnique;
+    for(const r of filteredReferenceData){
+      missedCallsDisplay += Number(r['Total Missed Calls']) || 0;
+      missedCallsUniqueDisplay += Number(r['Total Unique Missed Calls']) || 0;
+    }
+    
+    // Calculate grand totals for context
+    let missedCallsTotal = 0;
+    let missedCallsUnique = 0;
+    for(const r of REFERENCE_DATA){
+      missedCallsTotal += Number(r['Total Missed Calls']) || 0;
+      missedCallsUnique += Number(r['Total Unique Missed Calls']) || 0;
     }
     
     document.getElementById('kpiTotalBig').textContent = total.toLocaleString();
@@ -1878,6 +1895,21 @@
     fill(selZone, zones);
   }
 
+  function populateReferenceFilters(refData){
+    const names = uniqSorted(refData.map(r=>trim(r.Name||'')).filter(Boolean));
+    const hqs = uniqSorted(refData.map(r=>trim(r.HQ||'')).filter(Boolean));
+
+    function fill(sel, items){ 
+      sel.innerHTML = ''; 
+      const opt0 = document.createElement('option'); 
+      opt0.value=''; opt0.textContent='All'; sel.appendChild(opt0); 
+      for(const v of items){ const o=document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o); }
+    }
+
+    fill(selName, names);
+    fill(selHQ, hqs);
+  }
+
   function attachFilterHandlers(){
     selDateFrom.onchange = ()=>{ FILTERS.dateFrom = selDateFrom.value; render(); };
     selDateTo.onchange   = ()=>{ FILTERS.dateTo   = selDateTo.value; render(); };
@@ -1943,6 +1975,8 @@
     selSource.onchange = ()=>{ FILTERS.source = selSource.value; render(); };
     selPT.onchange = ()=>{ FILTERS.pt = selPT.value; render(); };
     selZone.onchange = ()=>{ FILTERS.zone = selZone.value; render(); };
+    selName.onchange = ()=>{ FILTERS.name = selName.value; render(); };
+    selHQ.onchange = ()=>{ FILTERS.hq = selHQ.value; render(); };
   }
 
   function render(){
@@ -1978,6 +2012,21 @@
     };
   }
 
+  // Load both CSV files in parallel
+  let csvLoaded = false;
+  let referenceLoaded = false;
+
+  function checkBothLoaded(){
+    if(csvLoaded && referenceLoaded){
+      populateFilters(RAW);
+      populateReferenceFilters(REFERENCE_DATA);
+      attachFilterHandlers();
+      render();
+      console.log('✅ Both CSV files loaded successfully!');
+    }
+  }
+
+  // Load main data.csv
   Papa.parse(CSV_URL, {
     download: true,
     header: true,
@@ -1989,35 +2038,59 @@
       // Debug: Check if new columns exist
       if(RAW.length > 0){
         const firstRow = RAW[0];
-        console.log('✅ CSV Columns Found:', Object.keys(firstRow));
-        console.log('📊 New Columns Check:', {
+        console.log('✅ data.csv Columns Found:', Object.keys(firstRow));
+        console.log('📊 Data Check:', {
+          totalRows: RAW.length,
           hasSource: 'Source' in firstRow,
           hasPT: 'PT' in firstRow,
-          hasZone: 'Zone' in firstRow,
-          sampleSource: firstRow.Source || '(empty)',
-          samplePT: firstRow.PT || '(empty)',
-          sampleZone: firstRow.Zone || '(empty)'
-        });
-        
-        // Count rows with data
-        const withSource = RAW.filter(r => r.Source && trim(r.Source)).length;
-        const withPT = RAW.filter(r => r.PT && trim(r.PT)).length;
-        const withZone = RAW.filter(r => r.Zone && trim(r.Zone)).length;
-        console.log('📈 Data availability:', {
-          totalRows: RAW.length,
-          rowsWithSource: withSource + ' (' + ((withSource/RAW.length)*100).toFixed(1) + '%)',
-          rowsWithPT: withPT + ' (' + ((withPT/RAW.length)*100).toFixed(1) + '%)',
-          rowsWithZone: withZone + ' (' + ((withZone/RAW.length)*100).toFixed(1) + '%)'
+          hasZone: 'Zone' in firstRow
         });
       }
       
-      populateFilters(RAW);
-      attachFilterHandlers();
-      render();
+      csvLoaded = true;
+      checkBothLoaded();
     },
     error: (err)=>{
       console.error('CSV load error', err);
       alert('Failed to load data.csv. Ensure the file exists at '+CSV_URL);
+    }
+  });
+
+  // Load reference.csv for PT/Missed Calls data
+  Papa.parse(REFERENCE_CSV_URL, {
+    download: true,
+    header: true,
+    skipEmptyLines: true,
+    dynamicTyping: false,
+    complete: (res)=>{
+      REFERENCE_DATA = res.data;
+      
+      if(REFERENCE_DATA.length > 0){
+        console.log('✅ reference.csv loaded:', {
+          totalPTs: REFERENCE_DATA.length,
+          columns: Object.keys(REFERENCE_DATA[0]),
+          sample: REFERENCE_DATA[0]
+        });
+        
+        // Calculate totals
+        let totalMissed = 0, totalUnique = 0;
+        for(const r of REFERENCE_DATA){
+          totalMissed += Number(r['Total Missed Calls']) || 0;
+          totalUnique += Number(r['Total Unique Missed Calls']) || 0;
+        }
+        console.log('📞 Total Missed Calls Data:', {
+          total: totalMissed.toLocaleString(),
+          unique: totalUnique.toLocaleString(),
+          states: [...new Set(REFERENCE_DATA.map(r=>r.State))].length
+        });
+      }
+      
+      referenceLoaded = true;
+      checkBothLoaded();
+    },
+    error: (err)=>{
+      console.error('Reference CSV load error', err);
+      alert('Failed to load reference.csv. Ensure the file exists at '+REFERENCE_CSV_URL);
     }
   });
 </script>
