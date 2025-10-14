@@ -470,7 +470,10 @@ function renderWeight(type){
     row.innerHTML = `
       <td>${formatDate(entry.Date)}</td>
       <td><span class="weight-value">${weight.toFixed(1)}</span> kg</td>
-      <td><span class="weight-change ${changeClass}">${change !== 0 ? changeIcon + ' ' + Math.abs(change).toFixed(1) + ' kg' : '—'}</span></td>
+      <td>
+        <span class="weight-change ${changeClass}">${change !== 0 ? changeIcon + ' ' + Math.abs(change).toFixed(1) + ' kg' : '—'}</span>
+        <button class="delete-btn" onclick="deleteWeightEntry('${type}', ${idx})" style="margin-left:12px;position:relative;top:0;right:0">🗑️</button>
+      </td>
     `;
     tbody.appendChild(row);
   });
@@ -625,11 +628,19 @@ function renderCalorie(){
 
 function renderActivitiesList(activities){
   const list = document.getElementById('activitiesList');
+  const today = new Date().toISOString().slice(0,10);
+  
   if(activities.length === 0){
     list.innerHTML = '<div class="empty-state"><div class="empty-icon">🏃</div><div class="empty-text">No activities today</div></div>';
   } else {
-    list.innerHTML = activities.map(a => `
+    // Get today's activities with their indices in the full DATA.activity array
+    const todayActivitiesWithIndex = DATA.activity
+      .map((a, idx) => ({...a, originalIndex: idx}))
+      .filter(a => a.Date === today);
+    
+    list.innerHTML = todayActivitiesWithIndex.map(a => `
       <div class="calorie-entry">
+        <button class="delete-btn" onclick="deleteActivity(${a.originalIndex})">🗑️</button>
         <div class="calorie-entry-header">
           <div class="calorie-entry-time">${a.Activity}</div>
           <div class="calorie-entry-calories">${a.TotalCalories} kcal</div>
@@ -644,9 +655,16 @@ function renderActivitiesList(activities){
 
 function renderFoodList(food){
   const list = document.getElementById('calorieEntriesList');
+  const today = new Date().toISOString().slice(0,10);
+  
   if(food.length === 0){
     list.innerHTML = '<div class="empty-state"><div class="empty-icon">🍽️</div><div class="empty-text">No food entries today</div></div>';
   } else {
+    // Get today's food with their indices in the full DATA.food array
+    const todayFoodWithIndex = DATA.food
+      .map((f, idx) => ({...f, originalIndex: idx}))
+      .filter(f => f.Date === today);
+    
     // Group by meal type
     const meals = {
       'Breakfast': [],
@@ -656,7 +674,7 @@ function renderFoodList(food){
       'Drink': []
     };
     
-    food.forEach(f => {
+    todayFoodWithIndex.forEach(f => {
       const mealType = f.MealType || 'Snack';
       if(meals[mealType]) {
         meals[mealType].push(f);
@@ -683,6 +701,7 @@ function renderFoodList(food){
             </div>
             ${meals[mealType].map(f => `
               <div class="calorie-entry">
+                <button class="delete-btn" onclick="deleteFood(${f.originalIndex})">🗑️</button>
                 <div class="calorie-entry-header">
                   <div class="calorie-entry-time">${f.FoodName || f.Description}</div>
                   <div class="calorie-entry-calories">${f.Calories} kcal</div>
@@ -827,6 +846,34 @@ function loadData(){
   // Render other tabs
   render('gain');
   render('calorie');
+}
+
+// Delete functions
+function deleteWeightEntry(type, index){
+  if(!confirm('Are you sure you want to delete this entry?')) return;
+  
+  DATA[type].splice(index, 1);
+  localStorage.setItem('fittrack_data_' + type, JSON.stringify(DATA[type]));
+  render(type);
+  alert('Entry deleted successfully');
+}
+
+function deleteFood(index){
+  if(!confirm('Are you sure you want to delete this food entry?')) return;
+  
+  DATA.food.splice(index, 1);
+  localStorage.setItem('fittrack_data_food', JSON.stringify(DATA.food));
+  render('calorie');
+  alert('Food entry deleted successfully');
+}
+
+function deleteActivity(index){
+  if(!confirm('Are you sure you want to delete this activity?')) return;
+  
+  DATA.activity.splice(index, 1);
+  localStorage.setItem('fittrack_data_activity', JSON.stringify(DATA.activity));
+  render('calorie');
+  alert('Activity deleted successfully');
 }
 
 // Initialize

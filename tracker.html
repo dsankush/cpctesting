@@ -390,6 +390,7 @@
       margin-bottom:12px;
       border:1px solid var(--border);
       transition:all .2s ease;
+      position:relative;
     }
     .calorie-entry:active{
       background:#f3f4f6;
@@ -414,6 +415,32 @@
       font-size:12px;
       color:var(--text-secondary);
       margin-top:4px;
+    }
+    .delete-btn{
+      position:absolute;
+      top:12px;
+      right:12px;
+      width:28px;
+      height:28px;
+      border-radius:8px;
+      border:none;
+      background:var(--danger);
+      color:white;
+      font-size:16px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all .2s ease;
+      box-shadow:0 2px 8px rgba(239,68,68,0.3);
+    }
+    .delete-btn:hover{
+      background:#dc2626;
+      transform:scale(1.1);
+      box-shadow:0 4px 12px rgba(239,68,68,0.5);
+    }
+    .delete-btn:active{
+      transform:scale(0.95);
     }
 
     /* Modal */
