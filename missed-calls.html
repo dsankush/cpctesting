@@ -409,8 +409,8 @@
         <div class="kpi-value" id="uniqueGrowers">0</div>
       </div>
       <div class="kpi">
-        <div class="kpi-label">Total Records</div>
-        <div class="kpi-value" id="totalRecords">0</div>
+        <div class="kpi-label">Active PTs</div>
+        <div class="kpi-value" id="activePTs">0 / 253</div>
       </div>
     </div>
 
@@ -424,7 +424,9 @@
       <div class="filters-grid">
         <div class="filter-group">
           <label>Digitrack No</label>
-          <input type="text" id="filterDigitrack" placeholder="Search Digitrack No">
+          <select id="filterDigitrack">
+            <option value="">All Digitrack Numbers</option>
+          </select>
         </div>
         <div class="filter-group">
           <label>State</label>
@@ -451,8 +453,12 @@
           </select>
         </div>
         <div class="filter-group">
-          <label>Date Processed</label>
-          <input type="date" id="filterDate">
+          <label>Date Range (From)</label>
+          <input type="date" id="filterDateFrom">
+        </div>
+        <div class="filter-group">
+          <label>Date Range (To)</label>
+          <input type="date" id="filterDateTo">
         </div>
       </div>
       
@@ -550,11 +556,13 @@
 
     // Populate filter dropdowns
     function populateFilters(){
+      const digitracks = [...new Set(MC_DATA.map(r => r['Digitrack No']).filter(Boolean))].sort();
       const states = [...new Set(MC_DATA.map(r => r.State).filter(Boolean))].sort();
       const hqs = [...new Set(MC_DATA.map(r => r.HQ).filter(Boolean))].sort();
       const districts = [...new Set(MC_DATA.map(r => r['Division/PT District']).filter(Boolean))].sort();
       const zones = [...new Set(MC_DATA.map(r => r.ZONE).filter(Boolean))].sort();
       
+      populateSelect('filterDigitrack', digitracks);
       populateSelect('filterState', states);
       populateSelect('filterHQ', hqs);
       populateSelect('filterDistrict', districts);
@@ -564,7 +572,22 @@
     function populateSelect(id, options){
       const select = document.getElementById(id);
       const currentValue = select.value;
-      select.innerHTML = '<option value="">All ' + select.previousElementSibling.textContent + '</option>';
+      const label = select.previousElementSibling.textContent;
+      
+      if(id === 'filterDigitrack'){
+        select.innerHTML = '<option value="">All Digitrack Numbers</option>';
+      } else if(id === 'filterState'){
+        select.innerHTML = '<option value="">All States</option>';
+      } else if(id === 'filterHQ'){
+        select.innerHTML = '<option value="">All HQs</option>';
+      } else if(id === 'filterDistrict'){
+        select.innerHTML = '<option value="">All Districts</option>';
+      } else if(id === 'filterZone'){
+        select.innerHTML = '<option value="">All Zones</option>';
+      } else {
+        select.innerHTML = '<option value="">All</option>';
+      }
+      
       options.forEach(opt => {
         const option = document.createElement('option');
         option.value = opt;
@@ -576,22 +599,45 @@
 
     // Apply filters
     function applyFilters(){
-      const digitrack = document.getElementById('filterDigitrack').value.toLowerCase();
+      const digitrack = document.getElementById('filterDigitrack').value;
       const state = document.getElementById('filterState').value;
       const hq = document.getElementById('filterHQ').value;
       const district = document.getElementById('filterDistrict').value;
       const zone = document.getElementById('filterZone').value;
-      const date = document.getElementById('filterDate').value;
+      const dateFrom = document.getElementById('filterDateFrom').value;
+      const dateTo = document.getElementById('filterDateTo').value;
+
+      console.log('🔍 Applying filters:', { digitrack, state, hq, district, zone, dateFrom, dateTo });
 
       FILTERED_DATA = MC_DATA.filter(row => {
-        if(digitrack && !row['Digitrack No']?.toLowerCase().includes(digitrack)) return false;
+        // Digitrack filter
+        if(digitrack && row['Digitrack No'] !== digitrack) return false;
+        
+        // State filter
         if(state && row.State !== state) return false;
+        
+        // HQ filter
         if(hq && row.HQ !== hq) return false;
+        
+        // District filter
         if(district && row['Division/PT District'] !== district) return false;
+        
+        // Zone filter
         if(zone && row.ZONE !== zone) return false;
-        if(date && row['Date Processed'] !== date) return false;
+        
+        // Date range filter
+        if(dateFrom || dateTo){
+          const rowDate = row['Date Processed'];
+          if(!rowDate) return false;
+          
+          if(dateFrom && rowDate < dateFrom) return false;
+          if(dateTo && rowDate > dateTo) return false;
+        }
+        
         return true;
       });
+
+      console.log('✅ Filtered results:', FILTERED_DATA.length, 'records');
 
       CURRENT_PAGE = 1;
       render();
@@ -620,7 +666,8 @@
       document.getElementById('filterHQ').value = '';
       document.getElementById('filterDistrict').value = '';
       document.getElementById('filterZone').value = '';
-      document.getElementById('filterDate').value = '';
+      document.getElementById('filterDateFrom').value = '';
+      document.getElementById('filterDateTo').value = '';
       document.getElementById('universalSearch').value = '';
       
       FILTERED_DATA = [...MC_DATA];
@@ -639,11 +686,17 @@
     // Update KPIs
     function updateKPIs(){
       const totalGrowers = FILTERED_DATA.length;
-      const uniqueGrowers = new Set(FILTERED_DATA.map(r => r['Mobile number'])).size;
+      
+      // Unique growers by Grower name
+      const uniqueGrowers = new Set(FILTERED_DATA.map(r => r.Grower).filter(Boolean)).size;
+      
+      // Active PTs - unique count of Name (PT) field
+      const activePTs = new Set(FILTERED_DATA.map(r => r.Name).filter(Boolean)).size;
+      const totalPTs = 253;
       
       document.getElementById('totalGrowers').textContent = totalGrowers.toLocaleString();
       document.getElementById('uniqueGrowers').textContent = uniqueGrowers.toLocaleString();
-      document.getElementById('totalRecords').textContent = FILTERED_DATA.length.toLocaleString();
+      document.getElementById('activePTs').textContent = `${activePTs} / ${totalPTs}`;
     }
 
     // Render charts
