@@ -15,39 +15,23 @@
             margin: 0;
             padding: 0;
             font-family: 'Arial', sans-serif;
-            overflow-x: hidden;
+            overflow: hidden;
             background: #0a0015;
         }
 
-        .top-section {
+        .container {
             position: relative;
-            width: 100%;
-            height: 50vh;
-            overflow: hidden;
-        }
-
-        .bottom-section {
-            position: relative;
-            width: 100%;
-            height: 50vh;
-            overflow: hidden;
-        }
-
-        .background-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(ellipse at center, 
-                    rgba(138, 43, 226, 0.4) 0%, 
-                    transparent 50%),
-                radial-gradient(ellipse at 50% 60%, 
-                    #7B2CBF 0%, 
-                    #5A189A 30%, 
-                    #240046 60%, 
-                    #10002B 100%);
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(to bottom, 
+                #1a0a2e 0%, 
+                #2d0a4a 25%, 
+                #3d0f5a 50%, 
+                #2d0a4a 75%, 
+                #1a0a2e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             overflow: hidden;
         }
 
@@ -70,6 +54,7 @@
             background-size: 200% 200%;
             opacity: 0.6;
             animation: twinkle 4s ease-in-out infinite;
+            z-index: 1;
         }
 
         @keyframes twinkle {
@@ -77,21 +62,38 @@
             50% { opacity: 0.7; }
         }
 
+        /* Top glow */
+        .top-glow {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 400px;
+            background: radial-gradient(ellipse at center, 
+                rgba(138, 43, 226, 0.6) 0%, 
+                rgba(138, 43, 226, 0.3) 30%, 
+                transparent 70%);
+            filter: blur(80px);
+            z-index: 1;
+        }
+
         /* Central Glow */
         .central-glow {
             position: absolute;
-            top: 75%;
+            top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 700px;
-            height: 400px;
+            width: 800px;
+            height: 500px;
             background: radial-gradient(ellipse at center, 
-                rgba(255, 0, 255, 0.6) 0%, 
-                rgba(200, 50, 255, 0.4) 20%,
-                rgba(147, 51, 234, 0.3) 40%, 
+                rgba(255, 0, 255, 0.5) 0%, 
+                rgba(200, 50, 255, 0.3) 20%,
+                rgba(147, 51, 234, 0.2) 40%, 
                 transparent 70%);
-            filter: blur(80px);
+            filter: blur(90px);
             animation: pulse 3s ease-in-out infinite;
+            z-index: 1;
         }
 
         @keyframes pulse {
@@ -105,67 +107,33 @@
             }
         }
 
-        /* Neon Beams Container */
-        .beams-container {
+        /* Neon Beams - Left */
+        .neon-lines-left {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            perspective: 1000px;
-        }
-
-        /* Left Beams */
-        .beams-left {
-            position: absolute;
-            left: 15%;
+            left: 12%;
             top: 0;
+            width: 200px;
             height: 100%;
             display: flex;
             gap: 10px;
+            justify-content: center;
+            z-index: 2;
         }
 
-        .beams-left::after {
-            content: '';
+        /* Neon Beams - Right */
+        .neon-lines-right {
             position: absolute;
-            bottom: 0;
-            left: -20px;
-            right: -20px;
-            height: 3px;
-            background: linear-gradient(90deg,
-                transparent 0%,
-                rgba(0, 255, 255, 0.3) 20%,
-                rgba(0, 255, 255, 0.6) 50%,
-                rgba(0, 255, 255, 0.3) 80%,
-                transparent 100%);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
-        }
-
-        /* Right Beams */
-        .beams-right {
-            position: absolute;
-            right: 15%;
+            right: 12%;
             top: 0;
+            width: 200px;
             height: 100%;
             display: flex;
             gap: 10px;
+            justify-content: center;
+            z-index: 2;
         }
 
-        .beams-right::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: -20px;
-            right: -20px;
-            height: 3px;
-            background: linear-gradient(90deg,
-                transparent 0%,
-                rgba(0, 255, 255, 0.3) 20%,
-                rgba(0, 255, 255, 0.6) 50%,
-                rgba(0, 255, 255, 0.3) 80%,
-                transparent 100%);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
-        }
-
-        .beam {
+        .line {
             width: 6px;
             height: 100%;
             background: linear-gradient(to bottom, 
@@ -175,30 +143,40 @@
             box-shadow: 0 0 15px #00ffff, 
                         0 0 30px #8a2be2, 
                         0 0 45px #ff00ff;
-            animation: beamGlow 2s ease-in-out infinite;
-            border-radius: 2px;
             filter: blur(0.5px);
+            animation: beamGlow 2s ease-in-out infinite;
         }
 
-        .beam:nth-child(2) { animation-delay: 0.2s; }
-        .beam:nth-child(3) { animation-delay: 0.4s; }
-        .beam:nth-child(4) { animation-delay: 0.6s; }
-        .beam:nth-child(5) { animation-delay: 0.8s; }
+        .line:nth-child(2) { animation-delay: 0.2s; }
+        .line:nth-child(3) { animation-delay: 0.4s; }
+        .line:nth-child(4) { animation-delay: 0.6s; }
+        .line:nth-child(5) { animation-delay: 0.8s; }
 
         @keyframes beamGlow {
             0%, 100% { opacity: 0.7; }
             50% { opacity: 1; }
         }
 
-        /* Stage Container */
-        .stage-container {
+        /* Top Stage */
+        .stage-top {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%) scaleY(-1);
+            width: 600px;
+            height: 250px;
+            z-index: 3;
+        }
+
+        /* Bottom Stage */
+        .stage-bottom {
             position: absolute;
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
             width: 600px;
             height: 250px;
-            z-index: 10;
+            z-index: 3;
         }
 
         /* Reflection glow */
@@ -217,6 +195,21 @@
             z-index: 0;
         }
 
+        .reflection-glow-top {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 150px;
+            background: linear-gradient(to bottom, 
+                rgba(138, 43, 226, 0.4), 
+                rgba(255, 0, 255, 0.3), 
+                transparent);
+            filter: blur(60px);
+            z-index: 0;
+        }
+
         svg {
             width: 100%;
             height: 100%;
@@ -224,30 +217,27 @@
                     drop-shadow(0 0 80px rgba(0, 255, 255, 0.3));
         }
 
-        /* Content Area */
+        /* Content Area - Centered */
         .content {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
+            position: relative;
             z-index: 10;
             color: white;
             text-align: center;
-            padding: 50px 20px 20px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
+            justify-content: center;
             align-items: center;
         }
 
         .content h1 {
-            font-size: 3rem;
+            font-size: 3.5rem;
             font-weight: bold;
             background: linear-gradient(45deg, #00ffff, #ff00ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 12px;
+            margin-bottom: 20px;
             animation: textGlow 2s ease-in-out infinite;
             filter: drop-shadow(0 0 30px rgba(0, 255, 255, 0.5));
         }
@@ -258,14 +248,14 @@
         }
 
         .content p {
-            font-size: 1.1rem;
+            font-size: 1.3rem;
             color: #c0c0ff;
             text-shadow: 0 0 15px rgba(160, 160, 255, 0.6);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
         .content .tagline {
-            font-size: 0.9rem;
+            font-size: 1rem;
             color: #8080ff;
             text-shadow: 0 0 10px rgba(128, 128, 255, 0.5);
         }
@@ -280,6 +270,7 @@
             box-shadow: 0 0 8px #00ffff;
             opacity: 0;
             pointer-events: none;
+            z-index: 1;
         }
 
         @keyframes float-particle {
@@ -292,82 +283,123 @@
             }
             100% {
                 opacity: 0;
-                transform: translateY(-100px);
+                transform: translateY(-150px);
             }
         }
     </style>
 </head>
 <body>
-    <!-- Top Half Section with Futuristic Background -->
-    <div class="top-section">
-        <div class="background-container">
-            <!-- Stars -->
-            <div class="stars"></div>
-            
-            <!-- Central Glow -->
-            <div class="central-glow"></div>
-            
-            <!-- Neon Beams -->
-            <div class="beams-container">
-                <div class="beams-left">
-                    <div class="beam"></div>
-                    <div class="beam"></div>
-                    <div class="beam"></div>
-                    <div class="beam"></div>
-                    <div class="beam"></div>
-                </div>
-                <div class="beams-right">
-                    <div class="beam"></div>
-                    <div class="beam"></div>
-                    <div class="beam"></div>
-                    <div class="beam"></div>
-                    <div class="beam"></div>
-                </div>
-            </div>
-            
-            <!-- SVG Stage -->
-            <div class="stage-container">
-                <svg viewBox="0 0 600 250" preserveAspectRatio="xMidYMid meet">
-                    <defs>
-                        <radialGradient id="centerGlow1">
-                            <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
-                            <stop offset="50%" style="stop-color:#00ffff;stop-opacity:0.6" />
-                            <stop offset="100%" style="stop-color:#ff00ff;stop-opacity:0" />
-                        </radialGradient>
-                    </defs>
-
-                    <!-- Platform/Stage base -->
-                    <ellipse cx="300" cy="120" rx="200" ry="60" fill="rgba(138, 43, 226, 0.3)" stroke="rgba(138, 43, 226, 0.8)" stroke-width="3"/>
-
-                    <!-- Stage rim glow -->
-                    <ellipse cx="300" cy="120" rx="200" ry="60" fill="none" stroke="rgba(255, 0, 255, 0.5)" stroke-width="2" opacity="0.6" stroke-dasharray="20,10"/>
-
-                    <!-- Outer ring (perspective) -->
-                    <ellipse cx="300" cy="150" rx="170" ry="48" fill="none" stroke="rgba(138, 43, 226, 0.6)" stroke-width="2"/>
-
-                    <!-- Mid ring 1 -->
-                    <ellipse cx="300" cy="145" rx="145" ry="40" fill="none" stroke="rgba(0, 255, 255, 0.4)" stroke-width="1" opacity="0.6"/>
-
-                    <!-- Mid ring 2 -->
-                    <ellipse cx="300" cy="140" rx="120" ry="34" fill="none" stroke="rgba(255, 0, 255, 0.5)" stroke-width="2" opacity="0.7"/>
-
-                    <!-- Inner ring -->
-                    <ellipse cx="300" cy="135" rx="90" ry="26" fill="none" stroke="rgba(0, 255, 255, 0.4)" stroke-width="1" opacity="0.5"/>
-
-                    <!-- Bright center -->
-                    <ellipse cx="300" cy="130" rx="60" ry="18" fill="url(#centerGlow1)" opacity="0.8"/>
-                    <ellipse cx="300" cy="130" rx="45" ry="14" fill="rgba(255, 255, 255, 0.7)"/>
-                    <ellipse cx="300" cy="130" rx="30" ry="10" fill="rgba(0, 255, 255, 0.9)"/>
-
-                    <!-- Horizontal accent lines -->
-                    <line x1="120" y1="130" x2="200" y2="130" stroke="rgba(255, 0, 255, 0.6)" stroke-width="2" opacity="0.7"/>
-                    <line x1="400" y1="130" x2="480" y2="130" stroke="rgba(0, 255, 255, 0.6)" stroke-width="2" opacity="0.7"/>
-                </svg>
-                <div class="reflection-glow"></div>
-            </div>
-        </div>
+    <div class="container">
+        <!-- Stars -->
+        <div class="stars"></div>
         
-        <!-- Your Website Content Goes Here -->
+        <!-- Top glow -->
+        <div class="top-glow"></div>
+        
+        <!-- Central Glow -->
+        <div class="central-glow"></div>
+
+        <!-- Left neon lines -->
+        <div class="neon-lines-left">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+        </div>
+
+        <!-- Right neon lines -->
+        <div class="neon-lines-right">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+        </div>
+
+        <!-- Top Stage (Inverted) -->
+        <div class="stage-top">
+            <svg viewBox="0 0 600 250" preserveAspectRatio="xMidYMid meet">
+                <defs>
+                    <radialGradient id="centerGlowTop">
+                        <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#00ffff;stop-opacity:0.6" />
+                        <stop offset="100%" style="stop-color:#ff00ff;stop-opacity:0" />
+                    </radialGradient>
+                </defs>
+
+                <!-- Platform/Stage base -->
+                <ellipse cx="300" cy="120" rx="200" ry="60" fill="rgba(138, 43, 226, 0.3)" stroke="rgba(138, 43, 226, 0.8)" stroke-width="3"/>
+
+                <!-- Stage rim glow -->
+                <ellipse cx="300" cy="120" rx="200" ry="60" fill="none" stroke="rgba(255, 0, 255, 0.5)" stroke-width="2" opacity="0.6" stroke-dasharray="20,10"/>
+
+                <!-- Outer ring -->
+                <ellipse cx="300" cy="150" rx="170" ry="48" fill="none" stroke="rgba(138, 43, 226, 0.6)" stroke-width="2"/>
+
+                <!-- Mid ring 1 -->
+                <ellipse cx="300" cy="145" rx="145" ry="40" fill="none" stroke="rgba(0, 255, 255, 0.4)" stroke-width="1" opacity="0.6"/>
+
+                <!-- Mid ring 2 -->
+                <ellipse cx="300" cy="140" rx="120" ry="34" fill="none" stroke="rgba(255, 0, 255, 0.5)" stroke-width="2" opacity="0.7"/>
+
+                <!-- Inner ring -->
+                <ellipse cx="300" cy="135" rx="90" ry="26" fill="none" stroke="rgba(0, 255, 255, 0.4)" stroke-width="1" opacity="0.5"/>
+
+                <!-- Bright center -->
+                <ellipse cx="300" cy="130" rx="60" ry="18" fill="url(#centerGlowTop)" opacity="0.8"/>
+                <ellipse cx="300" cy="130" rx="45" ry="14" fill="rgba(255, 255, 255, 0.7)"/>
+                <ellipse cx="300" cy="130" rx="30" ry="10" fill="rgba(0, 255, 255, 0.9)"/>
+
+                <!-- Horizontal accent lines -->
+                <line x1="120" y1="130" x2="200" y2="130" stroke="rgba(255, 0, 255, 0.6)" stroke-width="2" opacity="0.7"/>
+                <line x1="400" y1="130" x2="480" y2="130" stroke="rgba(0, 255, 255, 0.6)" stroke-width="2" opacity="0.7"/>
+            </svg>
+            <div class="reflection-glow-top"></div>
+        </div>
+
+        <!-- Bottom Stage -->
+        <div class="stage-bottom">
+            <svg viewBox="0 0 600 250" preserveAspectRatio="xMidYMid meet">
+                <defs>
+                    <radialGradient id="centerGlowBottom">
+                        <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#00ffff;stop-opacity:0.6" />
+                        <stop offset="100%" style="stop-color:#ff00ff;stop-opacity:0" />
+                    </radialGradient>
+                </defs>
+
+                <!-- Platform/Stage base -->
+                <ellipse cx="300" cy="120" rx="200" ry="60" fill="rgba(138, 43, 226, 0.3)" stroke="rgba(138, 43, 226, 0.8)" stroke-width="3"/>
+
+                <!-- Stage rim glow -->
+                <ellipse cx="300" cy="120" rx="200" ry="60" fill="none" stroke="rgba(255, 0, 255, 0.5)" stroke-width="2" opacity="0.6" stroke-dasharray="20,10"/>
+
+                <!-- Outer ring -->
+                <ellipse cx="300" cy="150" rx="170" ry="48" fill="none" stroke="rgba(138, 43, 226, 0.6)" stroke-width="2"/>
+
+                <!-- Mid ring 1 -->
+                <ellipse cx="300" cy="145" rx="145" ry="40" fill="none" stroke="rgba(0, 255, 255, 0.4)" stroke-width="1" opacity="0.6"/>
+
+                <!-- Mid ring 2 -->
+                <ellipse cx="300" cy="140" rx="120" ry="34" fill="none" stroke="rgba(255, 0, 255, 0.5)" stroke-width="2" opacity="0.7"/>
+
+                <!-- Inner ring -->
+                <ellipse cx="300" cy="135" rx="90" ry="26" fill="none" stroke="rgba(0, 255, 255, 0.4)" stroke-width="1" opacity="0.5"/>
+
+                <!-- Bright center -->
+                <ellipse cx="300" cy="130" rx="60" ry="18" fill="url(#centerGlowBottom)" opacity="0.8"/>
+                <ellipse cx="300" cy="130" rx="45" ry="14" fill="rgba(255, 255, 255, 0.7)"/>
+                <ellipse cx="300" cy="130" rx="30" ry="10" fill="rgba(0, 255, 255, 0.9)"/>
+
+                <!-- Horizontal accent lines -->
+                <line x1="120" y1="130" x2="200" y2="130" stroke="rgba(255, 0, 255, 0.6)" stroke-width="2" opacity="0.7"/>
+                <line x1="400" y1="130" x2="480" y2="130" stroke="rgba(0, 255, 255, 0.6)" stroke-width="2" opacity="0.7"/>
+            </svg>
+            <div class="reflection-glow"></div>
+        </div>
+
+        <!-- Content - Centered in Middle -->
         <div class="content">
             <h1>WELCOME TO THE FUTURE</h1>
             <p>Experience the next generation</p>
@@ -375,90 +407,19 @@
         </div>
     </div>
 
-    <!-- Bottom Half Section with Same Background -->
-    <div class="bottom-section">
-        <div class="background-container">
-            <!-- Stars -->
-            <div class="stars"></div>
-            
-            <!-- Central Glow -->
-            <div class="central-glow"></div>
-            
-            <!-- Neon Beams -->
-            <div class="beams-container">
-                <div class="beams-left">
-                    <div class="beam"></div>
-                    <div class="beam"></div>
-                    <div class="beam"></div>
-                    <div class="beam"></div>
-                    <div class="beam"></div>
-                </div>
-                <div class="beams-right">
-                    <div class="beam"></div>
-                    <div class="beam"></div>
-                    <div class="beam"></div>
-                    <div class="beam"></div>
-                    <div class="beam"></div>
-                </div>
-            </div>
-            
-            <!-- SVG Stage -->
-            <div class="stage-container">
-                <svg viewBox="0 0 600 250" preserveAspectRatio="xMidYMid meet">
-                    <defs>
-                        <radialGradient id="centerGlow2">
-                            <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
-                            <stop offset="50%" style="stop-color:#00ffff;stop-opacity:0.6" />
-                            <stop offset="100%" style="stop-color:#ff00ff;stop-opacity:0" />
-                        </radialGradient>
-                    </defs>
-
-                    <!-- Platform/Stage base -->
-                    <ellipse cx="300" cy="120" rx="200" ry="60" fill="rgba(138, 43, 226, 0.3)" stroke="rgba(138, 43, 226, 0.8)" stroke-width="3"/>
-
-                    <!-- Stage rim glow -->
-                    <ellipse cx="300" cy="120" rx="200" ry="60" fill="none" stroke="rgba(255, 0, 255, 0.5)" stroke-width="2" opacity="0.6" stroke-dasharray="20,10"/>
-
-                    <!-- Outer ring (perspective) -->
-                    <ellipse cx="300" cy="150" rx="170" ry="48" fill="none" stroke="rgba(138, 43, 226, 0.6)" stroke-width="2"/>
-
-                    <!-- Mid ring 1 -->
-                    <ellipse cx="300" cy="145" rx="145" ry="40" fill="none" stroke="rgba(0, 255, 255, 0.4)" stroke-width="1" opacity="0.6"/>
-
-                    <!-- Mid ring 2 -->
-                    <ellipse cx="300" cy="140" rx="120" ry="34" fill="none" stroke="rgba(255, 0, 255, 0.5)" stroke-width="2" opacity="0.7"/>
-
-                    <!-- Inner ring -->
-                    <ellipse cx="300" cy="135" rx="90" ry="26" fill="none" stroke="rgba(0, 255, 255, 0.4)" stroke-width="1" opacity="0.5"/>
-
-                    <!-- Bright center -->
-                    <ellipse cx="300" cy="130" rx="60" ry="18" fill="url(#centerGlow2)" opacity="0.8"/>
-                    <ellipse cx="300" cy="130" rx="45" ry="14" fill="rgba(255, 255, 255, 0.7)"/>
-                    <ellipse cx="300" cy="130" rx="30" ry="10" fill="rgba(0, 255, 255, 0.9)"/>
-
-                    <!-- Horizontal accent lines -->
-                    <line x1="120" y1="130" x2="200" y2="130" stroke="rgba(255, 0, 255, 0.6)" stroke-width="2" opacity="0.7"/>
-                    <line x1="400" y1="130" x2="480" y2="130" stroke="rgba(0, 255, 255, 0.6)" stroke-width="2" opacity="0.7"/>
-                </svg>
-                <div class="reflection-glow"></div>
-            </div>
-        </div>
-    </div>
-
     <script>
         // Generate floating particles
-        const topSection = document.querySelector('.top-section');
-        const bottomSection = document.querySelector('.bottom-section');
+        const container = document.querySelector('.container');
         
-        function createParticles(container) {
-            for (let i = 0; i < 15; i++) {
+        function createParticles() {
+            for (let i = 0; i < 30; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
                 
                 const x = Math.random() * window.innerWidth;
-                const y = container.offsetHeight - Math.random() * 150;
-                const duration = 3 + Math.random() * 2;
-                const delay = Math.random() * 2;
+                const y = window.innerHeight - Math.random() * 200;
+                const duration = 3 + Math.random() * 3;
+                const delay = Math.random() * 3;
                 
                 particle.style.left = x + 'px';
                 particle.style.top = y + 'px';
@@ -470,9 +431,7 @@
             }
         }
 
-        // Create particles for both sections
-        createParticles(topSection);
-        createParticles(bottomSection);
+        createParticles();
     </script>
 </body>
 </html>
