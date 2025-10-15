@@ -454,7 +454,7 @@
     }
 
     // Load CSV data
-    Papa.parse('data.csv', {
+    Papa.parse('w1d.csv', {
       download: true,
       header: true,
       complete: function(results) {
@@ -476,7 +476,8 @@
         document.getElementById('loadingMessage').innerHTML = `
           <div class="text-red-500">
             <div class="text-6xl mb-4">❌</div>
-            Error loading data: ${error.message}
+            Error loading data: ${error.message}<br>
+            <small>Make sure w1d.csv file exists in the workspace</small>
           </div>
         `;
       }
