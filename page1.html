@@ -397,7 +397,7 @@
         type="text"
         id="searchBox"
         class="search-box"
-        placeholder="🔍 Search by name, phone, district, state, or retailer..."
+        placeholder="🔍 Search by farmer name, mobile number, district, or headquarter..."
       />
     </div>
 
@@ -411,16 +411,11 @@
         <table id="winnersTable">
           <thead>
             <tr>
-              <th>Rank</th>
-              <th>Name</th>
-              <th>Phone</th>
+              <th>Sr. No.</th>
+              <th>Farmer Name</th>
+              <th>Mobile Number</th>
               <th>District</th>
-              <th>State</th>
-              <th>Land (Acre)</th>
-              <th>Crop</th>
-              <th>Retailer</th>
-              <th>Scan Date</th>
-              <th>Status</th>
+              <th>Headquarter</th>
             </tr>
           </thead>
           <tbody id="tableBody">
@@ -532,12 +527,7 @@
             <td class="font-semibold">${winner['First Name']} ${winner['Last Name']}</td>
             <td>${winner['Phone Number']}</td>
             <td>${winner['District']}</td>
-            <td><span class="font-semibold text-purple-600">${winner['State']}</span></td>
-            <td>${winner['Land Acreage'] || '-'}</td>
-            <td>${winner['Crop Name'] || '-'}</td>
-            <td class="text-sm">${winner['Retailer Name'] || '-'}</td>
-            <td class="text-sm">${winner['Scan Date'] ? new Date(winner['Scan Date']).toLocaleDateString() : '-'}</td>
-            <td>${getStatusBadge(winner['Submission Status'])}</td>
+            <td><span class="font-semibold text-purple-600">${winner['PT'] || '-'}</span></td>
           </tr>
         `;
       }).join('');
@@ -603,8 +593,7 @@
           (winner['Last Name'] || '').toLowerCase().includes(searchTerm) ||
           (winner['Phone Number'] || '').toLowerCase().includes(searchTerm) ||
           (winner['District'] || '').toLowerCase().includes(searchTerm) ||
-          (winner['State'] || '').toLowerCase().includes(searchTerm) ||
-          (winner['Retailer Name'] || '').toLowerCase().includes(searchTerm)
+          (winner['PT'] || '').toLowerCase().includes(searchTerm)
         );
       });
       
