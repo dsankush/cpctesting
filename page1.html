@@ -255,47 +255,16 @@
     }
     
     .carousel-content {
-      border-radius: 20px;
-      box-shadow: 
-        0 20px 60px rgba(0, 0, 0, 0.5),
-        0 0 0 4px rgba(255, 215, 0, 0.3),
-        0 0 40px rgba(255, 215, 0, 0.2);
-      transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      transition: all 0.4s ease;
       opacity: 0;
-      transform: translateX(50px) scale(0.9);
-      background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
+      transform: translateX(50px) scale(0.95);
+      background: #ffffff;
       padding: 0;
       overflow: hidden;
-      max-width: 900px;
+      max-width: 1100px;
       width: 100%;
-      border: 4px solid;
-      border-image: linear-gradient(135deg, #fbbf24, #f59e0b, #fbbf24) 1;
-      position: relative;
-    }
-    
-    .carousel-content::before {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      background: linear-gradient(135deg, #fbbf24, #f59e0b, #fbbf24);
-      border-radius: 20px;
-      z-index: -1;
-      opacity: 0.3;
-      animation: borderGlow 3s ease-in-out infinite;
-    }
-    
-    @keyframes borderGlow {
-      0%, 100% {
-        opacity: 0.3;
-        filter: blur(8px);
-      }
-      50% {
-        opacity: 0.6;
-        filter: blur(12px);
-      }
     }
     
     .carousel-content.loaded {
@@ -313,578 +282,112 @@
       transform: translateX(80px) scale(0.8);
     }
     
-    /* Winners Table in Carousel - LUCKY DRAW THEME */
+    /* Winners Table in Carousel - PROFESSIONAL LUCKY DRAW THEME */
     .table-title {
-      background: linear-gradient(135deg, #ff0080 0%, #ff8c00 25%, #ffd700 50%, #ff8c00 75%, #ff0080 100%);
-      background-size: 200% 200%;
-      animation: gradientShift 3s ease infinite;
-      padding: 24px;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      padding: 28px;
       text-align: center;
       color: white;
-      font-size: 28px;
-      font-weight: 900;
+      font-size: 32px;
+      font-weight: 800;
       border-radius: 16px 16px 0 0;
-      text-shadow: 
-        0 0 10px rgba(255, 215, 0, 0.8),
-        0 0 20px rgba(255, 140, 0, 0.6),
-        0 2px 4px rgba(0, 0, 0, 0.5);
-      letter-spacing: 2px;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .table-title::before {
-      content: '✨';
-      position: absolute;
-      left: 20px;
-      font-size: 32px;
-      animation: sparkle 2s ease-in-out infinite, float 3s ease-in-out infinite;
-    }
-    
-    .table-title::after {
-      content: '✨';
-      position: absolute;
-      right: 20px;
-      font-size: 32px;
-      animation: sparkle 2s ease-in-out infinite 1s, float 3s ease-in-out infinite 1.5s;
-    }
-    
-    @keyframes gradientShift {
-      0% {
-        background-position: 0% 50%;
-      }
-      50% {
-        background-position: 100% 50%;
-      }
-      100% {
-        background-position: 0% 50%;
-      }
-    }
-    
-    @keyframes sparkle {
-      0%, 100% {
-        opacity: 0.3;
-        transform: scale(0.8);
-      }
-      50% {
-        opacity: 1;
-        transform: scale(1.2);
-      }
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      letter-spacing: 1px;
+      border-bottom: 4px solid #fbbf24;
     }
     
     .winners-table {
       width: 100%;
       border-collapse: collapse;
-      position: relative;
     }
     
     .winners-table thead {
-      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 50%, #3b82f6 100%);
-      position: relative;
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
     }
     
     .winners-table thead th {
-      padding: 16px 12px;
+      padding: 20px 16px;
       text-align: left;
       color: #fff;
-      font-weight: 800;
-      font-size: 14px;
+      font-weight: 700;
+      font-size: 16px;
       text-transform: uppercase;
       border-bottom: 3px solid #fbbf24;
-      letter-spacing: 1px;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-      position: relative;
-    }
-    
-    .winners-table thead th::after {
-      content: '';
-      position: absolute;
-      bottom: -3px;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, 
-        transparent 0%, 
-        #fbbf24 20%, 
-        #f59e0b 50%, 
-        #fbbf24 80%, 
-        transparent 100%);
-      animation: shimmer 2s linear infinite;
-    }
-    
-    @keyframes shimmer {
-      0% {
-        transform: translateX(-100%);
-      }
-      100% {
-        transform: translateX(100%);
-      }
+      letter-spacing: 0.5px;
     }
     
     .winners-table tbody tr {
-      background: linear-gradient(90deg, #ffffff 0%, #fefce8 50%, #ffffff 100%);
-      transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      background: #ffffff;
+      transition: all 0.2s ease;
       border-left: 4px solid transparent;
-      position: relative;
-      animation: slideInRow 0.6s ease-out backwards;
-      opacity: 0;
-    }
-    
-    .winners-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
-    .winners-table tbody tr:nth-child(2) { animation-delay: 0.2s; }
-    .winners-table tbody tr:nth-child(3) { animation-delay: 0.3s; }
-    .winners-table tbody tr:nth-child(4) { animation-delay: 0.4s; }
-    .winners-table tbody tr:nth-child(5) { animation-delay: 0.5s; }
-    .winners-table tbody tr:nth-child(6) { animation-delay: 0.6s; }
-    .winners-table tbody tr:nth-child(7) { animation-delay: 0.7s; }
-    .winners-table tbody tr:nth-child(8) { animation-delay: 0.8s; }
-    .winners-table tbody tr:nth-child(9) { animation-delay: 0.9s; }
-    .winners-table tbody tr:nth-child(10) { animation-delay: 1s; }
-    
-    @keyframes slideInRow {
-      0% {
-        opacity: 0;
-        transform: translateX(-50px) rotateY(-20deg);
-      }
-      60% {
-        transform: translateX(10px) rotateY(5deg);
-      }
-      100% {
-        opacity: 1;
-        transform: translateX(0) rotateY(0deg);
-      }
     }
     
     .winners-table tbody tr:nth-child(even) {
-      background: linear-gradient(90deg, #fefce8 0%, #fffbeb 50%, #fefce8 100%);
+      background: #f8fafc;
     }
     
     .winners-table tbody tr:hover {
-      background: linear-gradient(90deg, 
-        rgba(251, 191, 36, 0.3) 0%, 
-        rgba(245, 158, 11, 0.4) 50%, 
-        rgba(251, 191, 36, 0.3) 100%);
-      transform: translateX(8px) scale(1.02);
-      box-shadow: 
-        -4px 0 0 #fbbf24,
-        0 4px 20px rgba(251, 191, 36, 0.4),
-        0 0 30px rgba(245, 158, 11, 0.3);
-      border-left: 4px solid #fbbf24;
-      z-index: 10;
-      animation: rowPulse 0.6s ease-in-out infinite alternate;
-    }
-    
-    @keyframes rowPulse {
-      0% {
-        box-shadow: 
-          -4px 0 0 #fbbf24,
-          0 4px 20px rgba(251, 191, 36, 0.4),
-          0 0 30px rgba(245, 158, 11, 0.3);
-      }
-      100% {
-        box-shadow: 
-          -4px 0 0 #f59e0b,
-          0 6px 30px rgba(251, 191, 36, 0.6),
-          0 0 50px rgba(245, 158, 11, 0.5);
-      }
-    }
-    
-    .winners-table tbody tr:hover td {
-      color: #78350f;
-      font-weight: 600;
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
     }
     
     .winners-table tbody td {
-      padding: 14px 12px;
-      border-bottom: 1px solid rgba(251, 191, 36, 0.2);
-      font-size: 14px;
+      padding: 18px 16px;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 16px;
       color: #1f2937;
-      transition: all 0.3s ease;
+      font-weight: 500;
     }
     
+    /* Highlight top 3 winners */
     .winners-table tbody tr:first-child,
     .winners-table tbody tr:nth-child(2),
     .winners-table tbody tr:nth-child(3) {
-      background: linear-gradient(90deg, 
-        rgba(254, 252, 232, 1) 0%, 
-        rgba(254, 243, 199, 1) 50%, 
-        rgba(254, 252, 232, 1) 100%);
-      border-left: 4px solid #fbbf24;
+      background: #fef3c7;
+      border-left: 5px solid #f59e0b;
       font-weight: 600;
-      position: relative;
-      overflow: visible;
     }
     
-    /* Special glow for top 3 */
-    .winners-table tbody tr.top-winner {
-      animation: topWinnerGlow 3s ease-in-out infinite;
-    }
-    
-    @keyframes topWinnerGlow {
-      0%, 100% {
-        box-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
-      }
-      50% {
-        box-shadow: 0 0 25px rgba(251, 191, 36, 0.6), 0 0 40px rgba(245, 158, 11, 0.4);
-      }
-    }
-    
-    /* Celebration emoji animation */
-    .top-winner td:nth-child(2) {
-      animation: celebrateText 2s ease-in-out infinite;
-    }
-    
-    @keyframes celebrateText {
-      0%, 100% {
-        transform: scale(1);
-      }
-      50% {
-        transform: scale(1.05);
-      }
+    .winners-table tbody tr:first-child {
+      background: #fef9c3;
+      border-left: 5px solid #eab308;
     }
     
     .rank-badge {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      font-weight: 900;
-      font-size: 16px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-      border: 3px solid rgba(255, 255, 255, 0.5);
-      transition: all 0.3s ease;
-    }
-    
-    .rank-badge:hover {
-      transform: rotate(360deg) scale(1.2);
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 18px;
     }
     
     .rank-1 {
-      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
-      color: #92400e;
-      animation: goldShine 2s ease-in-out infinite, pulse 2s ease-in-out infinite;
-      border-color: #fbbf24;
-      box-shadow: 
-        0 0 20px rgba(255, 215, 0, 0.8),
-        0 0 40px rgba(255, 215, 0, 0.5),
-        0 4px 15px rgba(0, 0, 0, 0.3);
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      color: #78350f;
+      box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
     }
     
     .rank-2 {
-      background: linear-gradient(135deg, #e5e7eb 0%, #f3f4f6 50%, #d1d5db 100%);
-      color: #1f2937;
-      animation: silverShine 2s ease-in-out infinite;
-      border-color: #9ca3af;
-      box-shadow: 
-        0 0 15px rgba(156, 163, 175, 0.6),
-        0 4px 15px rgba(0, 0, 0, 0.3);
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(100, 116, 139, 0.4);
     }
     
     .rank-3 {
-      background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 50%, #d97706 100%);
-      color: #78350f;
-      animation: bronzeShine 2s ease-in-out infinite;
-      border-color: #d97706;
-      box-shadow: 
-        0 0 15px rgba(217, 119, 6, 0.6),
-        0 4px 15px rgba(0, 0, 0, 0.3);
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
     }
     
     .rank-default {
-      background: linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 50%, #a78bfa 100%);
-      color: #5b21b6;
-      border-color: #8b5cf6;
-      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+      background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
     }
     
-    @keyframes goldShine {
-      0%, 100% {
-        box-shadow: 
-          0 0 20px rgba(255, 215, 0, 0.8),
-          0 0 40px rgba(255, 215, 0, 0.5),
-          0 4px 15px rgba(0, 0, 0, 0.3);
-      }
-      50% {
-        box-shadow: 
-          0 0 30px rgba(255, 215, 0, 1),
-          0 0 60px rgba(255, 215, 0, 0.8),
-          0 6px 20px rgba(0, 0, 0, 0.4);
-      }
-    }
-    
-    @keyframes silverShine {
-      0%, 100% {
-        box-shadow: 
-          0 0 15px rgba(156, 163, 175, 0.6),
-          0 4px 15px rgba(0, 0, 0, 0.3);
-      }
-      50% {
-        box-shadow: 
-          0 0 25px rgba(156, 163, 175, 0.9),
-          0 6px 20px rgba(0, 0, 0, 0.4);
-      }
-    }
-    
-    @keyframes bronzeShine {
-      0%, 100% {
-        box-shadow: 
-          0 0 15px rgba(217, 119, 6, 0.6),
-          0 4px 15px rgba(0, 0, 0, 0.3);
-      }
-      50% {
-        box-shadow: 
-          0 0 25px rgba(217, 119, 6, 0.9),
-          0 6px 20px rgba(0, 0, 0, 0.4);
-      }
-    }
-    
-    @keyframes pulse {
-      0%, 100% {
-        transform: scale(1);
-      }
-      50% {
-        transform: scale(1.05);
-      }
-    }
-    
-    /* Sparkle particles on top 3 rows */
-    .winners-table tbody tr:first-child::before,
-    .winners-table tbody tr:nth-child(2)::before,
-    .winners-table tbody tr:nth-child(3)::before {
-      content: '⭐';
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 20px;
-      animation: twinkle 2s ease-in-out infinite;
-      opacity: 0;
-    }
-    
-    @keyframes twinkle {
-      0%, 100% {
-        opacity: 0;
-        transform: translateY(-50%) scale(0.5) rotate(0deg);
-      }
-      50% {
-        opacity: 1;
-        transform: translateY(-50%) scale(1) rotate(180deg);
-      }
-    }
-    
-    /* Firework effect on table title */
-    .table-title {
-      overflow: visible;
-    }
-    
-    @keyframes firework {
-      0% {
-        opacity: 1;
-        transform: translate(0, 0) scale(0);
-      }
-      50% {
-        opacity: 0.8;
-      }
-      100% {
-        opacity: 0;
-        transform: translate(var(--tx), var(--ty)) scale(1);
-      }
-    }
-    
-    /* Floating badges */
-    .rank-badge {
-      animation: floatBadge 3s ease-in-out infinite;
-    }
-    
-    @keyframes floatBadge {
-      0%, 100% {
-        transform: translateY(0px);
-      }
-      50% {
-        transform: translateY(-5px);
-      }
-    }
-    
-    /* Rainbow shimmer on header */
-    .winners-table thead th {
-      background: linear-gradient(
-        90deg,
-        #8b5cf6 0%,
-        #6366f1 20%,
-        #3b82f6 40%,
-        #06b6d4 60%,
-        #3b82f6 80%,
-        #6366f1 100%
-      );
-      background-size: 200% 100%;
-      animation: rainbowSlide 3s linear infinite;
-    }
-    
-    @keyframes rainbowSlide {
-      0% {
-        background-position: 0% 50%;
-      }
-      100% {
-        background-position: 200% 50%;
-      }
-    }
-    
-    /* Bounce effect on rank badges when hovering row */
-    .winners-table tbody tr:hover .rank-badge {
-      animation: bounceBadge 0.6s ease-in-out;
-    }
-    
-    @keyframes bounceBadge {
-      0%, 100% {
-        transform: translateY(0) scale(1);
-      }
-      25% {
-        transform: translateY(-10px) scale(1.1) rotate(-10deg);
-      }
-      50% {
-        transform: translateY(0) scale(1.15) rotate(10deg);
-      }
-      75% {
-        transform: translateY(-5px) scale(1.1) rotate(-5deg);
-      }
-    }
-    
-    /* Text glow animation on hover */
-    .winners-table tbody tr:hover td:nth-child(2) {
-      animation: textGlow 1s ease-in-out infinite alternate;
-    }
-    
-    @keyframes textGlow {
-      0% {
-        text-shadow: 0 0 5px rgba(251, 191, 36, 0.5);
-      }
-      100% {
-        text-shadow: 0 0 15px rgba(251, 191, 36, 0.8),
-                     0 0 25px rgba(245, 158, 11, 0.5);
-      }
-    }
-    
-    /* Wave animation for table */
-    @keyframes wave {
-      0%, 100% {
-        transform: translateY(0px);
-      }
-      50% {
-        transform: translateY(-3px);
-      }
-    }
-    
-    .winners-table tbody td {
-      animation: wave 3s ease-in-out infinite;
-    }
-    
-    .winners-table tbody tr:nth-child(1) td { animation-delay: 0s; }
-    .winners-table tbody tr:nth-child(2) td { animation-delay: 0.1s; }
-    .winners-table tbody tr:nth-child(3) td { animation-delay: 0.2s; }
-    .winners-table tbody tr:nth-child(4) td { animation-delay: 0.3s; }
-    .winners-table tbody tr:nth-child(5) td { animation-delay: 0.4s; }
-    .winners-table tbody tr:nth-child(6) td { animation-delay: 0.5s; }
-    .winners-table tbody tr:nth-child(7) td { animation-delay: 0.6s; }
-    .winners-table tbody tr:nth-child(8) td { animation-delay: 0.7s; }
-    .winners-table tbody tr:nth-child(9) td { animation-delay: 0.8s; }
-    .winners-table tbody tr:nth-child(10) td { animation-delay: 0.9s; }
-    
-    /* Confetti animation on table load */
-    @keyframes confettiDrop {
-      0% {
-        transform: translateY(-100vh) rotate(0deg);
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(100vh) rotate(720deg);
-        opacity: 0;
-      }
-    }
-    
-    /* Shooting star effect across table */
-    .carousel-content::after {
-      content: '⭐';
-      position: absolute;
-      top: 20%;
-      left: -50px;
-      font-size: 24px;
-      opacity: 0;
-      animation: shootingStar 4s ease-in-out 1s infinite;
-      pointer-events: none;
-    }
-    
-    @keyframes shootingStar {
-      0% {
-        left: -50px;
-        top: 20%;
-        opacity: 0;
-      }
-      10% {
-        opacity: 1;
-      }
-      90% {
-        opacity: 1;
-      }
-      100% {
-        left: 110%;
-        top: 80%;
-        opacity: 0;
-      }
-    }
-    
-    /* Pulsing border on carousel */
-    .carousel-content.loaded {
-      animation: contentPulse 2s ease-in-out infinite;
-    }
-    
-    @keyframes contentPulse {
-      0%, 100% {
-        box-shadow: 
-          0 20px 60px rgba(0, 0, 0, 0.5),
-          0 0 0 4px rgba(255, 215, 0, 0.3),
-          0 0 40px rgba(255, 215, 0, 0.2);
-      }
-      50% {
-        box-shadow: 
-          0 20px 60px rgba(0, 0, 0, 0.5),
-          0 0 0 4px rgba(255, 215, 0, 0.6),
-          0 0 60px rgba(255, 215, 0, 0.4);
-      }
-    }
-    
-    /* Rotating gradient on top winner badges */
-    .rank-1::before {
-      content: '';
-      position: absolute;
-      inset: -4px;
-      border-radius: 50%;
-      background: conic-gradient(
-        from 0deg,
-        #ffd700,
-        #ffed4e,
-        #ffd700,
-        #fbbf24,
-        #ffd700
-      );
-      animation: rotateBadge 3s linear infinite;
-      z-index: -1;
-      opacity: 0.5;
-    }
-    
-    @keyframes rotateBadge {
-      0% {
-        transform: rotate(0deg);
-      }
-      100% {
-        transform: rotate(360deg);
-      }
-    }
     
     .control-button {
       background: linear-gradient(135deg, #facc15 0%, #f59e0b 100%);
@@ -1104,36 +607,31 @@
         const district = winner['District'] || '-';
         const headquarter = winner['Headquater'] || '-';
         
-        const isTopThree = globalIndex < 3;
-        const celebrationEmoji = isTopThree ? ['🎆', '🎇', '🌟'][globalIndex] : '';
-        
         return `
-          <tr class="${isTopThree ? 'top-winner' : ''}">
+          <tr>
             <td style="text-align: center;">
               <div class="rank-badge ${getRankClass(globalIndex)}">
                 ${rankNum <= 3 ? ['🥇', '🥈', '🥉'][globalIndex] : rankNum}
               </div>
             </td>
-            <td style="font-weight: 600;">
-              ${isTopThree ? celebrationEmoji + ' ' : ''}${farmerName}
-            </td>
+            <td>${farmerName}</td>
             <td>${mobile}</td>
             <td>${district}</td>
-            <td style="font-weight: 600; color: #8b5cf6;">${headquarter}</td>
+            <td>${headquarter}</td>
           </tr>
         `;
       }).join('');
       
       return `
-        <div class="table-title">🎊 LUCKY DRAW WINNERS 🎊</div>
+        <div class="table-title">🏆 LUCKY DRAW WINNERS 🏆</div>
         <table class="winners-table">
           <thead>
             <tr>
-              <th style="width: 80px; text-align: center;">🎯 SR. NO.</th>
-              <th>👨‍🌾 FARMER NAME</th>
-              <th>📱 MOBILE NUMBER</th>
-              <th>🏙️ DISTRICT</th>
-              <th>🏢 HEADQUARTER</th>
+              <th style="width: 100px; text-align: center;">SR. NO.</th>
+              <th style="width: 30%;">FARMER NAME</th>
+              <th style="width: 20%;">MOBILE NUMBER</th>
+              <th style="width: 20%;">DISTRICT</th>
+              <th style="width: 20%;">HEADQUARTER</th>
             </tr>
           </thead>
           <tbody>
@@ -1157,63 +655,11 @@
         // Trigger slide in animation
         setTimeout(() => {
           carouselContent.classList.add('loaded');
-          createTableParticles();
         }, 50);
         
         renderDots();
       }, 300);
     }
-    
-    // Create floating particles around the table
-    function createTableParticles() {
-      const container = carouselContent;
-      const particles = ['⭐', '✨', '🎊', '🎉', '💫', '⭐'];
-      
-      for (let i = 0; i < 12; i++) {
-        const particle = document.createElement('div');
-        particle.textContent = particles[Math.floor(Math.random() * particles.length)];
-        particle.style.cssText = `
-          position: absolute;
-          font-size: ${20 + Math.random() * 20}px;
-          pointer-events: none;
-          z-index: 1000;
-          opacity: 0;
-          animation: particleFloat ${3 + Math.random() * 2}s ease-out forwards;
-          left: ${Math.random() * 100}%;
-          top: ${Math.random() * 100}%;
-        `;
-        
-        container.appendChild(particle);
-        
-        setTimeout(() => {
-          if (particle.parentNode) {
-            particle.parentNode.removeChild(particle);
-          }
-        }, 5000);
-      }
-    }
-    
-    // Add particle animation style dynamically
-    const particleStyle = document.createElement('style');
-    particleStyle.textContent = `
-      @keyframes particleFloat {
-        0% {
-          opacity: 0;
-          transform: translate(0, 0) scale(0) rotate(0deg);
-        }
-        20% {
-          opacity: 1;
-        }
-        80% {
-          opacity: 1;
-        }
-        100% {
-          opacity: 0;
-          transform: translate(${Math.random() * 200 - 100}px, ${Math.random() * 200 - 100}px) scale(1.5) rotate(720deg);
-        }
-      }
-    `;
-    document.head.appendChild(particleStyle);
 
     function renderDots() {
       carouselDots.innerHTML = "";
