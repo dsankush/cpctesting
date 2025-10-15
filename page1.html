@@ -256,15 +256,32 @@
     
     .carousel-content {
       border-radius: 16px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      box-shadow: 
+        0 10px 40px rgba(0, 0, 0, 0.4),
+        0 0 0 3px rgba(251, 191, 36, 0.3);
       transition: all 0.4s ease;
       opacity: 0;
       transform: translateX(50px) scale(0.95);
       background: #ffffff;
       padding: 0;
       overflow: hidden;
-      max-width: 1100px;
+      max-width: 850px;
       width: 100%;
+      max-height: 65vh;
+      overflow-y: auto;
+    }
+    
+    .carousel-content::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .carousel-content::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    
+    .carousel-content::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      border-radius: 10px;
     }
     
     .carousel-content.loaded {
@@ -282,18 +299,36 @@
       transform: translateX(80px) scale(0.8);
     }
     
-    /* Winners Table in Carousel - PROFESSIONAL LUCKY DRAW THEME */
+    /* Winners Table in Carousel - QUIRKY LUCKY DRAW THEME */
     .table-title {
-      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-      padding: 28px;
+      background: linear-gradient(135deg, #ec4899 0%, #f97316 50%, #eab308 100%);
+      padding: 20px;
       text-align: center;
       color: white;
-      font-size: 32px;
-      font-weight: 800;
-      border-radius: 16px 16px 0 0;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-      letter-spacing: 1px;
+      font-size: 26px;
+      font-weight: 900;
+      border-radius: 12px 12px 0 0;
+      text-shadow: 
+        2px 2px 0 rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(255, 215, 0, 0.5);
+      letter-spacing: 2px;
       border-bottom: 4px solid #fbbf24;
+      position: relative;
+      animation: titleShine 3s ease-in-out infinite;
+    }
+    
+    @keyframes titleShine {
+      0%, 100% {
+        text-shadow: 
+          2px 2px 0 rgba(0, 0, 0, 0.3),
+          0 0 20px rgba(255, 215, 0, 0.5);
+      }
+      50% {
+        text-shadow: 
+          2px 2px 0 rgba(0, 0, 0, 0.3),
+          0 0 30px rgba(255, 215, 0, 0.8),
+          0 0 40px rgba(255, 165, 0, 0.6);
+      }
     }
     
     .winners-table {
@@ -302,141 +337,211 @@
     }
     
     .winners-table thead {
-      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      background: linear-gradient(135deg, #7c3aed 0%, #6366f1 50%, #3b82f6 100%);
+      background-size: 200% 100%;
+      animation: headerSlide 4s linear infinite;
+    }
+    
+    @keyframes headerSlide {
+      0% {
+        background-position: 0% 50%;
+      }
+      100% {
+        background-position: 200% 50%;
+      }
     }
     
     .winners-table thead th {
-      padding: 20px 16px;
+      padding: 14px 12px;
       text-align: left;
       color: #fff;
       font-weight: 700;
-      font-size: 16px;
+      font-size: 14px;
       text-transform: uppercase;
       border-bottom: 3px solid #fbbf24;
       letter-spacing: 0.5px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
     
     .winners-table tbody tr {
       background: #ffffff;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
       border-left: 4px solid transparent;
     }
     
     .winners-table tbody tr:nth-child(even) {
-      background: #f8fafc;
+      background: linear-gradient(90deg, #fefce8 0%, #fffbeb 100%);
     }
     
     .winners-table tbody tr:hover {
-      background: #fef3c7;
+      background: linear-gradient(90deg, #fef3c7 0%, #fde68a 50%, #fef3c7 100%);
       border-left: 4px solid #f59e0b;
+      transform: translateX(5px);
+      box-shadow: -4px 0 0 #f59e0b, 0 4px 12px rgba(245, 158, 11, 0.3);
     }
     
     .winners-table tbody td {
-      padding: 18px 16px;
-      border-bottom: 1px solid #e5e7eb;
-      font-size: 16px;
+      padding: 12px;
+      border-bottom: 1px solid rgba(251, 191, 36, 0.2);
+      font-size: 15px;
       color: #1f2937;
       font-weight: 500;
     }
     
-    /* Highlight top 3 winners */
+    /* Highlight top 3 winners with quirky style */
     .winners-table tbody tr:first-child,
     .winners-table tbody tr:nth-child(2),
     .winners-table tbody tr:nth-child(3) {
-      background: #fef3c7;
-      border-left: 5px solid #f59e0b;
+      background: linear-gradient(90deg, #fef9c3 0%, #fef3c7 50%, #fef9c3 100%);
+      border-left: 5px solid #eab308;
       font-weight: 600;
+      animation: topWinnerPulse 2s ease-in-out infinite;
     }
     
-    .winners-table tbody tr:first-child {
-      background: #fef9c3;
-      border-left: 5px solid #eab308;
+    @keyframes topWinnerPulse {
+      0%, 100% {
+        box-shadow: 0 0 0 rgba(234, 179, 8, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 15px rgba(234, 179, 8, 0.4);
+      }
     }
     
     .rank-badge {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 48px;
-      height: 48px;
-      border-radius: 8px;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
       font-weight: 800;
-      font-size: 18px;
+      font-size: 16px;
+      border: 3px solid;
+      transform: rotate(-10deg);
+      transition: transform 0.3s ease;
+    }
+    
+    .rank-badge:hover {
+      transform: rotate(0deg) scale(1.1);
     }
     
     .rank-1 {
-      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      background: linear-gradient(135deg, #ffd700 0%, #fbbf24 100%);
       color: #78350f;
-      box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
+      border-color: #eab308;
+      box-shadow: 0 4px 15px rgba(251, 191, 36, 0.5);
+      animation: badgeBounce 2s ease-in-out infinite;
     }
     
     .rank-2 {
-      background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
-      color: white;
-      box-shadow: 0 4px 12px rgba(100, 116, 139, 0.4);
+      background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
+      color: #1e293b;
+      border-color: #64748b;
+      box-shadow: 0 4px 15px rgba(100, 116, 139, 0.5);
+      animation: badgeBounce 2s ease-in-out infinite 0.2s;
     }
     
     .rank-3 {
-      background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
-      color: white;
-      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+      background: linear-gradient(135deg, #fdba74 0%, #fb923c 100%);
+      color: #7c2d12;
+      border-color: #f97316;
+      box-shadow: 0 4px 15px rgba(249, 115, 22, 0.5);
+      animation: badgeBounce 2s ease-in-out infinite 0.4s;
     }
     
     .rank-default {
-      background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+      background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
       color: white;
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+      border-color: #7c3aed;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+    }
+    
+    @keyframes badgeBounce {
+      0%, 100% {
+        transform: rotate(-10deg) translateY(0);
+      }
+      50% {
+        transform: rotate(-10deg) translateY(-5px);
+      }
     }
     
     
     .control-button {
       background: linear-gradient(135deg, #facc15 0%, #f59e0b 100%);
-      border: 2px solid #f59e0b;
-      color: #1f2937;
-      font-weight: 700;
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(250, 204, 21, 0.3);
+      border: 3px solid #fff;
+      color: #78350f;
+      font-weight: 800;
+      padding: 12px 24px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(250, 204, 21, 0.4);
       transition: all 0.3s ease;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
       cursor: pointer;
+      font-size: 16px;
     }
     
     .control-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(250, 204, 21, 0.4);
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(250, 204, 21, 0.6);
+      animation: buttonWiggle 0.5s ease-in-out infinite;
+    }
+    
+    @keyframes buttonWiggle {
+      0%, 100% {
+        transform: translateY(-3px) scale(1.05) rotate(-1deg);
+      }
+      50% {
+        transform: translateY(-3px) scale(1.05) rotate(1deg);
+      }
     }
     
     .close-button {
-      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-      border: 2px solid #1d4ed8;
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      border: 3px solid #fff;
       color: white;
-      font-weight: 700;
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+      font-weight: 800;
+      padding: 12px 24px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
       transition: all 0.3s ease;
       cursor: pointer;
+      font-size: 16px;
     }
     
     .close-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(239, 68, 68, 0.6);
     }
     
     .dot-indicator {
       transition: all 0.3s ease;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
       cursor: pointer;
+      border: 2px solid #fff;
     }
     
     .dot-indicator.active {
-      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-      transform: scale(1.2);
+      background: linear-gradient(135deg, #f59e0b 0%, #eab308 100%);
+      transform: scale(1.4);
+      box-shadow: 0 4px 12px rgba(251, 191, 36, 0.6);
+      animation: dotPulse 1s ease-in-out infinite;
+    }
+    
+    @keyframes dotPulse {
+      0%, 100% {
+        box-shadow: 0 4px 12px rgba(251, 191, 36, 0.6);
+      }
+      50% {
+        box-shadow: 0 6px 18px rgba(251, 191, 36, 0.9);
+      }
     }
     
     .dot-indicator:not(.active) {
-      background: rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.4);
+    }
+    
+    .dot-indicator:hover {
+      transform: scale(1.2);
     }
     
     /* Confetti animation */
@@ -505,8 +610,8 @@
     </div>
 
     <!-- Carousel Viewer -->
-    <div id="carouselContainer" class="fixed inset-0 flex items-center justify-center z-30 hidden bg-transparent">
-      <div class="carousel-container p-6 flex flex-col items-center" style="max-width: 1000px; width: 100%;">
+    <div id="carouselContainer" class="fixed inset-0 flex items-center justify-center z-30 hidden bg-transparent" style="padding: 20px;">
+      <div class="carousel-container flex flex-col items-center" style="max-width: 900px; width: 100%; max-height: 90vh;">
         <div id="carouselContent" class="carousel-content w-full"></div>
 
         <!-- Dots Indicator -->
@@ -514,9 +619,9 @@
 
         <!-- Controls -->
         <div class="mt-4 flex gap-4">
-          <button id="prevBtn" class="control-button">‹</button>
-          <button id="nextBtn" class="control-button">›</button>
-          <button id="closeCarousel" class="close-button">Close</button>
+          <button id="prevBtn" class="control-button text-2xl">‹ Prev</button>
+          <button id="closeCarousel" class="close-button">✕ Close</button>
+          <button id="nextBtn" class="control-button text-2xl">Next ›</button>
         </div>
       </div>
     </div>
@@ -623,15 +728,15 @@
       }).join('');
       
       return `
-        <div class="table-title">🏆 LUCKY DRAW WINNERS 🏆</div>
+        <div class="table-title">✨ LUCKY DRAW WINNERS ✨</div>
         <table class="winners-table">
           <thead>
             <tr>
-              <th style="width: 100px; text-align: center;">SR. NO.</th>
-              <th style="width: 30%;">FARMER NAME</th>
-              <th style="width: 20%;">MOBILE NUMBER</th>
-              <th style="width: 20%;">DISTRICT</th>
-              <th style="width: 20%;">HEADQUARTER</th>
+              <th style="width: 90px; text-align: center;">🎯 SR. NO.</th>
+              <th style="width: 28%;">👨‍🌾 FARMER NAME</th>
+              <th style="width: 22%;">📱 MOBILE</th>
+              <th style="width: 20%;">🏙️ DISTRICT</th>
+              <th style="width: 20%;">🏢 HQ</th>
             </tr>
           </thead>
           <tbody>
