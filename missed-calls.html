@@ -241,6 +241,18 @@
       font-weight:800;
       text-transform:uppercase;
       letter-spacing:1px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .filter-count{
+      font-size:10px;
+      background:linear-gradient(135deg, var(--acc1), var(--acc3));
+      color:white;
+      padding:2px 8px;
+      border-radius:10px;
+      font-weight:700;
+      margin-left:8px;
     }
     .filter-group input,
     .filter-group select{
@@ -569,52 +581,65 @@
       
       <div class="filters-grid">
         <div class="filter-group">
-          <label>Digitrack No</label>
+          <label>
+            <span>📱 Digitrack No</span>
+            <span class="filter-count" id="digitrackCount">0</span>
+          </label>
           <select id="filterDigitrack">
             <option value="">All Digitrack Numbers</option>
           </select>
         </div>
         <div class="filter-group">
-          <label>State</label>
+          <label>
+            <span>🗺️ State</span>
+            <span class="filter-count" id="stateCount">0</span>
+          </label>
           <select id="filterState">
             <option value="">All States</option>
           </select>
         </div>
         <div class="filter-group">
-          <label>HQ</label>
+          <label>
+            <span>🏢 HQ</span>
+            <span class="filter-count" id="hqCount">0</span>
+          </label>
           <select id="filterHQ">
             <option value="">All HQs</option>
           </select>
         </div>
         <div class="filter-group">
-          <label>Division/PT District</label>
+          <label>
+            <span>📍 District</span>
+            <span class="filter-count" id="districtCount">0</span>
+          </label>
           <select id="filterDistrict">
             <option value="">All Districts</option>
           </select>
         </div>
         <div class="filter-group">
-          <label>Zone</label>
+          <label>
+            <span>🌐 Zone</span>
+            <span class="filter-count" id="zoneCount">0</span>
+          </label>
           <select id="filterZone">
             <option value="">All Zones</option>
           </select>
         </div>
         <div class="filter-group">
           <label>📅 Date Range</label>
-          <input type="text" id="filterDateRange" placeholder="Select date range" readonly style="cursor:pointer;">
+          <input type="text" id="filterDateRange" placeholder="Click to select date range" readonly style="cursor:pointer;">
         </div>
       </div>
       
       <div class="filter-actions">
-        <button class="btn btn-primary" id="applyFiltersBtn">Apply Filters</button>
-        <button class="btn btn-secondary" id="resetFiltersBtn">Reset</button>
+        <button class="btn btn-secondary" id="resetFiltersBtn">🔄 Reset All Filters</button>
       </div>
     </div>
 
     <!-- Universal Search -->
     <div class="search-section">
       <div class="search-box">
-        <input type="text" class="search-input" id="universalSearch" placeholder="🔍 Universal Search - Search across all columns...">
-        <button class="btn btn-primary" id="searchBtn">Search</button>
+        <input type="text" class="search-input" id="universalSearch" placeholder="🔍 Universal Search - Search across all columns (auto-search as you type)...">
       </div>
     </div>
 
@@ -696,25 +721,82 @@
       }
     });
 
-    // Populate filter dropdowns
-    function populateFilters(){
-      const digitracks = [...new Set(MC_DATA.map(r => r['Digitrack No']).filter(Boolean))].sort();
-      const states = [...new Set(MC_DATA.map(r => r.State).filter(Boolean))].sort();
-      const hqs = [...new Set(MC_DATA.map(r => r.HQ).filter(Boolean))].sort();
-      const districts = [...new Set(MC_DATA.map(r => r['Division/PT District']).filter(Boolean))].sort();
-      const zones = [...new Set(MC_DATA.map(r => r.ZONE).filter(Boolean))].sort();
+    // Populate filter dropdowns with cascading logic
+    function populateFilters(preserveFilters = false){
+      // Get current filter values
+      const currentFilters = {
+        digitrack: document.getElementById('filterDigitrack').value,
+        state: document.getElementById('filterState').value,
+        hq: document.getElementById('filterHQ').value,
+        district: document.getElementById('filterDistrict').value,
+        zone: document.getElementById('filterZone').value
+      };
+
+      // Start with all data or filtered data
+      let baseData = [...MC_DATA];
       
-      populateSelect('filterDigitrack', digitracks);
-      populateSelect('filterState', states);
-      populateSelect('filterHQ', hqs);
-      populateSelect('filterDistrict', districts);
-      populateSelect('filterZone', zones);
+      // Apply date range filter to base data first
+      if(window.dateRangePicker && window.dateRangePicker.selectedDates.length === 2){
+        const dates = window.dateRangePicker.selectedDates;
+        const dateFrom = formatDateYYYYMMDD(dates[0]);
+        const dateTo = formatDateYYYYMMDD(dates[1]);
+        
+        baseData = baseData.filter(row => {
+          const rowDate = row['Date Processed'];
+          return rowDate && rowDate >= dateFrom && rowDate <= dateTo;
+        });
+      }
+
+      // For each filter, get available options based on other selected filters
+      // Digitrack options based on other filters (except digitrack itself)
+      let digitrackData = baseData;
+      if(currentFilters.state) digitrackData = digitrackData.filter(r => r.State === currentFilters.state);
+      if(currentFilters.hq) digitrackData = digitrackData.filter(r => r.HQ === currentFilters.hq);
+      if(currentFilters.district) digitrackData = digitrackData.filter(r => r['Division/PT District'] === currentFilters.district);
+      if(currentFilters.zone) digitrackData = digitrackData.filter(r => r.ZONE === currentFilters.zone);
+      const digitracks = [...new Set(digitrackData.map(r => r['Digitrack No']).filter(Boolean))].sort();
+
+      // State options
+      let stateData = baseData;
+      if(currentFilters.digitrack) stateData = stateData.filter(r => r['Digitrack No'] === currentFilters.digitrack);
+      if(currentFilters.hq) stateData = stateData.filter(r => r.HQ === currentFilters.hq);
+      if(currentFilters.district) stateData = stateData.filter(r => r['Division/PT District'] === currentFilters.district);
+      if(currentFilters.zone) stateData = stateData.filter(r => r.ZONE === currentFilters.zone);
+      const states = [...new Set(stateData.map(r => r.State).filter(Boolean))].sort();
+
+      // HQ options
+      let hqData = baseData;
+      if(currentFilters.digitrack) hqData = hqData.filter(r => r['Digitrack No'] === currentFilters.digitrack);
+      if(currentFilters.state) hqData = hqData.filter(r => r.State === currentFilters.state);
+      if(currentFilters.district) hqData = hqData.filter(r => r['Division/PT District'] === currentFilters.district);
+      if(currentFilters.zone) hqData = hqData.filter(r => r.ZONE === currentFilters.zone);
+      const hqs = [...new Set(hqData.map(r => r.HQ).filter(Boolean))].sort();
+
+      // District options
+      let districtData = baseData;
+      if(currentFilters.digitrack) districtData = districtData.filter(r => r['Digitrack No'] === currentFilters.digitrack);
+      if(currentFilters.state) districtData = districtData.filter(r => r.State === currentFilters.state);
+      if(currentFilters.hq) districtData = districtData.filter(r => r.HQ === currentFilters.hq);
+      if(currentFilters.zone) districtData = districtData.filter(r => r.ZONE === currentFilters.zone);
+      const districts = [...new Set(districtData.map(r => r['Division/PT District']).filter(Boolean))].sort();
+
+      // Zone options
+      let zoneData = baseData;
+      if(currentFilters.digitrack) zoneData = zoneData.filter(r => r['Digitrack No'] === currentFilters.digitrack);
+      if(currentFilters.state) zoneData = zoneData.filter(r => r.State === currentFilters.state);
+      if(currentFilters.hq) zoneData = zoneData.filter(r => r.HQ === currentFilters.hq);
+      if(currentFilters.district) zoneData = zoneData.filter(r => r['Division/PT District'] === currentFilters.district);
+      const zones = [...new Set(zoneData.map(r => r.ZONE).filter(Boolean))].sort();
+      
+      populateSelect('filterDigitrack', digitracks, preserveFilters ? currentFilters.digitrack : '');
+      populateSelect('filterState', states, preserveFilters ? currentFilters.state : '');
+      populateSelect('filterHQ', hqs, preserveFilters ? currentFilters.hq : '');
+      populateSelect('filterDistrict', districts, preserveFilters ? currentFilters.district : '');
+      populateSelect('filterZone', zones, preserveFilters ? currentFilters.zone : '');
     }
 
-    function populateSelect(id, options){
+    function populateSelect(id, options, valueToSet){
       const select = document.getElementById(id);
-      const currentValue = select.value;
-      const label = select.previousElementSibling.textContent;
       
       if(id === 'filterDigitrack'){
         select.innerHTML = '<option value="">All Digitrack Numbers</option>';
@@ -736,10 +818,31 @@
         option.textContent = opt;
         select.appendChild(option);
       });
-      if(currentValue) select.value = currentValue;
+      
+      // Update count badge
+      const countMap = {
+        'filterDigitrack': 'digitrackCount',
+        'filterState': 'stateCount',
+        'filterHQ': 'hqCount',
+        'filterDistrict': 'districtCount',
+        'filterZone': 'zoneCount'
+      };
+      
+      if(countMap[id]){
+        const countEl = document.getElementById(countMap[id]);
+        if(countEl) countEl.textContent = options.length;
+      }
+      
+      // Set value if provided and exists in options
+      if(valueToSet && options.includes(valueToSet)){
+        select.value = valueToSet;
+      } else if(valueToSet && !options.includes(valueToSet)){
+        // Value was set but no longer valid, clear it
+        select.value = '';
+      }
     }
 
-    // Apply filters
+    // Apply filters (called automatically on any filter change)
     function applyFilters(){
       const digitrack = document.getElementById('filterDigitrack').value;
       const state = document.getElementById('filterState').value;
@@ -756,7 +859,7 @@
         dateTo = formatDateYYYYMMDD(dates[1]);
       }
 
-      console.log('🔍 Applying filters:', { digitrack, state, hq, district, zone, dateFrom, dateTo });
+      console.log('🔍 Auto-applying filters:', { digitrack, state, hq, district, zone, dateFrom, dateTo });
 
       FILTERED_DATA = MC_DATA.filter(row => {
         // Digitrack filter
@@ -789,6 +892,11 @@
       console.log('✅ Filtered results:', FILTERED_DATA.length, 'records');
 
       CURRENT_PAGE = 1;
+      
+      // Update cascading filters
+      populateFilters(true);
+      
+      // Update display
       render();
     }
 
@@ -800,20 +908,50 @@
       return `${year}-${month}-${day}`;
     }
 
-    // Universal search
+    // Universal search (auto-search with debounce)
+    let searchTimeout;
     function universalSearch(){
-      const query = document.getElementById('universalSearch').value.toLowerCase();
-      if(!query){
-        FILTERED_DATA = [...MC_DATA];
-      } else {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        const query = document.getElementById('universalSearch').value.toLowerCase().trim();
+        
+        // First apply all other filters
+        const digitrack = document.getElementById('filterDigitrack').value;
+        const state = document.getElementById('filterState').value;
+        const hq = document.getElementById('filterHQ').value;
+        const district = document.getElementById('filterDistrict').value;
+        const zone = document.getElementById('filterZone').value;
+        
+        let dateFrom = null;
+        let dateTo = null;
+        if(window.dateRangePicker && window.dateRangePicker.selectedDates.length === 2){
+          const dates = window.dateRangePicker.selectedDates;
+          dateFrom = formatDateYYYYMMDD(dates[0]);
+          dateTo = formatDateYYYYMMDD(dates[1]);
+        }
+
         FILTERED_DATA = MC_DATA.filter(row => {
-          return Object.values(row).some(val => 
-            String(val).toLowerCase().includes(query)
-          );
+          if(digitrack && row['Digitrack No'] !== digitrack) return false;
+          if(state && row.State !== state) return false;
+          if(hq && row.HQ !== hq) return false;
+          if(district && row['Division/PT District'] !== district) return false;
+          if(zone && row.ZONE !== zone) return false;
+          if(dateFrom && dateTo){
+            const rowDate = row['Date Processed'];
+            if(!rowDate || rowDate < dateFrom || rowDate > dateTo) return false;
+          }
+          
+          // Then filter by search query
+          if(query){
+            return Object.values(row).some(val => String(val).toLowerCase().includes(query));
+          }
+          
+          return true;
         });
-      }
-      CURRENT_PAGE = 1;
-      render();
+        
+        CURRENT_PAGE = 1;
+        render();
+      }, 300); // 300ms debounce
     }
 
     // Reset filters
@@ -833,6 +971,10 @@
       
       FILTERED_DATA = [...MC_DATA];
       CURRENT_PAGE = 1;
+      
+      // Repopulate filters with all options
+      populateFilters(false);
+      
       render();
     }
 
@@ -1098,24 +1240,46 @@
       alert(`✅ Downloaded ${dataToExport.length} records to ${filename}`);
     }
 
-    // Initialize flatpickr for date range
+    // Initialize flatpickr for date range (auto-apply on change)
     window.dateRangePicker = flatpickr("#filterDateRange", {
       mode: "range",
       dateFormat: "Y-m-d",
       maxDate: "today",
       onChange: function(selectedDates, dateStr, instance) {
         console.log('📅 Date range selected:', dateStr);
+        // Auto-apply when both dates are selected
+        if(selectedDates.length === 2){
+          applyFilters();
+        }
+      },
+      onClose: function(selectedDates, dateStr, instance) {
+        // Also apply when calendar is closed (in case user selected range and clicked away)
+        if(selectedDates.length === 2){
+          applyFilters();
+        }
       }
     });
 
-    // Event listeners
-    document.getElementById('applyFiltersBtn').onclick = applyFilters;
-    document.getElementById('resetFiltersBtn').onclick = resetFilters;
-    document.getElementById('searchBtn').onclick = universalSearch;
-    document.getElementById('universalSearch').onkeypress = (e) => {
-      if(e.key === 'Enter') universalSearch();
-    };
-    document.getElementById('downloadBtn').onclick = downloadExcel;
+    // Attach change handlers to all filters (auto-apply)
+    function attachFilterHandlers(){
+      document.getElementById('filterDigitrack').onchange = applyFilters;
+      document.getElementById('filterState').onchange = applyFilters;
+      document.getElementById('filterHQ').onchange = applyFilters;
+      document.getElementById('filterDistrict').onchange = applyFilters;
+      document.getElementById('filterZone').onchange = applyFilters;
+      
+      // Universal search with auto-search
+      document.getElementById('universalSearch').oninput = universalSearch;
+      
+      // Reset button
+      document.getElementById('resetFiltersBtn').onclick = resetFilters;
+      
+      // Download button
+      document.getElementById('downloadBtn').onclick = downloadExcel;
+    }
+
+    // Call after DOM is ready
+    attachFilterHandlers();
   </script>
 </body>
 </html>
