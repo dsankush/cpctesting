@@ -779,6 +779,21 @@
       carouselContainer.classList.add("hidden");
       initialButtonContainer.classList.remove("hidden");
     });
+
+    // Add click event to carousel image - navigate to prize page when image is clicked
+    carouselImage.addEventListener("click", () => {
+      // When first carousel item (w1.jpg) is clicked, navigate to page1.html
+      if (carouselItems[currentIndex] === "w1.jpg") {
+        window.location.href = "page1.html";
+      }
+      // Add more conditions for other prize pages if needed
+      // else if (carouselItems[currentIndex] === "w2.jpg") {
+      //   window.location.href = "page2.html";
+      // }
+      // else if (carouselItems[currentIndex] === "w3.jpg") {
+      //   window.location.href = "page3.html";
+      // }
+    });
   </script>
 </body>
 </html>

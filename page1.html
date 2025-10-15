@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prize 1 - Winner Announcement</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #000;
+    }
+    
+    .full-page {
+      width: 100vw;
+      height: 100vh;
+      background:
+        url("b2.jpg") top center / 100% 50% no-repeat,
+        url("b1.jpg") bottom center / 100% 50% no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      background-attachment: fixed;
+    }
+    
+    /* Professional overlay for better contrast */
+    .full-page::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.2) 0%,
+        rgba(0, 0, 0, 0.1) 40%,
+        rgba(0, 0, 0, 0.3) 100%
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .glow-effect {
+      animation: glow 1.2s ease-in-out infinite alternate, float 1.2s ease-in-out infinite;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      will-change: transform;
+      display: inline-block;
+      filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+    }
+
+    .glow-effect:hover {
+      transform: scale(1.08);
+      filter: drop-shadow(0 0 16px rgba(255, 215, 0, 0.8)) drop-shadow(0 0 24px rgba(255, 165, 0, 0.6));
+    }
+
+    @keyframes glow {
+      0% {
+        filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6))
+                drop-shadow(0 0 16px rgba(255, 165, 0, 0.4))
+                drop-shadow(0 0 24px rgba(255, 140, 0, 0.3));
+      }
+      100% {
+        filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.8))
+                drop-shadow(0 0 24px rgba(255, 165, 0, 0.6))
+                drop-shadow(0 0 36px rgba(255, 140, 0, 0.4));
+      }
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(3600deg); }
+    }
+
+    .spin-animation {
+      animation: spin 5.5s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+    }
+
+    /* Professional Spinning Wheel */
+    .fantastic-wheel {
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      position: relative;
+      background: conic-gradient(
+        from 0deg,
+        #1e40af 0deg 51.43deg,
+        #dc2626 51.43deg 102.86deg,
+        #059669 102.86deg 154.29deg,
+        #d97706 154.29deg 205.71deg,
+        #7c3aed 205.71deg 257.14deg,
+        #be185d 257.14deg 308.57deg,
+        #0891b2 308.57deg 360deg
+      );
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 0 0 4px #fff,
+        0 0 0 8px #e5e7eb,
+        inset 0 0 20px rgba(255, 255, 255, 0.1);
+      border: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .fantastic-wheel:hover {
+      transform: scale(1.05);
+      box-shadow: 
+        0 12px 48px rgba(0, 0, 0, 0.4),
+        0 0 0 4px #fff,
+        0 0 0 8px #d1d5db,
+        inset 0 0 25px rgba(255, 255, 255, 0.15);
+    }
+
+    .wheel-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      border-radius: 50%;
+      border: 4px solid #fff;
+      box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.2),
+        inset 0 2px 4px rgba(255, 255, 255, 0.8),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 12px;
+      color: #374151;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+      letter-spacing: 1px;
+    }
+
+    .wheel-pointer {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 40px solid #dc2626;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+      z-index: 10;
+    }
+
+    .wheel-pointer::after {
+      content: '';
+      position: absolute;
+      top: 35px;
+      left: -15px;
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-bottom: 25px solid #fff;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    }
+
+    .wheel-segments {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+
+    .wheel-segment {
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      top: 0;
+      left: 50%;
+      transform-origin: 0 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wheel-segment:nth-child(1) { transform: rotate(0deg); }
+    .wheel-segment:nth-child(2) { transform: rotate(51.43deg); }
+    .wheel-segment:nth-child(3) { transform: rotate(102.86deg); }
+    .wheel-segment:nth-child(4) { transform: rotate(154.29deg); }
+    .wheel-segment:nth-child(5) { transform: rotate(205.71deg); }
+    .wheel-segment:nth-child(6) { transform: rotate(257.14deg); }
+    .wheel-segment:nth-child(7) { transform: rotate(308.57deg); }
+
+    .wheel-symbol {
+      font-size: 28px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+
+    /* Professional spin animation */
+    @keyframes professionalSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(3600deg); }
+    }
+
+    .professional-spin {
+      animation: professionalSpin 4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+
+    .shiny-home {
+      background: linear-gradient(135deg, #facc15 0%, #f59e0b 50%, #d97706 100%);
+      border: 2px solid #f59e0b;
+      color: #1f2937;
+      font-weight: 700;
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(250, 204, 21, 0.4), 0 0 20px rgba(245, 158, 11, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      animation: pulseGlow 1.5s infinite alternate;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      letter-spacing: 0.5px;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .shiny-home:hover {
+      transform: scale(1.05) translateY(-2px);
+      box-shadow: 0 6px 24px rgba(250, 204, 21, 0.5), 0 0 30px rgba(245, 158, 11, 0.4), 0 0 40px rgba(217, 119, 6, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+
+    @keyframes pulseGlow {
+      0% {
+        box-shadow: 0 4px 16px rgba(250, 204, 21, 0.4), 0 0 20px rgba(245, 158, 11, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      }
+      100% {
+        box-shadow: 0 6px 24px rgba(250, 204, 21, 0.5), 0 0 30px rgba(245, 158, 11, 0.4), 0 0 40px rgba(217, 119, 6, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      }
+    }
+    
+    /* Enhanced carousel styling */
+    .carousel-container {
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      padding: 2rem;
+      max-width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    .winner-card {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.1) 100%);
+      border: 2px solid rgba(59, 130, 246, 0.3);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .winner-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(59, 130, 246, 0.3);
+      border-color: rgba(59, 130, 246, 0.5);
+    }
+
+    .winner-title {
+      color: #facc15;
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .winner-info {
+      color: #fff;
+      font-size: 0.95rem;
+      line-height: 1.8;
+    }
+
+    .winner-info strong {
+      color: #facc15;
+      font-weight: 700;
+    }
+    
+    .control-button {
+      background: linear-gradient(135deg, #facc15 0%, #f59e0b 100%);
+      border: 2px solid #f59e0b;
+      color: #1f2937;
+      font-weight: 700;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(250, 204, 21, 0.3);
+      transition: all 0.3s ease;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      font-size: 1.1rem;
+    }
+    
+    .control-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(250, 204, 21, 0.4);
+    }
+
+    .control-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .close-button {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      border: 2px solid #1d4ed8;
+      color: white;
+      font-weight: 700;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+      transition: all 0.3s ease;
+    }
+    
+    .close-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    }
+    
+    .dot-indicator {
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    
+    .dot-indicator.active {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      transform: scale(1.3);
+    }
+    
+    .dot-indicator:not(.active) {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .loading {
+      color: #facc15;
+      font-size: 1.2rem;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .batch-info {
+      color: #facc15;
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    
+  </style>
+</head>
+<body class="m-0 p-0 overflow-hidden">
+  <div class="full-page">
+    <a href="lucky-draw.html" class="absolute top-10 left-10 shiny-home z-30">
+      ← Back
+    </a>
+
+    <!-- Start Button -->
+    <div id="initialButtonContainer" class="absolute bottom-10 left-1/2 -translate-x-1/2 z-20">
+      <button id="startButton" class="focus:outline-none">
+        <img src="bt1.jpg" class="w-[220px] h-auto object-contain select-none glow-effect" />
+      </button>
+    </div>
+
+    <!-- Fantastic Spinning Wheel -->
+    <div id="wheelContainer" class="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 hidden">
+      <button id="wheelButton" class="relative">
+        <div id="wheelImage" class="fantastic-wheel">
+          <!-- Wheel Pointer -->
+          <div class="wheel-pointer"></div>
+          
+          <!-- Wheel Segments -->
+          <div class="wheel-segments">
+            <div class="wheel-segment">
+              <div class="wheel-symbol">⭐</div>
+            </div>
+            <div class="wheel-segment">
+              <div class="wheel-symbol">💎</div>
+            </div>
+            <div class="wheel-segment">
+              <div class="wheel-symbol">🏆</div>
+            </div>
+            <div class="wheel-segment">
+              <div class="wheel-symbol">🎁</div>
+            </div>
+            <div class="wheel-segment">
+              <div class="wheel-symbol">💰</div>
+            </div>
+            <div class="wheel-segment">
+              <div class="wheel-symbol">👑</div>
+            </div>
+            <div class="wheel-segment">
+              <div class="wheel-symbol">🎊</div>
+            </div>
+          </div>
+          
+          <!-- Wheel Center -->
+          <div class="wheel-center">SPIN</div>
+        </div>
+      </button>
+    </div>
+
+    <!-- Winner Display Carousel -->
+    <div id="carouselContainer" class="fixed inset-0 flex items-center justify-center z-30 hidden">
+      <div class="carousel-container">
+        <div id="winnerDisplay" class="loading">
+          Loading winners...
+        </div>
+
+        <!-- Dots Indicator -->
+        <div id="carouselDots" class="flex justify-center mt-6 gap-3"></div>
+
+        <!-- Controls -->
+        <div class="mt-6 flex gap-4 justify-center">
+          <button id="prevBtn" class="control-button">‹ Previous</button>
+          <button id="nextBtn" class="control-button">Next ›</button>
+          <button id="closeCarousel" class="close-button">Close</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    const startButton = document.getElementById("startButton");
+    const initialButtonContainer = document.getElementById("initialButtonContainer");
+    const wheelContainer = document.getElementById("wheelContainer");
+    const wheelButton = document.getElementById("wheelButton");
+    const wheelImage = document.getElementById("wheelImage");
+    const carouselContainer = document.getElementById("carouselContainer");
+    const winnerDisplay = document.getElementById("winnerDisplay");
+    const carouselDots = document.getElementById("carouselDots");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const closeCarousel = document.getElementById("closeCarousel");
+
+    let winnersData = [];
+    let batchedData = [];
+    let currentIndex = 0;
+    let hasSpun = false;
+    const BATCH_SIZE = 10;
+
+    // Load winner data from CSV
+    function loadWinnerData() {
+      Papa.parse('w1d.csv', {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+          winnersData = results.data;
+          console.log('✅ Loaded winners:', winnersData.length);
+          
+          // Create batches of 10
+          batchedData = [];
+          for (let i = 0; i < winnersData.length; i += BATCH_SIZE) {
+            batchedData.push(winnersData.slice(i, i + BATCH_SIZE));
+          }
+          
+          console.log('📦 Created batches:', batchedData.length);
+          updateWinnerDisplay(currentIndex);
+        },
+        error: function(error) {
+          console.error('❌ Error loading data:', error);
+          winnerDisplay.innerHTML = `
+            <div class="text-red-400 text-center">
+              <p class="text-xl font-bold mb-2">⚠️ Error Loading Winners</p>
+              <p>Could not load w1d.csv file. Please make sure the file exists.</p>
+            </div>
+          `;
+        }
+      });
+    }
+
+    function updateWinnerDisplay(index) {
+      if (batchedData.length === 0) {
+        winnerDisplay.innerHTML = '<div class="loading">No winner data available</div>';
+        return;
+      }
+
+      const batch = batchedData[index];
+      const batchNumber = index + 1;
+      const totalBatches = batchedData.length;
+      const startSr = (index * BATCH_SIZE) + 1;
+      const endSr = Math.min(startSr + batch.length - 1, winnersData.length);
+
+      let html = `
+        <div class="batch-info">
+          🏆 Winners ${startSr} - ${endSr} of ${winnersData.length} (Batch ${batchNumber}/${totalBatches})
+        </div>
+      `;
+
+      batch.forEach((winner, idx) => {
+        html += `
+          <div class="winner-card">
+            <div class="winner-title">🎉 Winner #${startSr + idx}</div>
+            <div class="winner-info">
+              <div><strong>👤 Name:</strong> ${winner['Farmer Name'] || 'N/A'}</div>
+              <div><strong>📱 Mobile:</strong> ${winner['Mobile Number'] || 'N/A'}</div>
+              <div><strong>📍 District:</strong> ${winner['District'] || 'N/A'}</div>
+              <div><strong>🏢 Headquarter:</strong> ${winner['Headquater'] || 'N/A'}</div>
+            </div>
+          </div>
+        `;
+      });
+
+      winnerDisplay.innerHTML = html;
+      renderDots();
+      updateButtonStates();
+    }
+
+    function renderDots() {
+      carouselDots.innerHTML = "";
+      batchedData.forEach((_, index) => {
+        const dot = document.createElement("span");
+        dot.className = `dot-indicator cursor-pointer ${
+          index === currentIndex ? "active" : ""
+        }`;
+        dot.addEventListener("click", () => {
+          currentIndex = index;
+          updateWinnerDisplay(currentIndex);
+        });
+        carouselDots.appendChild(dot);
+      });
+    }
+
+    function updateButtonStates() {
+      prevBtn.disabled = currentIndex === 0;
+      nextBtn.disabled = currentIndex === batchedData.length - 1;
+    }
+
+    startButton.addEventListener("click", () => {
+      initialButtonContainer.classList.add("hidden");
+
+      if (hasSpun) {
+        carouselContainer.classList.remove("hidden");
+        updateWinnerDisplay(currentIndex);
+      } else {
+        wheelContainer.classList.remove("hidden");
+      }
+    });
+
+    wheelButton.addEventListener("click", () => {
+      if (wheelImage.classList.contains("professional-spin")) return;
+      wheelImage.classList.add("professional-spin");
+
+      setTimeout(() => {
+        wheelImage.classList.remove("professional-spin");
+        wheelContainer.classList.add("hidden");
+        carouselContainer.classList.remove("hidden");
+        loadWinnerData();
+        hasSpun = true;
+      }, 4000);
+    });
+
+    prevBtn.addEventListener("click", () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateWinnerDisplay(currentIndex);
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (currentIndex < batchedData.length - 1) {
+        currentIndex++;
+        updateWinnerDisplay(currentIndex);
+      }
+    });
+
+    closeCarousel.addEventListener("click", () => {
+      carouselContainer.classList.add("hidden");
+      initialButtonContainer.classList.remove("hidden");
+    });
+  </script>
+</body>
+</html>
