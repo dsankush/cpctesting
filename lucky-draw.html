@@ -247,37 +247,128 @@
     }
     
     .carousel-image {
-      border-radius: 12px;
+      border-radius: 16px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
       transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
       opacity: 0;
-      transform: translateX(50px) scale(0.8) rotate(5deg);
-      filter: blur(2px);
+      transform: translateX(50px) scale(0.9);
+      background: rgba(255, 255, 255, 0.98);
+      padding: 0;
+      overflow: hidden;
     }
     
     .carousel-image.loaded {
       opacity: 1;
-      transform: translateX(0) scale(1) rotate(0deg);
-      filter: blur(0px);
+      transform: translateX(0) scale(1);
       animation: festiveBounce 0.8s ease-out;
-    }
-    
-    .carousel-image:hover {
-      transform: translateX(0) scale(1.08) rotate(-2deg);
-      box-shadow: 0 20px 50px rgba(255, 215, 0, 0.3);
-      animation: festiveWiggle 0.5s ease-in-out infinite alternate;
     }
     
     .carousel-image.slide-out-left {
       opacity: 0;
-      transform: translateX(-80px) scale(0.7) rotate(-10deg);
-      filter: blur(3px);
+      transform: translateX(-80px) scale(0.8);
     }
     
     .carousel-image.slide-out-right {
       opacity: 0;
-      transform: translateX(80px) scale(0.7) rotate(10deg);
-      filter: blur(3px);
+      transform: translateX(80px) scale(0.8);
+    }
+    
+    /* Winners Table in Carousel */
+    .winners-table-wrapper {
+      width: 100%;
+    }
+    
+    .table-title {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      padding: 20px;
+      text-align: center;
+      color: white;
+      font-size: 24px;
+      font-weight: 800;
+      border-radius: 16px 16px 0 0;
+    }
+    
+    .winners-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .winners-table thead {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    }
+    
+    .winners-table thead th {
+      padding: 14px 12px;
+      text-align: left;
+      color: white;
+      font-weight: 700;
+      font-size: 13px;
+      text-transform: uppercase;
+      border-bottom: 2px solid rgba(255, 215, 0, 0.5);
+    }
+    
+    .winners-table tbody tr {
+      background: white;
+      transition: all 0.3s ease;
+    }
+    
+    .winners-table tbody tr:nth-child(even) {
+      background: rgba(243, 244, 246, 0.6);
+    }
+    
+    .winners-table tbody tr:hover {
+      background: linear-gradient(90deg, rgba(250, 204, 21, 0.2), rgba(245, 158, 11, 0.2));
+      transform: scale(1.01);
+    }
+    
+    .winners-table tbody td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(209, 213, 219, 0.4);
+      font-size: 13px;
+      color: #374151;
+    }
+    
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-weight: 800;
+      font-size: 13px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .rank-1 {
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      color: #78350f;
+      animation: goldShine 2s ease-in-out infinite;
+    }
+    
+    .rank-2 {
+      background: linear-gradient(135deg, #e5e7eb 0%, #9ca3af 100%);
+      color: #374151;
+    }
+    
+    .rank-3 {
+      background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+      color: #78350f;
+    }
+    
+    .rank-default {
+      background: linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%);
+      color: #5b21b6;
+    }
+    
+    @keyframes goldShine {
+      0%, 100% {
+        box-shadow: 0 3px 10px rgba(251, 191, 36, 0.4);
+      }
+      50% {
+        box-shadow: 0 5px 18px rgba(251, 191, 36, 0.8),
+                    0 0 25px rgba(251, 191, 36, 0.5);
+      }
     }
     
     @keyframes festiveBounce {
@@ -592,10 +683,10 @@
 
     <!-- Carousel Viewer -->
     <div id="carouselContainer" class="fixed inset-0 flex items-center justify-center z-30 hidden bg-transparent">
-      <div class="max-w-screen-lg w-full carousel-container p-6 flex flex-col items-center">
+      <div class="max-w-4xl w-full carousel-container p-6 flex flex-col items-center">
         <div
           id="carouselImage"
-          class="w-full max-h-[85vh] carousel-image flex items-center justify-center"
+          class="w-full carousel-image"
         ></div>
 
         <!-- Dots Indicator -->
@@ -613,6 +704,7 @@
   </div>
 
   <!-- JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
     const startButton = document.getElementById("startButton");
     const initialButtonContainer = document.getElementById("initialButtonContainer");
@@ -627,36 +719,104 @@
     const closeCarousel = document.getElementById("closeCarousel");
     const fantasticWheel = document.getElementById("wheelImage");
 
-    const carouselItems = [
-      { emoji: '🏆', title: 'Grand Prize', subtitle: '1st Place Winner', color: 'from-yellow-400 to-yellow-600' },
-      { emoji: '💎', title: 'Diamond Prize', subtitle: '2nd Place Winner', color: 'from-blue-400 to-blue-600' },
-      { emoji: '👑', title: 'Royal Prize', subtitle: '3rd Place Winner', color: 'from-purple-400 to-purple-600' },
-      { emoji: '🎁', title: 'Special Prize', subtitle: 'Bonus Winner', color: 'from-pink-400 to-pink-600' }
-    ];
+    let carouselItems = [];
+    let winnersData = [];
     let currentIndex = 0;
     let hasSpun = false;
     let isFirstCarouselEntry = true;
+    
+    // Load winners data from CSV
+    function loadWinnersData() {
+      Papa.parse('w1d.csv', {
+        download: true,
+        header: true,
+        complete: function(results) {
+          winnersData = results.data.filter(row => 
+            row['First Name'] && row['First Name'].trim() !== ''
+          );
+          
+          // Split winners into groups of 10
+          carouselItems = [];
+          for (let i = 0; i < winnersData.length; i += 10) {
+            carouselItems.push(winnersData.slice(i, i + 10));
+          }
+          
+          console.log(`Loaded ${winnersData.length} winners in ${carouselItems.length} tables`);
+        },
+        error: function(error) {
+          console.error('Error loading CSV:', error);
+          carouselItems = [[]]; // Empty table
+        }
+      });
+    }
+    
+    // Load data on page load
+    loadWinnersData();
+    
+    function getRankClass(index) {
+      if (index === 0) return 'rank-1';
+      if (index === 1) return 'rank-2';
+      if (index === 2) return 'rank-3';
+      return 'rank-default';
+    }
+    
+    function createTableHTML(winners, startIndex) {
+      const tableRows = winners.map((winner, idx) => {
+        const globalIndex = startIndex + idx;
+        const rankNum = globalIndex + 1;
+        const farmerName = `${winner['First Name']} ${winner['Last Name']}`;
+        const mobile = winner['Phone Number'] || '-';
+        const district = winner['District'] || '-';
+        const headquarter = winner['PT'] || '-';
+        
+        return `
+          <tr>
+            <td style="text-align: center;">
+              <div class="rank-badge ${getRankClass(globalIndex)}">
+                ${rankNum <= 3 ? ['🥇', '🥈', '🥉'][globalIndex] : rankNum}
+              </div>
+            </td>
+            <td style="font-weight: 600;">${farmerName}</td>
+            <td>${mobile}</td>
+            <td>${district}</td>
+            <td style="font-weight: 600; color: #8b5cf6;">${headquarter}</td>
+          </tr>
+        `;
+      }).join('');
+      
+      return `
+        <div class="winners-table-wrapper">
+          <div class="table-title">
+            🏆 Lucky Draw Winners 🏆
+          </div>
+          <table class="winners-table">
+            <thead>
+              <tr>
+                <th style="width: 80px; text-align: center;">Sr. No.</th>
+                <th>Farmer Name</th>
+                <th>Mobile Number</th>
+                <th>District</th>
+                <th>Headquarter</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tableRows}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
 
     function updateCarousel(index, direction = 'right', isInitialEntry = false) {
       // Add slide out animation
       carouselImage.classList.add(direction === 'left' ? 'slide-out-left' : 'slide-out-right');
       
-      // Only add festive filter on initial entry
-      if (isInitialEntry) {
-        carouselImage.style.filter = 'hue-rotate(20deg) saturate(1.2)';
-      }
-      
       setTimeout(() => {
-        const item = carouselItems[index];
-        carouselImage.innerHTML = `
-          <div class="bg-gradient-to-br ${item.color} rounded-3xl p-16 shadow-2xl border-8 border-white min-h-[400px] flex flex-col items-center justify-center">
-            <div class="text-9xl mb-8">${item.emoji}</div>
-            <h2 class="text-5xl font-bold text-white mb-4 text-shadow">${item.title}</h2>
-            <p class="text-2xl text-white/90">${item.subtitle}</p>
-          </div>
-        `;
+        const winners = carouselItems[index] || [];
+        const startIndex = index * 10;
+        
+        carouselImage.innerHTML = createTableHTML(winners, startIndex);
         carouselImage.classList.remove('slide-out-left', 'slide-out-right', 'loaded');
-        carouselImage.style.filter = '';
         
         // Trigger slide in animation
         setTimeout(() => {
@@ -793,7 +953,13 @@
 
     closeCarousel.addEventListener("click", () => {
       carouselContainer.classList.add("hidden");
-      initialButtonContainer.classList.remove("hidden");
+      if (hasSpun) {
+        // If already spun, go back to start button
+        initialButtonContainer.classList.remove("hidden");
+      } else {
+        // If not spun yet, shouldn't happen but show start
+        initialButtonContainer.classList.remove("hidden");
+      }
     });
   </script>
 </body>
