@@ -30,8 +30,23 @@
                 #2d0a4a 75%, 
                 #1a0a2e 100%);
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* First Half */
+        .first-half {
+            position: relative;
+            width: 100%;
+            height: 50vh;
+            overflow: hidden;
+        }
+
+        /* Second Half */
+        .second-half {
+            position: relative;
+            width: 100%;
+            height: 50vh;
             overflow: hidden;
         }
 
@@ -55,6 +70,7 @@
             opacity: 0.6;
             animation: twinkle 4s ease-in-out infinite;
             z-index: 1;
+            pointer-events: none;
         }
 
         @keyframes twinkle {
@@ -65,7 +81,7 @@
         /* Top glow */
         .top-glow {
             position: absolute;
-            top: 10%;
+            top: 20%;
             left: 50%;
             transform: translateX(-50%);
             width: 600px;
@@ -81,7 +97,7 @@
         /* Central Glow */
         .central-glow {
             position: absolute;
-            top: 50%;
+            top: 70%;
             left: 50%;
             transform: translate(-50%, -50%);
             width: 800px;
@@ -107,30 +123,31 @@
             }
         }
 
-        /* Neon Beams - Left */
+        /* Neon Beams - Continuous */
         .neon-lines-left {
-            position: absolute;
+            position: fixed;
             left: 12%;
             top: 0;
             width: 200px;
-            height: 100%;
+            height: 100vh;
             display: flex;
             gap: 10px;
             justify-content: center;
             z-index: 2;
+            pointer-events: none;
         }
 
-        /* Neon Beams - Right */
         .neon-lines-right {
-            position: absolute;
+            position: fixed;
             right: 12%;
             top: 0;
             width: 200px;
-            height: 100%;
+            height: 100vh;
             display: flex;
             gap: 10px;
             justify-content: center;
             z-index: 2;
+            pointer-events: none;
         }
 
         .line {
@@ -157,10 +174,10 @@
             50% { opacity: 1; }
         }
 
-        /* Top Stage */
-        .stage-top {
+        /* Stage Container - First Half (Inverted) */
+        .stage-first {
             position: absolute;
-            top: 0;
+            bottom: 0;
             left: 50%;
             transform: translateX(-50%) scaleY(-1);
             width: 600px;
@@ -168,8 +185,8 @@
             z-index: 3;
         }
 
-        /* Bottom Stage */
-        .stage-bottom {
+        /* Stage Container - Second Half (Normal) */
+        .stage-second {
             position: absolute;
             bottom: 0;
             left: 50%;
@@ -195,14 +212,14 @@
             z-index: 0;
         }
 
-        .reflection-glow-top {
+        .reflection-glow-inverted {
             position: absolute;
-            top: 0;
+            bottom: 0;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translateX(-50%) scaleY(-1);
             width: 800px;
             height: 150px;
-            background: linear-gradient(to bottom, 
+            background: linear-gradient(to top, 
                 rgba(138, 43, 226, 0.4), 
                 rgba(255, 0, 255, 0.3), 
                 transparent);
@@ -217,16 +234,19 @@
                     drop-shadow(0 0 80px rgba(0, 255, 255, 0.3));
         }
 
-        /* Content Area - Centered */
+        /* Content Area - Top */
         .content {
-            position: relative;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
             z-index: 10;
             color: white;
             text-align: center;
-            padding: 20px;
+            padding: 40px 20px 20px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
         }
 
@@ -290,16 +310,7 @@
 </head>
 <body>
     <div class="container">
-        <!-- Stars -->
-        <div class="stars"></div>
-        
-        <!-- Top glow -->
-        <div class="top-glow"></div>
-        
-        <!-- Central Glow -->
-        <div class="central-glow"></div>
-
-        <!-- Left neon lines -->
+        <!-- Continuous Neon Lines (Full Height) -->
         <div class="neon-lines-left">
             <div class="line"></div>
             <div class="line"></div>
@@ -308,7 +319,6 @@
             <div class="line"></div>
         </div>
 
-        <!-- Right neon lines -->
         <div class="neon-lines-right">
             <div class="line"></div>
             <div class="line"></div>
@@ -317,93 +327,114 @@
             <div class="line"></div>
         </div>
 
-        <!-- Top Stage (Inverted) -->
-        <div class="stage-top">
-            <svg viewBox="0 0 600 250" preserveAspectRatio="xMidYMid meet">
-                <defs>
-                    <radialGradient id="centerGlowTop">
-                        <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
-                        <stop offset="50%" style="stop-color:#00ffff;stop-opacity:0.6" />
-                        <stop offset="100%" style="stop-color:#ff00ff;stop-opacity:0" />
-                    </radialGradient>
-                </defs>
+        <!-- First Half Section -->
+        <div class="first-half">
+            <!-- Stars -->
+            <div class="stars"></div>
+            
+            <!-- Top glow -->
+            <div class="top-glow"></div>
+            
+            <!-- Central Glow -->
+            <div class="central-glow"></div>
 
-                <!-- Platform/Stage base -->
-                <ellipse cx="300" cy="120" rx="200" ry="60" fill="rgba(138, 43, 226, 0.3)" stroke="rgba(138, 43, 226, 0.8)" stroke-width="3"/>
+            <!-- Content - Top -->
+            <div class="content">
+                <h1>WELCOME TO THE FUTURE</h1>
+                <p>Experience the next generation</p>
+                <p class="tagline">Innovative • Modern • Revolutionary</p>
+            </div>
 
-                <!-- Stage rim glow -->
-                <ellipse cx="300" cy="120" rx="200" ry="60" fill="none" stroke="rgba(255, 0, 255, 0.5)" stroke-width="2" opacity="0.6" stroke-dasharray="20,10"/>
+            <!-- First Stage (Inverted at bottom) -->
+            <div class="stage-first">
+                <svg viewBox="0 0 600 250" preserveAspectRatio="xMidYMid meet">
+                    <defs>
+                        <radialGradient id="centerGlow1">
+                            <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                            <stop offset="50%" style="stop-color:#00ffff;stop-opacity:0.6" />
+                            <stop offset="100%" style="stop-color:#ff00ff;stop-opacity:0" />
+                        </radialGradient>
+                    </defs>
 
-                <!-- Outer ring -->
-                <ellipse cx="300" cy="150" rx="170" ry="48" fill="none" stroke="rgba(138, 43, 226, 0.6)" stroke-width="2"/>
+                    <!-- Platform/Stage base -->
+                    <ellipse cx="300" cy="120" rx="200" ry="60" fill="rgba(138, 43, 226, 0.3)" stroke="rgba(138, 43, 226, 0.8)" stroke-width="3"/>
 
-                <!-- Mid ring 1 -->
-                <ellipse cx="300" cy="145" rx="145" ry="40" fill="none" stroke="rgba(0, 255, 255, 0.4)" stroke-width="1" opacity="0.6"/>
+                    <!-- Stage rim glow -->
+                    <ellipse cx="300" cy="120" rx="200" ry="60" fill="none" stroke="rgba(255, 0, 255, 0.5)" stroke-width="2" opacity="0.6" stroke-dasharray="20,10"/>
 
-                <!-- Mid ring 2 -->
-                <ellipse cx="300" cy="140" rx="120" ry="34" fill="none" stroke="rgba(255, 0, 255, 0.5)" stroke-width="2" opacity="0.7"/>
+                    <!-- Outer ring -->
+                    <ellipse cx="300" cy="150" rx="170" ry="48" fill="none" stroke="rgba(138, 43, 226, 0.6)" stroke-width="2"/>
 
-                <!-- Inner ring -->
-                <ellipse cx="300" cy="135" rx="90" ry="26" fill="none" stroke="rgba(0, 255, 255, 0.4)" stroke-width="1" opacity="0.5"/>
+                    <!-- Mid ring 1 -->
+                    <ellipse cx="300" cy="145" rx="145" ry="40" fill="none" stroke="rgba(0, 255, 255, 0.4)" stroke-width="1" opacity="0.6"/>
 
-                <!-- Bright center -->
-                <ellipse cx="300" cy="130" rx="60" ry="18" fill="url(#centerGlowTop)" opacity="0.8"/>
-                <ellipse cx="300" cy="130" rx="45" ry="14" fill="rgba(255, 255, 255, 0.7)"/>
-                <ellipse cx="300" cy="130" rx="30" ry="10" fill="rgba(0, 255, 255, 0.9)"/>
+                    <!-- Mid ring 2 -->
+                    <ellipse cx="300" cy="140" rx="120" ry="34" fill="none" stroke="rgba(255, 0, 255, 0.5)" stroke-width="2" opacity="0.7"/>
 
-                <!-- Horizontal accent lines -->
-                <line x1="120" y1="130" x2="200" y2="130" stroke="rgba(255, 0, 255, 0.6)" stroke-width="2" opacity="0.7"/>
-                <line x1="400" y1="130" x2="480" y2="130" stroke="rgba(0, 255, 255, 0.6)" stroke-width="2" opacity="0.7"/>
-            </svg>
-            <div class="reflection-glow-top"></div>
+                    <!-- Inner ring -->
+                    <ellipse cx="300" cy="135" rx="90" ry="26" fill="none" stroke="rgba(0, 255, 255, 0.4)" stroke-width="1" opacity="0.5"/>
+
+                    <!-- Bright center -->
+                    <ellipse cx="300" cy="130" rx="60" ry="18" fill="url(#centerGlow1)" opacity="0.8"/>
+                    <ellipse cx="300" cy="130" rx="45" ry="14" fill="rgba(255, 255, 255, 0.7)"/>
+                    <ellipse cx="300" cy="130" rx="30" ry="10" fill="rgba(0, 255, 255, 0.9)"/>
+
+                    <!-- Horizontal accent lines -->
+                    <line x1="120" y1="130" x2="200" y2="130" stroke="rgba(255, 0, 255, 0.6)" stroke-width="2" opacity="0.7"/>
+                    <line x1="400" y1="130" x2="480" y2="130" stroke="rgba(0, 255, 255, 0.6)" stroke-width="2" opacity="0.7"/>
+                </svg>
+                <div class="reflection-glow-inverted"></div>
+            </div>
         </div>
 
-        <!-- Bottom Stage -->
-        <div class="stage-bottom">
-            <svg viewBox="0 0 600 250" preserveAspectRatio="xMidYMid meet">
-                <defs>
-                    <radialGradient id="centerGlowBottom">
-                        <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
-                        <stop offset="50%" style="stop-color:#00ffff;stop-opacity:0.6" />
-                        <stop offset="100%" style="stop-color:#ff00ff;stop-opacity:0" />
-                    </radialGradient>
-                </defs>
+        <!-- Second Half Section -->
+        <div class="second-half">
+            <!-- Stars -->
+            <div class="stars"></div>
+            
+            <!-- Central Glow -->
+            <div class="central-glow"></div>
 
-                <!-- Platform/Stage base -->
-                <ellipse cx="300" cy="120" rx="200" ry="60" fill="rgba(138, 43, 226, 0.3)" stroke="rgba(138, 43, 226, 0.8)" stroke-width="3"/>
+            <!-- Second Stage (Normal at bottom) -->
+            <div class="stage-second">
+                <svg viewBox="0 0 600 250" preserveAspectRatio="xMidYMid meet">
+                    <defs>
+                        <radialGradient id="centerGlow2">
+                            <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                            <stop offset="50%" style="stop-color:#00ffff;stop-opacity:0.6" />
+                            <stop offset="100%" style="stop-color:#ff00ff;stop-opacity:0" />
+                        </radialGradient>
+                    </defs>
 
-                <!-- Stage rim glow -->
-                <ellipse cx="300" cy="120" rx="200" ry="60" fill="none" stroke="rgba(255, 0, 255, 0.5)" stroke-width="2" opacity="0.6" stroke-dasharray="20,10"/>
+                    <!-- Platform/Stage base -->
+                    <ellipse cx="300" cy="120" rx="200" ry="60" fill="rgba(138, 43, 226, 0.3)" stroke="rgba(138, 43, 226, 0.8)" stroke-width="3"/>
 
-                <!-- Outer ring -->
-                <ellipse cx="300" cy="150" rx="170" ry="48" fill="none" stroke="rgba(138, 43, 226, 0.6)" stroke-width="2"/>
+                    <!-- Stage rim glow -->
+                    <ellipse cx="300" cy="120" rx="200" ry="60" fill="none" stroke="rgba(255, 0, 255, 0.5)" stroke-width="2" opacity="0.6" stroke-dasharray="20,10"/>
 
-                <!-- Mid ring 1 -->
-                <ellipse cx="300" cy="145" rx="145" ry="40" fill="none" stroke="rgba(0, 255, 255, 0.4)" stroke-width="1" opacity="0.6"/>
+                    <!-- Outer ring -->
+                    <ellipse cx="300" cy="150" rx="170" ry="48" fill="none" stroke="rgba(138, 43, 226, 0.6)" stroke-width="2"/>
 
-                <!-- Mid ring 2 -->
-                <ellipse cx="300" cy="140" rx="120" ry="34" fill="none" stroke="rgba(255, 0, 255, 0.5)" stroke-width="2" opacity="0.7"/>
+                    <!-- Mid ring 1 -->
+                    <ellipse cx="300" cy="145" rx="145" ry="40" fill="none" stroke="rgba(0, 255, 255, 0.4)" stroke-width="1" opacity="0.6"/>
 
-                <!-- Inner ring -->
-                <ellipse cx="300" cy="135" rx="90" ry="26" fill="none" stroke="rgba(0, 255, 255, 0.4)" stroke-width="1" opacity="0.5"/>
+                    <!-- Mid ring 2 -->
+                    <ellipse cx="300" cy="140" rx="120" ry="34" fill="none" stroke="rgba(255, 0, 255, 0.5)" stroke-width="2" opacity="0.7"/>
 
-                <!-- Bright center -->
-                <ellipse cx="300" cy="130" rx="60" ry="18" fill="url(#centerGlowBottom)" opacity="0.8"/>
-                <ellipse cx="300" cy="130" rx="45" ry="14" fill="rgba(255, 255, 255, 0.7)"/>
-                <ellipse cx="300" cy="130" rx="30" ry="10" fill="rgba(0, 255, 255, 0.9)"/>
+                    <!-- Inner ring -->
+                    <ellipse cx="300" cy="135" rx="90" ry="26" fill="none" stroke="rgba(0, 255, 255, 0.4)" stroke-width="1" opacity="0.5"/>
 
-                <!-- Horizontal accent lines -->
-                <line x1="120" y1="130" x2="200" y2="130" stroke="rgba(255, 0, 255, 0.6)" stroke-width="2" opacity="0.7"/>
-                <line x1="400" y1="130" x2="480" y2="130" stroke="rgba(0, 255, 255, 0.6)" stroke-width="2" opacity="0.7"/>
-            </svg>
-            <div class="reflection-glow"></div>
-        </div>
+                    <!-- Bright center -->
+                    <ellipse cx="300" cy="130" rx="60" ry="18" fill="url(#centerGlow2)" opacity="0.8"/>
+                    <ellipse cx="300" cy="130" rx="45" ry="14" fill="rgba(255, 255, 255, 0.7)"/>
+                    <ellipse cx="300" cy="130" rx="30" ry="10" fill="rgba(0, 255, 255, 0.9)"/>
 
-        <!-- Content - Centered in Middle -->
-        <div class="content">
-            <h1>WELCOME TO THE FUTURE</h1>
-            <p>Experience the next generation</p>
-            <p class="tagline">Innovative • Modern • Revolutionary</p>
+                    <!-- Horizontal accent lines -->
+                    <line x1="120" y1="130" x2="200" y2="130" stroke="rgba(255, 0, 255, 0.6)" stroke-width="2" opacity="0.7"/>
+                    <line x1="400" y1="130" x2="480" y2="130" stroke="rgba(0, 255, 255, 0.6)" stroke-width="2" opacity="0.7"/>
+                </svg>
+                <div class="reflection-glow"></div>
+            </div>
         </div>
     </div>
 
