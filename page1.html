@@ -529,16 +529,20 @@
     let winnersData = [];
     let currentIndex = 0;
     let hasSpun = false;
+    let dataLoaded = false;
     
     // Load winners data from CSV
-    function loadWinnersData() {
+    function loadWinnersData(callback) {
       Papa.parse('w1d.csv', {
         download: true,
         header: true,
         complete: function(results) {
+          console.log('CSV loaded, raw data:', results.data.length, 'rows');
           winnersData = results.data.filter(row => 
             row['First Name'] && row['First Name'].trim() !== ''
           );
+          
+          console.log('Filtered winners:', winnersData.length);
           
           // Split winners into groups of 10
           carouselItems = [];
@@ -546,11 +550,16 @@
             carouselItems.push(winnersData.slice(i, i + 10));
           }
           
+          dataLoaded = true;
           console.log(`Loaded ${winnersData.length} winners in ${carouselItems.length} tables`);
+          
+          if (callback) callback();
         },
         error: function(error) {
           console.error('Error loading CSV:', error);
           carouselItems = [[]]; // Empty table
+          dataLoaded = true;
+          if (callback) callback();
         }
       });
     }
@@ -700,9 +709,20 @@
         wheelImage.classList.remove("professional-spin");
         wheelContainer.classList.add("hidden");
         carouselContainer.classList.remove("hidden");
-        updateCarousel(currentIndex);
-        hasSpun = true;
-        createConfettiBurst();
+        
+        // Ensure data is loaded before showing carousel
+        if (!dataLoaded) {
+          console.log('Data not loaded yet, waiting...');
+          loadWinnersData(() => {
+            updateCarousel(currentIndex);
+            hasSpun = true;
+            createConfettiBurst();
+          });
+        } else {
+          updateCarousel(currentIndex);
+          hasSpun = true;
+          createConfettiBurst();
+        }
       }, 4000);
     });
 
