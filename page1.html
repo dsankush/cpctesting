@@ -112,6 +112,27 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
       border-bottom: 3px solid rgba(255, 215, 0, 0.5);
+      position: relative;
+    }
+    
+    thead th:first-child::before {
+      content: '🎯 ';
+    }
+    
+    thead th:nth-child(2)::before {
+      content: '👨‍🌾 ';
+    }
+    
+    thead th:nth-child(3)::before {
+      content: '📱 ';
+    }
+    
+    thead th:nth-child(4)::before {
+      content: '🏙️ ';
+    }
+    
+    thead th:nth-child(5)::before {
+      content: '🏢 ';
     }
 
     tbody tr {
@@ -148,6 +169,17 @@
       border-bottom: 1px solid rgba(209, 213, 219, 0.5);
       font-size: 14px;
       color: #374151;
+      vertical-align: middle;
+    }
+    
+    tbody td:nth-child(2) {
+      font-weight: 600;
+      color: #1f2937;
+    }
+    
+    tbody td:nth-child(5) {
+      font-weight: 600;
+      color: #8b5cf6;
     }
 
     .rank-badge {
@@ -520,15 +552,15 @@
         
         return `
           <tr style="animation-delay: ${index * 0.05}s">
-            <td>
+            <td style="text-align: center;">
               <div class="rank-badge ${getRankClass(globalIndex)}">
                 ${rankNum <= 3 ? ['🥇', '🥈', '🥉'][globalIndex] : rankNum}
               </div>
             </td>
-            <td class="font-semibold">${winner['First Name']} ${winner['Last Name']}</td>
+            <td>${winner['First Name']} ${winner['Last Name']}</td>
             <td>${winner['Phone Number']}</td>
             <td>${winner['District']}</td>
-            <td><span class="font-semibold text-purple-600">${winner['PT'] || '-'}</span></td>
+            <td>${winner['PT'] || '-'}</td>
           </tr>
         `;
       }).join('');
