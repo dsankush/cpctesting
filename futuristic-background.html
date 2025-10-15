@@ -62,10 +62,7 @@
                 radial-gradient(1px 1px at 80% 10%, white, transparent),
                 radial-gradient(2px 2px at 90% 60%, white, transparent),
                 radial-gradient(1px 1px at 33% 80%, white, transparent),
-                radial-gradient(1px 1px at 15% 90%, white, transparent),
-                radial-gradient(3px 3px at 45% 25%, rgba(255, 100, 255, 0.6), transparent),
-                radial-gradient(2px 2px at 70% 40%, rgba(100, 200, 255, 0.5), transparent),
-                radial-gradient(2px 2px at 25% 60%, rgba(255, 150, 255, 0.4), transparent);
+                radial-gradient(1px 1px at 15% 90%, white, transparent);
             background-size: 200% 200%;
             opacity: 0.6;
             animation: twinkle 4s ease-in-out infinite;
@@ -174,64 +171,49 @@
             50% { opacity: 1; }
         }
 
-        /* Stage Container - First Half (Inverted) */
+        /* 3D Stage Container - First Half (Inverted) */
         .stage-first {
             position: absolute;
-            bottom: -60px;
+            bottom: -80px;
             left: 50%;
             transform: translateX(-50%) rotateX(180deg);
-            width: 800px;
-            height: 350px;
+            width: 900px;
+            height: 400px;
             z-index: 3;
+            perspective: 1000px;
         }
 
-        /* Stage Container - Second Half (Normal) */
+        /* 3D Stage Container - Second Half (Normal) */
         .stage-second {
             position: absolute;
-            bottom: -60px;
+            bottom: -80px;
             left: 50%;
             transform: translateX(-50%);
-            width: 800px;
-            height: 350px;
+            width: 900px;
+            height: 400px;
             z-index: 3;
+            perspective: 1000px;
         }
 
         /* Reflection glow */
         .reflection-glow {
             position: absolute;
-            bottom: 0;
+            bottom: -50px;
             left: 50%;
             transform: translateX(-50%);
-            width: 900px;
-            height: 200px;
-            background: linear-gradient(to top, 
-                rgba(138, 43, 226, 0.5), 
-                rgba(255, 0, 255, 0.4), 
+            width: 1000px;
+            height: 250px;
+            background: radial-gradient(ellipse at center, 
+                rgba(0, 255, 255, 0.4), 
+                rgba(138, 43, 226, 0.3), 
                 transparent);
-            filter: blur(70px);
-            z-index: 0;
-        }
-
-        .reflection-glow-inverted {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%) scaleY(-1);
-            width: 900px;
-            height: 200px;
-            background: linear-gradient(to top, 
-                rgba(138, 43, 226, 0.5), 
-                rgba(255, 0, 255, 0.4), 
-                transparent);
-            filter: blur(70px);
+            filter: blur(80px);
             z-index: 0;
         }
 
         svg {
             width: 100%;
             height: 100%;
-            filter: drop-shadow(0 0 30px rgba(255, 0, 255, 0.6)) 
-                    drop-shadow(0 0 60px rgba(0, 255, 255, 0.4));
         }
 
         /* Content Area - Top */
@@ -306,11 +288,6 @@
                 transform: translateY(-150px);
             }
         }
-
-        @keyframes rotate-rings {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
     </style>
 </head>
 <body>
@@ -350,84 +327,105 @@
                 <p class="tagline">Innovative • Modern • Revolutionary</p>
             </div>
 
-            <!-- First Stage (Inverted at bottom) -->
+            <!-- First 3D Stage (Inverted) -->
             <div class="stage-first">
-                <svg viewBox="0 0 800 350" preserveAspectRatio="xMidYMid meet">
+                <svg viewBox="0 0 900 400" preserveAspectRatio="xMidYMid meet">
                     <defs>
-                        <!-- Gradients for realistic depth -->
-                        <radialGradient id="platformGradient1">
-                            <stop offset="0%" style="stop-color:#4a1a6b;stop-opacity:0.9" />
-                            <stop offset="50%" style="stop-color:#2d0a4a;stop-opacity:0.7" />
-                            <stop offset="100%" style="stop-color:#1a0a2e;stop-opacity:0.5" />
-                        </radialGradient>
-
-                        <radialGradient id="centerGlow1">
-                            <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
-                            <stop offset="20%" style="stop-color:#00ffff;stop-opacity:0.9" />
-                            <stop offset="50%" style="stop-color:#8a2be2;stop-opacity:0.6" />
-                            <stop offset="100%" style="stop-color:#ff00ff;stop-opacity:0" />
-                        </radialGradient>
-
-                        <linearGradient id="edgeGlow1" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <!-- Holographic gradient -->
+                        <linearGradient id="holoGrad1" x1="0%" y1="0%" x2="0%" y2="100%">
                             <stop offset="0%" style="stop-color:#00ffff;stop-opacity:0.8" />
-                            <stop offset="50%" style="stop-color:#8a2be2;stop-opacity:0.6" />
-                            <stop offset="100%" style="stop-color:#ff00ff;stop-opacity:0.4" />
+                            <stop offset="50%" style="stop-color:#0088ff;stop-opacity:0.5" />
+                            <stop offset="100%" style="stop-color:#0044ff;stop-opacity:0.3" />
                         </linearGradient>
+
+                        <radialGradient id="centerLight1">
+                            <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                            <stop offset="30%" style="stop-color:#00ffff;stop-opacity:0.9" />
+                            <stop offset="100%" style="stop-color:#0088ff;stop-opacity:0" />
+                        </radialGradient>
+
+                        <!-- Grid pattern -->
+                        <pattern id="grid1" width="40" height="40" patternUnits="userSpaceOnUse">
+                            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(0,255,255,0.3)" stroke-width="0.5"/>
+                        </pattern>
+
+                        <!-- Hexagon pattern -->
+                        <pattern id="hexPattern1" width="30" height="26" patternUnits="userSpaceOnUse">
+                            <polygon points="15,0 27,7.5 27,20 15,26 3,20 3,7.5" fill="none" stroke="rgba(0,255,255,0.2)" stroke-width="0.5"/>
+                        </pattern>
                     </defs>
 
-                    <!-- Main platform base with realistic shading -->
-                    <ellipse cx="400" cy="180" rx="280" ry="85" fill="url(#platformGradient1)" opacity="0.8"/>
+                    <!-- Platform Side (3D depth) -->
+                    <ellipse cx="450" cy="230" rx="350" ry="100" fill="rgba(0, 100, 200, 0.3)" opacity="0.6"/>
+                    <ellipse cx="450" cy="225" rx="350" ry="100" fill="rgba(0, 120, 220, 0.4)" opacity="0.7"/>
+                    <ellipse cx="450" cy="220" rx="350" ry="100" fill="rgba(0, 140, 240, 0.5)" opacity="0.8"/>
+
+                    <!-- Main Platform Surface -->
+                    <ellipse cx="450" cy="215" rx="350" ry="100" fill="url(#holoGrad1)" opacity="0.7"/>
                     
-                    <!-- Platform edge with glow -->
-                    <ellipse cx="400" cy="180" rx="280" ry="85" fill="none" stroke="url(#edgeGlow1)" stroke-width="4" opacity="0.9"/>
+                    <!-- Grid overlay on platform -->
+                    <ellipse cx="450" cy="215" rx="350" ry="100" fill="url(#grid1)" opacity="0.6"/>
                     
-                    <!-- Outer protective ring -->
-                    <ellipse cx="400" cy="190" rx="260" ry="75" fill="none" stroke="rgba(138, 43, 226, 0.7)" stroke-width="3" opacity="0.8"/>
-                    
-                    <!-- Tech ring 1 with segments -->
-                    <ellipse cx="400" cy="200" rx="230" ry="65" fill="none" stroke="rgba(0, 255, 255, 0.6)" stroke-width="2" stroke-dasharray="15,8" opacity="0.7">
-                        <animateTransform attributeName="transform" type="rotate" from="0 400 200" to="360 400 200" dur="20s" repeatCount="indefinite"/>
-                    </ellipse>
-                    
-                    <!-- Tech ring 2 -->
-                    <ellipse cx="400" cy="205" rx="200" ry="56" fill="none" stroke="rgba(255, 0, 255, 0.7)" stroke-width="3" opacity="0.8">
-                        <animateTransform attributeName="transform" type="rotate" from="0 400 205" to="-360 400 205" dur="25s" repeatCount="indefinite"/>
-                    </ellipse>
-                    
-                    <!-- Segments on ring 2 -->
-                    <ellipse cx="400" cy="205" rx="200" ry="56" fill="none" stroke="rgba(255, 100, 255, 0.9)" stroke-width="1" stroke-dasharray="30,10" opacity="0.9">
-                        <animateTransform attributeName="transform" type="rotate" from="0 400 205" to="-360 400 205" dur="25s" repeatCount="indefinite"/>
-                    </ellipse>
-                    
-                    <!-- Inner tech ring 3 -->
-                    <ellipse cx="400" cy="210" rx="160" ry="45" fill="none" stroke="rgba(0, 255, 255, 0.8)" stroke-width="2" stroke-dasharray="20,5" opacity="0.85">
-                        <animateTransform attributeName="transform" type="rotate" from="0 400 210" to="360 400 210" dur="15s" repeatCount="indefinite"/>
-                    </ellipse>
-                    
-                    <!-- Core ring -->
-                    <ellipse cx="400" cy="215" rx="120" ry="34" fill="none" stroke="rgba(138, 43, 226, 0.9)" stroke-width="4" opacity="0.9"/>
-                    
-                    <!-- Bright center core -->
-                    <ellipse cx="400" cy="220" rx="90" ry="26" fill="url(#centerGlow1)" opacity="0.95"/>
-                    <ellipse cx="400" cy="220" rx="70" ry="20" fill="rgba(255, 255, 255, 0.8)"/>
-                    <ellipse cx="400" cy="220" rx="50" ry="14" fill="rgba(0, 255, 255, 0.95)"/>
-                    <ellipse cx="400" cy="220" rx="30" ry="9" fill="rgba(255, 255, 255, 1)">
-                        <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" repeatCount="indefinite"/>
+                    <!-- Platform edge glow -->
+                    <ellipse cx="450" cy="215" rx="350" ry="100" fill="none" stroke="rgba(0, 255, 255, 0.9)" stroke-width="3" opacity="0.9">
+                        <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite"/>
                     </ellipse>
 
-                    <!-- Tech details - Horizontal accent bars -->
-                    <line x1="150" y1="220" x2="250" y2="220" stroke="rgba(255, 0, 255, 0.9)" stroke-width="3" opacity="0.8"/>
-                    <line x1="550" y1="220" x2="650" y2="220" stroke="rgba(0, 255, 255, 0.9)" stroke-width="3" opacity="0.8"/>
+                    <!-- Tech ring level 1 -->
+                    <ellipse cx="450" cy="225" rx="300" ry="85" fill="none" stroke="rgba(0, 255, 255, 0.5)" stroke-width="2" stroke-dasharray="10,5"/>
                     
-                    <!-- Small detail lights -->
-                    <circle cx="180" cy="220" r="4" fill="rgba(0, 255, 255, 1)">
-                        <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"/>
+                    <!-- Hexagonal tech panels -->
+                    <ellipse cx="450" cy="230" rx="250" ry="70" fill="url(#hexPattern1)" opacity="0.5"/>
+                    
+                    <!-- Inner tech ring -->
+                    <ellipse cx="450" cy="235" rx="200" ry="55" fill="none" stroke="rgba(0, 200, 255, 0.7)" stroke-width="2">
+                        <animate attributeName="stroke-dashoffset" from="0" to="100" dur="3s" repeatCount="indefinite"/>
+                    </ellipse>
+
+                    <!-- Rotating tech segments -->
+                    <g opacity="0.8">
+                        <ellipse cx="450" cy="240" rx="150" ry="42" fill="none" stroke="rgba(0, 255, 255, 0.6)" stroke-width="1.5" stroke-dasharray="20,10">
+                            <animateTransform attributeName="transform" type="rotate" from="0 450 240" to="360 450 240" dur="10s" repeatCount="indefinite"/>
+                        </ellipse>
+                    </g>
+
+                    <!-- Center core platform -->
+                    <ellipse cx="450" cy="245" rx="100" ry="28" fill="rgba(0, 150, 255, 0.6)" opacity="0.8"/>
+                    <ellipse cx="450" cy="245" rx="100" ry="28" fill="url(#centerLight1)" opacity="0.7"/>
+                    
+                    <!-- Bright center -->
+                    <ellipse cx="450" cy="250" rx="60" ry="17" fill="rgba(255, 255, 255, 0.9)"/>
+                    <ellipse cx="450" cy="250" rx="40" ry="11" fill="rgba(0, 255, 255, 1)">
+                        <animate attributeName="opacity" values="0.7;1;0.7" dur="1.5s" repeatCount="indefinite"/>
+                    </ellipse>
+
+                    <!-- Holographic scan lines -->
+                    <line x1="100" y1="250" x2="800" y2="250" stroke="rgba(0, 255, 255, 0.3)" stroke-width="1">
+                        <animate attributeName="y1" values="200;300;200" dur="4s" repeatCount="indefinite"/>
+                        <animate attributeName="y2" values="200;300;200" dur="4s" repeatCount="indefinite"/>
+                    </line>
+
+                    <!-- Tech detail nodes -->
+                    <circle cx="200" cy="250" r="5" fill="rgba(0, 255, 255, 1)">
+                        <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
                     </circle>
-                    <circle cx="620" cy="220" r="4" fill="rgba(255, 0, 255, 1)">
-                        <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" begin="0.75s" repeatCount="indefinite"/>
+                    <circle cx="700" cy="250" r="5" fill="rgba(0, 255, 255, 1)">
+                        <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" begin="1s" repeatCount="indefinite"/>
                     </circle>
+
+                    <!-- Corner tech indicators -->
+                    <rect x="150" y="240" width="15" height="3" fill="rgba(0, 255, 255, 0.8)" rx="1"/>
+                    <rect x="735" y="240" width="15" height="3" fill="rgba(0, 255, 255, 0.8)" rx="1"/>
+
+                    <!-- Holographic data streams -->
+                    <path d="M 250 250 Q 350 230 450 250" fill="none" stroke="rgba(0, 255, 255, 0.4)" stroke-width="1" stroke-dasharray="5,5">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-50" dur="2s" repeatCount="indefinite"/>
+                    </path>
+                    <path d="M 450 250 Q 550 230 650 250" fill="none" stroke="rgba(0, 255, 255, 0.4)" stroke-width="1" stroke-dasharray="5,5">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-50" dur="2s" repeatCount="indefinite"/>
+                    </path>
                 </svg>
-                <div class="reflection-glow-inverted"></div>
+                <div class="reflection-glow"></div>
             </div>
         </div>
 
@@ -439,82 +437,103 @@
             <!-- Central Glow -->
             <div class="central-glow"></div>
 
-            <!-- Second Stage (Normal at bottom) -->
+            <!-- Second 3D Stage (Normal) -->
             <div class="stage-second">
-                <svg viewBox="0 0 800 350" preserveAspectRatio="xMidYMid meet">
+                <svg viewBox="0 0 900 400" preserveAspectRatio="xMidYMid meet">
                     <defs>
-                        <!-- Gradients for realistic depth -->
-                        <radialGradient id="platformGradient2">
-                            <stop offset="0%" style="stop-color:#4a1a6b;stop-opacity:0.9" />
-                            <stop offset="50%" style="stop-color:#2d0a4a;stop-opacity:0.7" />
-                            <stop offset="100%" style="stop-color:#1a0a2e;stop-opacity:0.5" />
-                        </radialGradient>
-
-                        <radialGradient id="centerGlow2">
-                            <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
-                            <stop offset="20%" style="stop-color:#00ffff;stop-opacity:0.9" />
-                            <stop offset="50%" style="stop-color:#8a2be2;stop-opacity:0.6" />
-                            <stop offset="100%" style="stop-color:#ff00ff;stop-opacity:0" />
-                        </radialGradient>
-
-                        <linearGradient id="edgeGlow2" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <!-- Holographic gradient -->
+                        <linearGradient id="holoGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
                             <stop offset="0%" style="stop-color:#00ffff;stop-opacity:0.8" />
-                            <stop offset="50%" style="stop-color:#8a2be2;stop-opacity:0.6" />
-                            <stop offset="100%" style="stop-color:#ff00ff;stop-opacity:0.4" />
+                            <stop offset="50%" style="stop-color:#0088ff;stop-opacity:0.5" />
+                            <stop offset="100%" style="stop-color:#0044ff;stop-opacity:0.3" />
                         </linearGradient>
+
+                        <radialGradient id="centerLight2">
+                            <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                            <stop offset="30%" style="stop-color:#00ffff;stop-opacity:0.9" />
+                            <stop offset="100%" style="stop-color:#0088ff;stop-opacity:0" />
+                        </radialGradient>
+
+                        <!-- Grid pattern -->
+                        <pattern id="grid2" width="40" height="40" patternUnits="userSpaceOnUse">
+                            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(0,255,255,0.3)" stroke-width="0.5"/>
+                        </pattern>
+
+                        <!-- Hexagon pattern -->
+                        <pattern id="hexPattern2" width="30" height="26" patternUnits="userSpaceOnUse">
+                            <polygon points="15,0 27,7.5 27,20 15,26 3,20 3,7.5" fill="none" stroke="rgba(0,255,255,0.2)" stroke-width="0.5"/>
+                        </pattern>
                     </defs>
 
-                    <!-- Main platform base with realistic shading -->
-                    <ellipse cx="400" cy="180" rx="280" ry="85" fill="url(#platformGradient2)" opacity="0.8"/>
+                    <!-- Platform Side (3D depth) -->
+                    <ellipse cx="450" cy="230" rx="350" ry="100" fill="rgba(0, 100, 200, 0.3)" opacity="0.6"/>
+                    <ellipse cx="450" cy="225" rx="350" ry="100" fill="rgba(0, 120, 220, 0.4)" opacity="0.7"/>
+                    <ellipse cx="450" cy="220" rx="350" ry="100" fill="rgba(0, 140, 240, 0.5)" opacity="0.8"/>
+
+                    <!-- Main Platform Surface -->
+                    <ellipse cx="450" cy="215" rx="350" ry="100" fill="url(#holoGrad2)" opacity="0.7"/>
                     
-                    <!-- Platform edge with glow -->
-                    <ellipse cx="400" cy="180" rx="280" ry="85" fill="none" stroke="url(#edgeGlow2)" stroke-width="4" opacity="0.9"/>
+                    <!-- Grid overlay on platform -->
+                    <ellipse cx="450" cy="215" rx="350" ry="100" fill="url(#grid2)" opacity="0.6"/>
                     
-                    <!-- Outer protective ring -->
-                    <ellipse cx="400" cy="190" rx="260" ry="75" fill="none" stroke="rgba(138, 43, 226, 0.7)" stroke-width="3" opacity="0.8"/>
-                    
-                    <!-- Tech ring 1 with segments -->
-                    <ellipse cx="400" cy="200" rx="230" ry="65" fill="none" stroke="rgba(0, 255, 255, 0.6)" stroke-width="2" stroke-dasharray="15,8" opacity="0.7">
-                        <animateTransform attributeName="transform" type="rotate" from="0 400 200" to="360 400 200" dur="20s" repeatCount="indefinite"/>
-                    </ellipse>
-                    
-                    <!-- Tech ring 2 -->
-                    <ellipse cx="400" cy="205" rx="200" ry="56" fill="none" stroke="rgba(255, 0, 255, 0.7)" stroke-width="3" opacity="0.8">
-                        <animateTransform attributeName="transform" type="rotate" from="0 400 205" to="-360 400 205" dur="25s" repeatCount="indefinite"/>
-                    </ellipse>
-                    
-                    <!-- Segments on ring 2 -->
-                    <ellipse cx="400" cy="205" rx="200" ry="56" fill="none" stroke="rgba(255, 100, 255, 0.9)" stroke-width="1" stroke-dasharray="30,10" opacity="0.9">
-                        <animateTransform attributeName="transform" type="rotate" from="0 400 205" to="-360 400 205" dur="25s" repeatCount="indefinite"/>
-                    </ellipse>
-                    
-                    <!-- Inner tech ring 3 -->
-                    <ellipse cx="400" cy="210" rx="160" ry="45" fill="none" stroke="rgba(0, 255, 255, 0.8)" stroke-width="2" stroke-dasharray="20,5" opacity="0.85">
-                        <animateTransform attributeName="transform" type="rotate" from="0 400 210" to="360 400 210" dur="15s" repeatCount="indefinite"/>
-                    </ellipse>
-                    
-                    <!-- Core ring -->
-                    <ellipse cx="400" cy="215" rx="120" ry="34" fill="none" stroke="rgba(138, 43, 226, 0.9)" stroke-width="4" opacity="0.9"/>
-                    
-                    <!-- Bright center core -->
-                    <ellipse cx="400" cy="220" rx="90" ry="26" fill="url(#centerGlow2)" opacity="0.95"/>
-                    <ellipse cx="400" cy="220" rx="70" ry="20" fill="rgba(255, 255, 255, 0.8)"/>
-                    <ellipse cx="400" cy="220" rx="50" ry="14" fill="rgba(0, 255, 255, 0.95)"/>
-                    <ellipse cx="400" cy="220" rx="30" ry="9" fill="rgba(255, 255, 255, 1)">
-                        <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" repeatCount="indefinite"/>
+                    <!-- Platform edge glow -->
+                    <ellipse cx="450" cy="215" rx="350" ry="100" fill="none" stroke="rgba(0, 255, 255, 0.9)" stroke-width="3" opacity="0.9">
+                        <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite"/>
                     </ellipse>
 
-                    <!-- Tech details - Horizontal accent bars -->
-                    <line x1="150" y1="220" x2="250" y2="220" stroke="rgba(255, 0, 255, 0.9)" stroke-width="3" opacity="0.8"/>
-                    <line x1="550" y1="220" x2="650" y2="220" stroke="rgba(0, 255, 255, 0.9)" stroke-width="3" opacity="0.8"/>
+                    <!-- Tech ring level 1 -->
+                    <ellipse cx="450" cy="225" rx="300" ry="85" fill="none" stroke="rgba(0, 255, 255, 0.5)" stroke-width="2" stroke-dasharray="10,5"/>
                     
-                    <!-- Small detail lights -->
-                    <circle cx="180" cy="220" r="4" fill="rgba(0, 255, 255, 1)">
-                        <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"/>
+                    <!-- Hexagonal tech panels -->
+                    <ellipse cx="450" cy="230" rx="250" ry="70" fill="url(#hexPattern2)" opacity="0.5"/>
+                    
+                    <!-- Inner tech ring -->
+                    <ellipse cx="450" cy="235" rx="200" ry="55" fill="none" stroke="rgba(0, 200, 255, 0.7)" stroke-width="2">
+                        <animate attributeName="stroke-dashoffset" from="0" to="100" dur="3s" repeatCount="indefinite"/>
+                    </ellipse>
+
+                    <!-- Rotating tech segments -->
+                    <g opacity="0.8">
+                        <ellipse cx="450" cy="240" rx="150" ry="42" fill="none" stroke="rgba(0, 255, 255, 0.6)" stroke-width="1.5" stroke-dasharray="20,10">
+                            <animateTransform attributeName="transform" type="rotate" from="0 450 240" to="360 450 240" dur="10s" repeatCount="indefinite"/>
+                        </ellipse>
+                    </g>
+
+                    <!-- Center core platform -->
+                    <ellipse cx="450" cy="245" rx="100" ry="28" fill="rgba(0, 150, 255, 0.6)" opacity="0.8"/>
+                    <ellipse cx="450" cy="245" rx="100" ry="28" fill="url(#centerLight2)" opacity="0.7"/>
+                    
+                    <!-- Bright center -->
+                    <ellipse cx="450" cy="250" rx="60" ry="17" fill="rgba(255, 255, 255, 0.9)"/>
+                    <ellipse cx="450" cy="250" rx="40" ry="11" fill="rgba(0, 255, 255, 1)">
+                        <animate attributeName="opacity" values="0.7;1;0.7" dur="1.5s" repeatCount="indefinite"/>
+                    </ellipse>
+
+                    <!-- Holographic scan lines -->
+                    <line x1="100" y1="250" x2="800" y2="250" stroke="rgba(0, 255, 255, 0.3)" stroke-width="1">
+                        <animate attributeName="y1" values="200;300;200" dur="4s" repeatCount="indefinite"/>
+                        <animate attributeName="y2" values="200;300;200" dur="4s" repeatCount="indefinite"/>
+                    </line>
+
+                    <!-- Tech detail nodes -->
+                    <circle cx="200" cy="250" r="5" fill="rgba(0, 255, 255, 1)">
+                        <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
                     </circle>
-                    <circle cx="620" cy="220" r="4" fill="rgba(255, 0, 255, 1)">
-                        <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" begin="0.75s" repeatCount="indefinite"/>
+                    <circle cx="700" cy="250" r="5" fill="rgba(0, 255, 255, 1)">
+                        <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" begin="1s" repeatCount="indefinite"/>
                     </circle>
+
+                    <!-- Corner tech indicators -->
+                    <rect x="150" y="240" width="15" height="3" fill="rgba(0, 255, 255, 0.8)" rx="1"/>
+                    <rect x="735" y="240" width="15" height="3" fill="rgba(0, 255, 255, 0.8)" rx="1"/>
+
+                    <!-- Holographic data streams -->
+                    <path d="M 250 250 Q 350 230 450 250" fill="none" stroke="rgba(0, 255, 255, 0.4)" stroke-width="1" stroke-dasharray="5,5">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-50" dur="2s" repeatCount="indefinite"/>
+                    </path>
+                    <path d="M 450 250 Q 550 230 650 250" fill="none" stroke="rgba(0, 255, 255, 0.4)" stroke-width="1" stroke-dasharray="5,5">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-50" dur="2s" repeatCount="indefinite"/>
+                    </path>
                 </svg>
                 <div class="reflection-glow"></div>
             </div>
