@@ -338,7 +338,7 @@
     
     .winners-table thead th {
       padding: 10px;
-      text-align: left;
+      text-align: center;
       color: #fff;
       font-weight: 700;
       font-size: 13px;
@@ -371,6 +371,7 @@
       font-size: 14px;
       color: #1f2937;
       font-weight: 500;
+      text-align: center;
     }
     
     /* Highlight top 3 winners with quirky style */
@@ -394,24 +395,15 @@
     
     /* Serial number styling */
     .sr-number {
-      font-weight: 800;
-      font-size: 18px;
-      color: #6366f1;
+      font-weight: 700;
+      font-size: 16px;
+      color: #1f2937;
     }
     
-    .sr-number.top-1 {
-      color: #eab308;
-      font-size: 20px;
-    }
-    
-    .sr-number.top-2 {
-      color: #64748b;
-      font-size: 20px;
-    }
-    
+    .sr-number.top-1,
+    .sr-number.top-2,
     .sr-number.top-3 {
-      color: #f97316;
-      font-size: 20px;
+      font-weight: 800;
     }
     
     
@@ -655,12 +647,11 @@
         const headquarter = winner['Headquater'] || '-';
         
         const srClass = globalIndex === 0 ? 'top-1' : globalIndex === 1 ? 'top-2' : globalIndex === 2 ? 'top-3' : '';
-        const emoji = globalIndex === 0 ? '🥇' : globalIndex === 1 ? '🥈' : globalIndex === 2 ? '🥉' : '';
         
         return `
           <tr>
-            <td style="text-align: center;">
-              <span class="sr-number ${srClass}">${emoji} ${rankNum}</span>
+            <td>
+              <span class="sr-number ${srClass}">${rankNum}</span>
             </td>
             <td>${farmerName}</td>
             <td>${mobile}</td>
@@ -675,7 +666,7 @@
         <table class="winners-table">
           <thead>
             <tr>
-              <th style="width: 80px; text-align: center;">🎯 NO.</th>
+              <th style="width: 80px;">🎯 NO.</th>
               <th style="width: 28%;">👨‍🌾 FARMER NAME</th>
               <th style="width: 21%;">📱 MOBILE</th>
               <th style="width: 20%;">🏙️ DISTRICT</th>
