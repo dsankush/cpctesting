@@ -15,27 +15,51 @@
     .full-page {
       width: 100vw;
       height: 100vh;
-      background:
-        url("https://raw.githubusercontent.com/dsankush/coro-lucky-draw/main/DB/page1/b2.jpg") top center / 100% 50% no-repeat,
-        url("https://raw.githubusercontent.com/dsankush/coro-lucky-draw/main/DB/page1/b1.jpg") bottom center / 100% 50% no-repeat;
+      background: #000;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
       overflow: hidden;
-      background-attachment: fixed;
+    }
+    
+    .full-page::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      background: url("https://raw.githubusercontent.com/dsankush/coro-lucky-draw/main/DB/page1/b2.jpg") center center / cover no-repeat;
+      z-index: 0;
+    }
+    
+    .full-page::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      background: url("https://raw.githubusercontent.com/dsankush/coro-lucky-draw/main/DB/page1/b1.jpg") center center / cover no-repeat;
+      z-index: 0;
     }
     
     /* Professional overlay for better contrast */
-    .full-page::before {
+    .full-page > * {
+      position: relative;
+      z-index: 10;
+    }
+    
+    .overlay-gradient {
       content: "";
       position: absolute;
       inset: 0;
       background: linear-gradient(
         to bottom,
-        rgba(0, 0, 0, 0.2) 0%,
-        rgba(0, 0, 0, 0.1) 40%,
-        rgba(0, 0, 0, 0.3) 100%
+        rgba(0, 0, 0, 0.3) 0%,
+        rgba(0, 0, 0, 0.2) 40%,
+        rgba(0, 0, 0, 0.4) 100%
       );
       pointer-events: none;
       z-index: 1;
@@ -501,6 +525,7 @@
 </head>
 <body class="m-0 p-0 overflow-hidden">
   <div class="full-page">
+    <div class="overlay-gradient"></div>
     <a href="index.html" class="absolute top-10 left-10 shiny-home" style="z-index: 100;">
       Home
     </a>
