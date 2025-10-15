@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Missed Call Data Download — Coromandel CPC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+  <style>
+    :root{
+      --bg:#f8fafc;
+      --panel:#ffffff;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --acc1:#6366f1;
+      --acc2:#f59e0b;
+      --acc3:#10b981;
+      --ring:#e5e7eb;
+      --border:#d1d5db;
+      --shadow:rgba(99,102,241,.08);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:'Outfit',sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
+    
+    /* Header */
+    header{
+      background:rgba(255,255,255,.98);
+      border-bottom:2px solid var(--ring);
+      box-shadow:0 4px 16px var(--shadow);
+      position:sticky;
+      top:0;
+      z-index:100;
+    }
+    .bar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:20px 40px;
+      flex-wrap:wrap;
+      gap:20px;
+    }
+    .logo{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .dot{
+      width:16px;
+      height:16px;
+      border-radius:50%;
+      background:linear-gradient(135deg,var(--acc1),var(--acc3));
+      box-shadow:0 4px 12px rgba(99,102,241,0.4);
+    }
+    .title{
+      font-size:1.5rem;
+      font-weight:900;
+      font-family:'Space Grotesk',sans-serif;
+      background:linear-gradient(135deg,var(--acc1),var(--acc3));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+    }
+    .nav-links{
+      display:flex;
+      gap:12px;
+    }
+    .nav-link{
+      padding:10px 20px;
+      border-radius:10px;
+      text-decoration:none;
+      color:var(--text);
+      font-weight:600;
+      font-size:14px;
+      transition:all .2s;
+      background:transparent;
+      border:2px solid transparent;
+    }
+    .nav-link:hover{
+      background:rgba(99,102,241,.1);
+      border-color:var(--acc1);
+    }
+    .nav-link.active{
+      background:var(--acc1);
+      color:white;
+    }
+    
+    /* Main */
+    .main{
+      max-width:1800px;
+      margin:0 auto;
+      padding:32px 40px;
+    }
+    
+    /* KPIs */
+    .kpis{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+      gap:20px;
+      margin-bottom:32px;
+    }
+    .kpi{
+      background:var(--card);
+      border:2px solid var(--ring);
+      border-radius:16px;
+      padding:24px;
+      box-shadow:0 4px 16px var(--shadow);
+      transition:all .2s;
+    }
+    .kpi:hover{
+      transform:translateY(-4px);
+      box-shadow:0 8px 24px var(--shadow);
+    }
+    .kpi-label{
+      font-size:13px;
+      color:var(--muted);
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:0.5px;
+      margin-bottom:12px;
+    }
+    .kpi-value{
+      font-size:36px;
+      font-weight:900;
+      color:var(--acc1);
+      font-family:'Space Grotesk',sans-serif;
+    }
+    
+    /* Filters */
+    .filters-section{
+      background:var(--card);
+      border:2px solid var(--ring);
+      border-radius:16px;
+      padding:24px;
+      margin-bottom:32px;
+      box-shadow:0 4px 16px var(--shadow);
+    }
+    .filters-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:20px;
+    }
+    .filters-title{
+      font-size:18px;
+      font-weight:700;
+      color:var(--text);
+    }
+    .filters-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+      gap:16px;
+      margin-bottom:16px;
+    }
+    .filter-group{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .filter-group label{
+      font-size:13px;
+      font-weight:600;
+      color:var(--muted);
+    }
+    .filter-group input,
+    .filter-group select{
+      padding:10px 14px;
+      border:2px solid var(--border);
+      border-radius:10px;
+      font-size:14px;
+      font-family:'Outfit',sans-serif;
+      transition:all .2s;
+      background:var(--bg);
+    }
+    .filter-group input:focus,
+    .filter-group select:focus{
+      outline:none;
+      border-color:var(--acc1);
+      box-shadow:0 0 0 3px rgba(99,102,241,.1);
+    }
+    .filter-actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      padding:10px 24px;
+      border-radius:10px;
+      border:none;
+      font-weight:600;
+      font-size:14px;
+      cursor:pointer;
+      font-family:'Outfit',sans-serif;
+      transition:all .2s;
+    }
+    .btn-primary{
+      background:var(--acc1);
+      color:white;
+      box-shadow:0 4px 12px rgba(99,102,241,.3);
+    }
+    .btn-primary:hover{
+      background:#4f46e5;
+      transform:translateY(-2px);
+      box-shadow:0 6px 16px rgba(99,102,241,.4);
+    }
+    .btn-secondary{
+      background:var(--bg);
+      color:var(--text);
+      border:2px solid var(--border);
+    }
+    .btn-secondary:hover{
+      border-color:var(--acc1);
+      background:rgba(99,102,241,.05);
+    }
+    .btn-success{
+      background:var(--acc3);
+      color:white;
+      box-shadow:0 4px 12px rgba(16,185,129,.3);
+    }
+    .btn-success:hover{
+      background:#059669;
+      transform:translateY(-2px);
+    }
+    
+    /* Search */
+    .search-section{
+      background:var(--card);
+      border:2px solid var(--ring);
+      border-radius:16px;
+      padding:20px 24px;
+      margin-bottom:32px;
+      box-shadow:0 4px 16px var(--shadow);
+    }
+    .search-box{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .search-input{
+      flex:1;
+      padding:12px 20px;
+      border:2px solid var(--border);
+      border-radius:10px;
+      font-size:15px;
+      font-family:'Outfit',sans-serif;
+    }
+    .search-input:focus{
+      outline:none;
+      border-color:var(--acc1);
+      box-shadow:0 0 0 3px rgba(99,102,241,.1);
+    }
+    
+    /* Charts */
+    .charts-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(400px,1fr));
+      gap:24px;
+      margin-bottom:32px;
+    }
+    .chart-card{
+      background:var(--card);
+      border:2px solid var(--ring);
+      border-radius:16px;
+      padding:24px;
+      box-shadow:0 4px 16px var(--shadow);
+    }
+    .chart-title{
+      font-size:16px;
+      font-weight:700;
+      color:var(--text);
+      margin-bottom:16px;
+    }
+    .chart-container{
+      position:relative;
+      height:300px;
+    }
+    
+    /* Table */
+    .table-section{
+      background:var(--card);
+      border:2px solid var(--ring);
+      border-radius:16px;
+      padding:24px;
+      box-shadow:0 4px 16px var(--shadow);
+    }
+    .table-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:20px;
+    }
+    .table-title{
+      font-size:18px;
+      font-weight:700;
+      color:var(--text);
+    }
+    .table-info{
+      font-size:14px;
+      color:var(--muted);
+    }
+    .table-container{
+      overflow-x:auto;
+      margin-bottom:20px;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:14px;
+    }
+    thead th{
+      text-align:left;
+      padding:12px 16px;
+      background:var(--bg);
+      font-weight:700;
+      color:var(--text);
+      border-bottom:2px solid var(--border);
+      white-space:nowrap;
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+    tbody td{
+      padding:12px 16px;
+      border-bottom:1px solid var(--ring);
+      color:var(--text);
+    }
+    tbody tr:hover{
+      background:rgba(99,102,241,.05);
+    }
+    
+    /* Pagination */
+    .pagination{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .page-btn{
+      padding:8px 14px;
+      border:2px solid var(--border);
+      border-radius:8px;
+      background:var(--bg);
+      color:var(--text);
+      font-weight:600;
+      font-size:14px;
+      cursor:pointer;
+      transition:all .2s;
+      font-family:'Outfit',sans-serif;
+    }
+    .page-btn:hover:not(:disabled){
+      border-color:var(--acc1);
+      background:rgba(99,102,241,.1);
+    }
+    .page-btn.active{
+      background:var(--acc1);
+      color:white;
+      border-color:var(--acc1);
+    }
+    .page-btn:disabled{
+      opacity:0.5;
+      cursor:not-allowed;
+    }
+    
+    @media (max-width: 768px){
+      .bar{padding:16px 20px}
+      .main{padding:20px 16px}
+      .kpis{grid-template-columns:repeat(2,1fr)}
+      .filters-grid{grid-template-columns:1fr}
+      .charts-grid{grid-template-columns:1fr}
+      .table-container{overflow-x:scroll}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="bar">
+      <div class="logo">
+        <span class="dot"></span>
+        <h1 class="title">Missed Call Data</h1>
+      </div>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link">📊 Dashboard</a>
+        <a href="missed-calls.html" class="nav-link active">📞 Missed Call Data</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- KPIs -->
+    <div class="kpis">
+      <div class="kpi">
+        <div class="kpi-label">Total Growers</div>
+        <div class="kpi-value" id="totalGrowers">0</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Unique Growers</div>
+        <div class="kpi-value" id="uniqueGrowers">0</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Total Records</div>
+        <div class="kpi-value" id="totalRecords">0</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+      <div class="filters-header">
+        <h2 class="filters-title">📋 Filters</h2>
+        <button class="btn btn-success" id="downloadBtn">📥 Download Excel</button>
+      </div>
+      
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label>Digitrack No</label>
+          <input type="text" id="filterDigitrack" placeholder="Search Digitrack No">
+        </div>
+        <div class="filter-group">
+          <label>State</label>
+          <select id="filterState">
+            <option value="">All States</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>HQ</label>
+          <select id="filterHQ">
+            <option value="">All HQs</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Division/PT District</label>
+          <select id="filterDistrict">
+            <option value="">All Districts</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Zone</label>
+          <select id="filterZone">
+            <option value="">All Zones</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Date Processed</label>
+          <input type="date" id="filterDate">
+        </div>
+      </div>
+      
+      <div class="filter-actions">
+        <button class="btn btn-primary" id="applyFiltersBtn">Apply Filters</button>
+        <button class="btn btn-secondary" id="resetFiltersBtn">Reset</button>
+      </div>
+    </div>
+
+    <!-- Universal Search -->
+    <div class="search-section">
+      <div class="search-box">
+        <input type="text" class="search-input" id="universalSearch" placeholder="🔍 Universal Search - Search across all columns...">
+        <button class="btn btn-primary" id="searchBtn">Search</button>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h3 class="chart-title">📍 State-wise Missed Calls</h3>
+        <div class="chart-container">
+          <canvas id="stateChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h3 class="chart-title">👤 PT-wise Missed Calls</h3>
+        <div class="chart-container">
+          <canvas id="ptChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-section">
+      <div class="table-header">
+        <h2 class="table-title">📞 Missed Call Records</h2>
+        <span class="table-info" id="tableInfo">Showing 0 of 0 records</span>
+      </div>
+      
+      <div class="table-container">
+        <table id="dataTable">
+          <thead>
+            <tr>
+              <th>Digitrack No</th>
+              <th>Grower</th>
+              <th>Date</th>
+              <th>Action</th>
+              <th>Date Processed</th>
+              <th>Name (PT)</th>
+              <th>HQ</th>
+              <th>Division/PT District</th>
+              <th>Zone</th>
+              <th>State</th>
+              <th>Mobile</th>
+              <th>Language</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="pagination" id="pagination">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // State
+    let MC_DATA = [];
+    let FILTERED_DATA = [];
+    let CURRENT_PAGE = 1;
+    const ROWS_PER_PAGE = 50;
+
+    // Load CSV
+    Papa.parse('./mc_data.csv', {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: (result) => {
+        MC_DATA = result.data;
+        FILTERED_DATA = [...MC_DATA];
+        console.log('✅ Loaded', MC_DATA.length, 'records');
+        populateFilters();
+        render();
+      },
+      error: (err) => {
+        console.error('❌ Error loading CSV:', err);
+        alert('Failed to load data. Please check if mc_data.csv exists.');
+      }
+    });
+
+    // Populate filter dropdowns
+    function populateFilters(){
+      const states = [...new Set(MC_DATA.map(r => r.State).filter(Boolean))].sort();
+      const hqs = [...new Set(MC_DATA.map(r => r.HQ).filter(Boolean))].sort();
+      const districts = [...new Set(MC_DATA.map(r => r['Division/PT District']).filter(Boolean))].sort();
+      const zones = [...new Set(MC_DATA.map(r => r.ZONE).filter(Boolean))].sort();
+      
+      populateSelect('filterState', states);
+      populateSelect('filterHQ', hqs);
+      populateSelect('filterDistrict', districts);
+      populateSelect('filterZone', zones);
+    }
+
+    function populateSelect(id, options){
+      const select = document.getElementById(id);
+      const currentValue = select.value;
+      select.innerHTML = '<option value="">All ' + select.previousElementSibling.textContent + '</option>';
+      options.forEach(opt => {
+        const option = document.createElement('option');
+        option.value = opt;
+        option.textContent = opt;
+        select.appendChild(option);
+      });
+      if(currentValue) select.value = currentValue;
+    }
+
+    // Apply filters
+    function applyFilters(){
+      const digitrack = document.getElementById('filterDigitrack').value.toLowerCase();
+      const state = document.getElementById('filterState').value;
+      const hq = document.getElementById('filterHQ').value;
+      const district = document.getElementById('filterDistrict').value;
+      const zone = document.getElementById('filterZone').value;
+      const date = document.getElementById('filterDate').value;
+
+      FILTERED_DATA = MC_DATA.filter(row => {
+        if(digitrack && !row['Digitrack No']?.toLowerCase().includes(digitrack)) return false;
+        if(state && row.State !== state) return false;
+        if(hq && row.HQ !== hq) return false;
+        if(district && row['Division/PT District'] !== district) return false;
+        if(zone && row.ZONE !== zone) return false;
+        if(date && row['Date Processed'] !== date) return false;
+        return true;
+      });
+
+      CURRENT_PAGE = 1;
+      render();
+    }
+
+    // Universal search
+    function universalSearch(){
+      const query = document.getElementById('universalSearch').value.toLowerCase();
+      if(!query){
+        FILTERED_DATA = [...MC_DATA];
+      } else {
+        FILTERED_DATA = MC_DATA.filter(row => {
+          return Object.values(row).some(val => 
+            String(val).toLowerCase().includes(query)
+          );
+        });
+      }
+      CURRENT_PAGE = 1;
+      render();
+    }
+
+    // Reset filters
+    function resetFilters(){
+      document.getElementById('filterDigitrack').value = '';
+      document.getElementById('filterState').value = '';
+      document.getElementById('filterHQ').value = '';
+      document.getElementById('filterDistrict').value = '';
+      document.getElementById('filterZone').value = '';
+      document.getElementById('filterDate').value = '';
+      document.getElementById('universalSearch').value = '';
+      
+      FILTERED_DATA = [...MC_DATA];
+      CURRENT_PAGE = 1;
+      render();
+    }
+
+    // Render everything
+    function render(){
+      updateKPIs();
+      renderCharts();
+      renderTable();
+      renderPagination();
+    }
+
+    // Update KPIs
+    function updateKPIs(){
+      const totalGrowers = FILTERED_DATA.length;
+      const uniqueGrowers = new Set(FILTERED_DATA.map(r => r['Mobile number'])).size;
+      
+      document.getElementById('totalGrowers').textContent = totalGrowers.toLocaleString();
+      document.getElementById('uniqueGrowers').textContent = uniqueGrowers.toLocaleString();
+      document.getElementById('totalRecords').textContent = FILTERED_DATA.length.toLocaleString();
+    }
+
+    // Render charts
+    let stateChart = null;
+    let ptChart = null;
+
+    function renderCharts(){
+      // State-wise data
+      const stateData = {};
+      FILTERED_DATA.forEach(row => {
+        const state = row.State || 'Unknown';
+        stateData[state] = (stateData[state] || 0) + 1;
+      });
+      
+      const states = Object.keys(stateData).sort((a,b) => stateData[b] - stateData[a]).slice(0,10);
+      const stateCounts = states.map(s => stateData[s]);
+
+      // PT-wise data
+      const ptData = {};
+      FILTERED_DATA.forEach(row => {
+        const pt = row.Name || 'Unknown';
+        ptData[pt] = (ptData[pt] || 0) + 1;
+      });
+      
+      const pts = Object.keys(ptData).sort((a,b) => ptData[b] - ptData[a]).slice(0,10);
+      const ptCounts = pts.map(p => ptData[p]);
+
+      // Render State Chart
+      const stateCtx = document.getElementById('stateChart').getContext('2d');
+      if(stateChart) stateChart.destroy();
+      stateChart = new Chart(stateCtx, {
+        type: 'bar',
+        data: {
+          labels: states,
+          datasets: [{
+            label: 'Missed Calls',
+            data: stateCounts,
+            backgroundColor: '#6366f1',
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {display: false}
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {font: {weight: '600'}}
+            },
+            x: {
+              ticks: {font: {weight: '600'}}
+            }
+          }
+        }
+      });
+
+      // Render PT Chart
+      const ptCtx = document.getElementById('ptChart').getContext('2d');
+      if(ptChart) ptChart.destroy();
+      ptChart = new Chart(ptCtx, {
+        type: 'bar',
+        data: {
+          labels: pts,
+          datasets: [{
+            label: 'Missed Calls',
+            data: ptCounts,
+            backgroundColor: '#10b981',
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {display: false}
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {font: {weight: '600'}}
+            },
+            x: {
+              ticks: {
+                font: {weight: '600'},
+                maxRotation: 45,
+                minRotation: 45
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Render table
+    function renderTable(){
+      const start = (CURRENT_PAGE - 1) * ROWS_PER_PAGE;
+      const end = start + ROWS_PER_PAGE;
+      const pageData = FILTERED_DATA.slice(start, end);
+
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+
+      if(pageData.length === 0){
+        tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:40px;color:#9ca3af">No data found</td></tr>';
+      } else {
+        pageData.forEach(row => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${row['Digitrack No'] || '-'}</td>
+            <td>${row.Grower || '-'}</td>
+            <td>${row.Date || '-'}</td>
+            <td>${row.Action || '-'}</td>
+            <td>${row['Date Processed'] || '-'}</td>
+            <td>${row.Name || '-'}</td>
+            <td>${row.HQ || '-'}</td>
+            <td>${row['Division/PT District'] || '-'}</td>
+            <td>${row.ZONE || '-'}</td>
+            <td>${row.State || '-'}</td>
+            <td>${row['Mobile number'] || '-'}</td>
+            <td>${row.Language || '-'}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      document.getElementById('tableInfo').textContent = 
+        `Showing ${start + 1}-${Math.min(end, FILTERED_DATA.length)} of ${FILTERED_DATA.length} records`;
+    }
+
+    // Render pagination
+    function renderPagination(){
+      const totalPages = Math.ceil(FILTERED_DATA.length / ROWS_PER_PAGE);
+      const pagination = document.getElementById('pagination');
+      pagination.innerHTML = '';
+
+      // Previous
+      const prev = document.createElement('button');
+      prev.textContent = '← Previous';
+      prev.className = 'page-btn';
+      prev.disabled = CURRENT_PAGE === 1;
+      prev.onclick = () => {
+        if(CURRENT_PAGE > 1){
+          CURRENT_PAGE--;
+          renderTable();
+          renderPagination();
+        }
+      };
+      pagination.appendChild(prev);
+
+      // Page numbers
+      const maxPages = 5;
+      let startPage = Math.max(1, CURRENT_PAGE - Math.floor(maxPages / 2));
+      let endPage = Math.min(totalPages, startPage + maxPages - 1);
+
+      if(endPage - startPage < maxPages - 1){
+        startPage = Math.max(1, endPage - maxPages + 1);
+      }
+
+      if(startPage > 1){
+        const first = document.createElement('button');
+        first.textContent = '1';
+        first.className = 'page-btn';
+        first.onclick = () => {
+          CURRENT_PAGE = 1;
+          renderTable();
+          renderPagination();
+        };
+        pagination.appendChild(first);
+
+        if(startPage > 2){
+          const dots = document.createElement('span');
+          dots.textContent = '...';
+          dots.style.padding = '0 8px';
+          pagination.appendChild(dots);
+        }
+      }
+
+      for(let i = startPage; i <= endPage; i++){
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        btn.className = 'page-btn' + (i === CURRENT_PAGE ? ' active' : '');
+        btn.onclick = () => {
+          CURRENT_PAGE = i;
+          renderTable();
+          renderPagination();
+        };
+        pagination.appendChild(btn);
+      }
+
+      if(endPage < totalPages){
+        if(endPage < totalPages - 1){
+          const dots = document.createElement('span');
+          dots.textContent = '...';
+          dots.style.padding = '0 8px';
+          pagination.appendChild(dots);
+        }
+
+        const last = document.createElement('button');
+        last.textContent = totalPages;
+        last.className = 'page-btn';
+        last.onclick = () => {
+          CURRENT_PAGE = totalPages;
+          renderTable();
+          renderPagination();
+        };
+        pagination.appendChild(last);
+      }
+
+      // Next
+      const next = document.createElement('button');
+      next.textContent = 'Next →';
+      next.className = 'page-btn';
+      next.disabled = CURRENT_PAGE === totalPages;
+      next.onclick = () => {
+        if(CURRENT_PAGE < totalPages){
+          CURRENT_PAGE++;
+          renderTable();
+          renderPagination();
+        }
+      };
+      pagination.appendChild(next);
+    }
+
+    // Download Excel
+    function downloadExcel(){
+      const dataToExport = FILTERED_DATA.length > 0 ? FILTERED_DATA : MC_DATA;
+      
+      const ws = XLSX.utils.json_to_sheet(dataToExport);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Missed Calls');
+      
+      const filename = `missed_calls_${new Date().toISOString().slice(0,10)}.xlsx`;
+      XLSX.writeFile(wb, filename);
+      
+      alert(`✅ Downloaded ${dataToExport.length} records to ${filename}`);
+    }
+
+    // Event listeners
+    document.getElementById('applyFiltersBtn').onclick = applyFilters;
+    document.getElementById('resetFiltersBtn').onclick = resetFilters;
+    document.getElementById('searchBtn').onclick = universalSearch;
+    document.getElementById('universalSearch').onkeypress = (e) => {
+      if(e.key === 'Enter') universalSearch();
+    };
+    document.getElementById('downloadBtn').onclick = downloadExcel;
+  </script>
+</body>
+</html>

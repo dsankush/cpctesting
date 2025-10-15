@@ -78,6 +78,28 @@
       box-shadow:0 4px 16px rgba(99,102,241,0.2);
       border:2px solid rgba(99,102,241,0.1);
     }
+    .nav-links{
+      display:flex;
+      gap:12px;
+      margin-left:auto;
+    }
+    .nav-link{
+      padding:10px 20px;
+      border-radius:10px;
+      text-decoration:none;
+      color:var(--text);
+      font-weight:600;
+      font-size:14px;
+      transition:all .2s;
+      background:rgba(99,102,241,.1);
+      border:2px solid rgba(99,102,241,.2);
+    }
+    .nav-link:hover{
+      background:var(--acc1);
+      color:white;
+      transform:translateY(-2px);
+      box-shadow:0 4px 12px rgba(99,102,241,.3);
+    }
     .dot{
       width:20px;height:20px;border-radius:50%;
       background:linear-gradient(135deg,var(--acc1),var(--acc4));
@@ -895,6 +917,10 @@
         <span class="dot"></span>
         <h1 class="title">Coromandel CPC Campaign Dashboard</h1>
       </div>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link" style="background:var(--acc1);color:white">📊 Dashboard</a>
+        <a href="missed-calls.html" class="nav-link">📞 Missed Call Data</a>
+      </nav>
       <div class="header-actions">
         <button class="btn" id="downloadBtn">📥 Download Data</button>
         <button class="btn btn-logout" id="logoutBtn">🔒 Logout</button>
