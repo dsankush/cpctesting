@@ -255,16 +255,47 @@
     }
     
     .carousel-content {
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      border-radius: 20px;
+      box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 0 0 4px rgba(255, 215, 0, 0.3),
+        0 0 40px rgba(255, 215, 0, 0.2);
       transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
       opacity: 0;
       transform: translateX(50px) scale(0.9);
-      background: rgba(255, 255, 255, 0.98);
+      background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
       padding: 0;
       overflow: hidden;
       max-width: 900px;
       width: 100%;
+      border: 4px solid;
+      border-image: linear-gradient(135deg, #fbbf24, #f59e0b, #fbbf24) 1;
+      position: relative;
+    }
+    
+    .carousel-content::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b, #fbbf24);
+      border-radius: 20px;
+      z-index: -1;
+      opacity: 0.3;
+      animation: borderGlow 3s ease-in-out infinite;
+    }
+    
+    @keyframes borderGlow {
+      0%, 100% {
+        opacity: 0.3;
+        filter: blur(8px);
+      }
+      50% {
+        opacity: 0.6;
+        filter: blur(12px);
+      }
     }
     
     .carousel-content.loaded {
@@ -306,14 +337,16 @@
       content: '✨';
       position: absolute;
       left: 20px;
-      animation: sparkle 2s ease-in-out infinite;
+      font-size: 32px;
+      animation: sparkle 2s ease-in-out infinite, float 3s ease-in-out infinite;
     }
     
     .table-title::after {
       content: '✨';
       position: absolute;
       right: 20px;
-      animation: sparkle 2s ease-in-out infinite 1s;
+      font-size: 32px;
+      animation: sparkle 2s ease-in-out infinite 1s, float 3s ease-in-out infinite 1.5s;
     }
     
     @keyframes gradientShift {
@@ -393,6 +426,33 @@
       transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
       border-left: 4px solid transparent;
       position: relative;
+      animation: slideInRow 0.6s ease-out backwards;
+      opacity: 0;
+    }
+    
+    .winners-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+    .winners-table tbody tr:nth-child(2) { animation-delay: 0.2s; }
+    .winners-table tbody tr:nth-child(3) { animation-delay: 0.3s; }
+    .winners-table tbody tr:nth-child(4) { animation-delay: 0.4s; }
+    .winners-table tbody tr:nth-child(5) { animation-delay: 0.5s; }
+    .winners-table tbody tr:nth-child(6) { animation-delay: 0.6s; }
+    .winners-table tbody tr:nth-child(7) { animation-delay: 0.7s; }
+    .winners-table tbody tr:nth-child(8) { animation-delay: 0.8s; }
+    .winners-table tbody tr:nth-child(9) { animation-delay: 0.9s; }
+    .winners-table tbody tr:nth-child(10) { animation-delay: 1s; }
+    
+    @keyframes slideInRow {
+      0% {
+        opacity: 0;
+        transform: translateX(-50px) rotateY(-20deg);
+      }
+      60% {
+        transform: translateX(10px) rotateY(5deg);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0) rotateY(0deg);
+      }
     }
     
     .winners-table tbody tr:nth-child(even) {
@@ -411,6 +471,22 @@
         0 0 30px rgba(245, 158, 11, 0.3);
       border-left: 4px solid #fbbf24;
       z-index: 10;
+      animation: rowPulse 0.6s ease-in-out infinite alternate;
+    }
+    
+    @keyframes rowPulse {
+      0% {
+        box-shadow: 
+          -4px 0 0 #fbbf24,
+          0 4px 20px rgba(251, 191, 36, 0.4),
+          0 0 30px rgba(245, 158, 11, 0.3);
+      }
+      100% {
+        box-shadow: 
+          -4px 0 0 #f59e0b,
+          0 6px 30px rgba(251, 191, 36, 0.6),
+          0 0 50px rgba(245, 158, 11, 0.5);
+      }
     }
     
     .winners-table tbody tr:hover td {
@@ -435,6 +511,36 @@
         rgba(254, 252, 232, 1) 100%);
       border-left: 4px solid #fbbf24;
       font-weight: 600;
+      position: relative;
+      overflow: visible;
+    }
+    
+    /* Special glow for top 3 */
+    .winners-table tbody tr.top-winner {
+      animation: topWinnerGlow 3s ease-in-out infinite;
+    }
+    
+    @keyframes topWinnerGlow {
+      0%, 100% {
+        box-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
+      }
+      50% {
+        box-shadow: 0 0 25px rgba(251, 191, 36, 0.6), 0 0 40px rgba(245, 158, 11, 0.4);
+      }
+    }
+    
+    /* Celebration emoji animation */
+    .top-winner td:nth-child(2) {
+      animation: celebrateText 2s ease-in-out infinite;
+    }
+    
+    @keyframes celebrateText {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
     }
     
     .rank-badge {
@@ -544,6 +650,239 @@
       }
       50% {
         transform: scale(1.05);
+      }
+    }
+    
+    /* Sparkle particles on top 3 rows */
+    .winners-table tbody tr:first-child::before,
+    .winners-table tbody tr:nth-child(2)::before,
+    .winners-table tbody tr:nth-child(3)::before {
+      content: '⭐';
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 20px;
+      animation: twinkle 2s ease-in-out infinite;
+      opacity: 0;
+    }
+    
+    @keyframes twinkle {
+      0%, 100% {
+        opacity: 0;
+        transform: translateY(-50%) scale(0.5) rotate(0deg);
+      }
+      50% {
+        opacity: 1;
+        transform: translateY(-50%) scale(1) rotate(180deg);
+      }
+    }
+    
+    /* Firework effect on table title */
+    .table-title {
+      overflow: visible;
+    }
+    
+    @keyframes firework {
+      0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(0);
+      }
+      50% {
+        opacity: 0.8;
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--tx), var(--ty)) scale(1);
+      }
+    }
+    
+    /* Floating badges */
+    .rank-badge {
+      animation: floatBadge 3s ease-in-out infinite;
+    }
+    
+    @keyframes floatBadge {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-5px);
+      }
+    }
+    
+    /* Rainbow shimmer on header */
+    .winners-table thead th {
+      background: linear-gradient(
+        90deg,
+        #8b5cf6 0%,
+        #6366f1 20%,
+        #3b82f6 40%,
+        #06b6d4 60%,
+        #3b82f6 80%,
+        #6366f1 100%
+      );
+      background-size: 200% 100%;
+      animation: rainbowSlide 3s linear infinite;
+    }
+    
+    @keyframes rainbowSlide {
+      0% {
+        background-position: 0% 50%;
+      }
+      100% {
+        background-position: 200% 50%;
+      }
+    }
+    
+    /* Bounce effect on rank badges when hovering row */
+    .winners-table tbody tr:hover .rank-badge {
+      animation: bounceBadge 0.6s ease-in-out;
+    }
+    
+    @keyframes bounceBadge {
+      0%, 100% {
+        transform: translateY(0) scale(1);
+      }
+      25% {
+        transform: translateY(-10px) scale(1.1) rotate(-10deg);
+      }
+      50% {
+        transform: translateY(0) scale(1.15) rotate(10deg);
+      }
+      75% {
+        transform: translateY(-5px) scale(1.1) rotate(-5deg);
+      }
+    }
+    
+    /* Text glow animation on hover */
+    .winners-table tbody tr:hover td:nth-child(2) {
+      animation: textGlow 1s ease-in-out infinite alternate;
+    }
+    
+    @keyframes textGlow {
+      0% {
+        text-shadow: 0 0 5px rgba(251, 191, 36, 0.5);
+      }
+      100% {
+        text-shadow: 0 0 15px rgba(251, 191, 36, 0.8),
+                     0 0 25px rgba(245, 158, 11, 0.5);
+      }
+    }
+    
+    /* Wave animation for table */
+    @keyframes wave {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-3px);
+      }
+    }
+    
+    .winners-table tbody td {
+      animation: wave 3s ease-in-out infinite;
+    }
+    
+    .winners-table tbody tr:nth-child(1) td { animation-delay: 0s; }
+    .winners-table tbody tr:nth-child(2) td { animation-delay: 0.1s; }
+    .winners-table tbody tr:nth-child(3) td { animation-delay: 0.2s; }
+    .winners-table tbody tr:nth-child(4) td { animation-delay: 0.3s; }
+    .winners-table tbody tr:nth-child(5) td { animation-delay: 0.4s; }
+    .winners-table tbody tr:nth-child(6) td { animation-delay: 0.5s; }
+    .winners-table tbody tr:nth-child(7) td { animation-delay: 0.6s; }
+    .winners-table tbody tr:nth-child(8) td { animation-delay: 0.7s; }
+    .winners-table tbody tr:nth-child(9) td { animation-delay: 0.8s; }
+    .winners-table tbody tr:nth-child(10) td { animation-delay: 0.9s; }
+    
+    /* Confetti animation on table load */
+    @keyframes confettiDrop {
+      0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+    
+    /* Shooting star effect across table */
+    .carousel-content::after {
+      content: '⭐';
+      position: absolute;
+      top: 20%;
+      left: -50px;
+      font-size: 24px;
+      opacity: 0;
+      animation: shootingStar 4s ease-in-out 1s infinite;
+      pointer-events: none;
+    }
+    
+    @keyframes shootingStar {
+      0% {
+        left: -50px;
+        top: 20%;
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        left: 110%;
+        top: 80%;
+        opacity: 0;
+      }
+    }
+    
+    /* Pulsing border on carousel */
+    .carousel-content.loaded {
+      animation: contentPulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes contentPulse {
+      0%, 100% {
+        box-shadow: 
+          0 20px 60px rgba(0, 0, 0, 0.5),
+          0 0 0 4px rgba(255, 215, 0, 0.3),
+          0 0 40px rgba(255, 215, 0, 0.2);
+      }
+      50% {
+        box-shadow: 
+          0 20px 60px rgba(0, 0, 0, 0.5),
+          0 0 0 4px rgba(255, 215, 0, 0.6),
+          0 0 60px rgba(255, 215, 0, 0.4);
+      }
+    }
+    
+    /* Rotating gradient on top winner badges */
+    .rank-1::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 0deg,
+        #ffd700,
+        #ffed4e,
+        #ffd700,
+        #fbbf24,
+        #ffd700
+      );
+      animation: rotateBadge 3s linear infinite;
+      z-index: -1;
+      opacity: 0.5;
+    }
+    
+    @keyframes rotateBadge {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
       }
     }
     
@@ -765,14 +1104,19 @@
         const district = winner['District'] || '-';
         const headquarter = winner['Headquater'] || '-';
         
+        const isTopThree = globalIndex < 3;
+        const celebrationEmoji = isTopThree ? ['🎆', '🎇', '🌟'][globalIndex] : '';
+        
         return `
-          <tr>
+          <tr class="${isTopThree ? 'top-winner' : ''}">
             <td style="text-align: center;">
               <div class="rank-badge ${getRankClass(globalIndex)}">
                 ${rankNum <= 3 ? ['🥇', '🥈', '🥉'][globalIndex] : rankNum}
               </div>
             </td>
-            <td style="font-weight: 600;">${farmerName}</td>
+            <td style="font-weight: 600;">
+              ${isTopThree ? celebrationEmoji + ' ' : ''}${farmerName}
+            </td>
             <td>${mobile}</td>
             <td>${district}</td>
             <td style="font-weight: 600; color: #8b5cf6;">${headquarter}</td>
@@ -781,15 +1125,15 @@
       }).join('');
       
       return `
-        <div class="table-title">🏆 Lucky Draw Winners 🏆</div>
+        <div class="table-title">🎊 LUCKY DRAW WINNERS 🎊</div>
         <table class="winners-table">
           <thead>
             <tr>
-              <th style="width: 80px; text-align: center;">Sr. No.</th>
-              <th>Farmer Name</th>
-              <th>Mobile Number</th>
-              <th>District</th>
-              <th>Headquarter</th>
+              <th style="width: 80px; text-align: center;">🎯 SR. NO.</th>
+              <th>👨‍🌾 FARMER NAME</th>
+              <th>📱 MOBILE NUMBER</th>
+              <th>🏙️ DISTRICT</th>
+              <th>🏢 HEADQUARTER</th>
             </tr>
           </thead>
           <tbody>
@@ -813,11 +1157,63 @@
         // Trigger slide in animation
         setTimeout(() => {
           carouselContent.classList.add('loaded');
+          createTableParticles();
         }, 50);
         
         renderDots();
       }, 300);
     }
+    
+    // Create floating particles around the table
+    function createTableParticles() {
+      const container = carouselContent;
+      const particles = ['⭐', '✨', '🎊', '🎉', '💫', '⭐'];
+      
+      for (let i = 0; i < 12; i++) {
+        const particle = document.createElement('div');
+        particle.textContent = particles[Math.floor(Math.random() * particles.length)];
+        particle.style.cssText = `
+          position: absolute;
+          font-size: ${20 + Math.random() * 20}px;
+          pointer-events: none;
+          z-index: 1000;
+          opacity: 0;
+          animation: particleFloat ${3 + Math.random() * 2}s ease-out forwards;
+          left: ${Math.random() * 100}%;
+          top: ${Math.random() * 100}%;
+        `;
+        
+        container.appendChild(particle);
+        
+        setTimeout(() => {
+          if (particle.parentNode) {
+            particle.parentNode.removeChild(particle);
+          }
+        }, 5000);
+      }
+    }
+    
+    // Add particle animation style dynamically
+    const particleStyle = document.createElement('style');
+    particleStyle.textContent = `
+      @keyframes particleFloat {
+        0% {
+          opacity: 0;
+          transform: translate(0, 0) scale(0) rotate(0deg);
+        }
+        20% {
+          opacity: 1;
+        }
+        80% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+          transform: translate(${Math.random() * 200 - 100}px, ${Math.random() * 200 - 100}px) scale(1.5) rotate(720deg);
+        }
+      }
+    `;
+    document.head.appendChild(particleStyle);
 
     function renderDots() {
       carouselDots.innerHTML = "";
