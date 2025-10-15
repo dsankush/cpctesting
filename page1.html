@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lucky Draw - Prize Carousel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #000;
+    }
+    
+    .full-page {
+      width: 100vw;
+      height: 100vh;
+      background:
+        url("https://raw.githubusercontent.com/dsankush/coro-lucky-draw/main/DB/page1/b2.jpg") top center / 100% 50% no-repeat,
+        url("https://raw.githubusercontent.com/dsankush/coro-lucky-draw/main/DB/page1/b1.jpg") bottom center / 100% 50% no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      background-attachment: fixed;
+    }
+    
+    /* Professional overlay for better contrast */
+    .full-page::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.2) 0%,
+        rgba(0, 0, 0, 0.1) 40%,
+        rgba(0, 0, 0, 0.3) 100%
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .glow-effect {
+      animation: glow 1.2s ease-in-out infinite alternate, float 1.2s ease-in-out infinite;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      will-change: transform;
+      display: inline-block;
+      filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+    }
+
+    .glow-effect:hover {
+      transform: scale(1.08);
+      filter: drop-shadow(0 0 16px rgba(255, 215, 0, 0.8)) drop-shadow(0 0 24px rgba(255, 165, 0, 0.6));
+    }
+
+    @keyframes glow {
+      0% {
+        filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6))
+                drop-shadow(0 0 16px rgba(255, 165, 0, 0.4))
+                drop-shadow(0 0 24px rgba(255, 140, 0, 0.3));
+      }
+      100% {
+        filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.8))
+                drop-shadow(0 0 24px rgba(255, 165, 0, 0.6))
+                drop-shadow(0 0 36px rgba(255, 140, 0, 0.4));
+      }
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(3600deg); }
+    }
+
+    .spin-animation {
+      animation: spin 5.5s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+    }
+
+    /* Professional Spinning Wheel */
+    .fantastic-wheel {
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      position: relative;
+      background: conic-gradient(
+        from 0deg,
+        #1e40af 0deg 51.43deg,
+        #dc2626 51.43deg 102.86deg,
+        #059669 102.86deg 154.29deg,
+        #d97706 154.29deg 205.71deg,
+        #7c3aed 205.71deg 257.14deg,
+        #be185d 257.14deg 308.57deg,
+        #0891b2 308.57deg 360deg
+      );
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 0 0 4px #fff,
+        0 0 0 8px #e5e7eb,
+        inset 0 0 20px rgba(255, 255, 255, 0.1);
+      border: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .fantastic-wheel:hover {
+      transform: scale(1.05);
+      box-shadow: 
+        0 12px 48px rgba(0, 0, 0, 0.4),
+        0 0 0 4px #fff,
+        0 0 0 8px #d1d5db,
+        inset 0 0 25px rgba(255, 255, 255, 0.15);
+    }
+
+    .wheel-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      border-radius: 50%;
+      border: 4px solid #fff;
+      box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.2),
+        inset 0 2px 4px rgba(255, 255, 255, 0.8),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 12px;
+      color: #374151;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+      letter-spacing: 1px;
+    }
+
+    .wheel-pointer {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 40px solid #dc2626;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+      z-index: 10;
+    }
+
+    .wheel-pointer::after {
+      content: '';
+      position: absolute;
+      top: 35px;
+      left: -15px;
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-bottom: 25px solid #fff;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    }
+
+    .wheel-segments {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+
+    .wheel-segment {
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      top: 0;
+      left: 50%;
+      transform-origin: 0 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wheel-segment:nth-child(1) { transform: rotate(0deg); }
+    .wheel-segment:nth-child(2) { transform: rotate(51.43deg); }
+    .wheel-segment:nth-child(3) { transform: rotate(102.86deg); }
+    .wheel-segment:nth-child(4) { transform: rotate(154.29deg); }
+    .wheel-segment:nth-child(5) { transform: rotate(205.71deg); }
+    .wheel-segment:nth-child(6) { transform: rotate(257.14deg); }
+    .wheel-segment:nth-child(7) { transform: rotate(308.57deg); }
+
+    .wheel-symbol {
+      font-size: 28px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+
+    /* Professional spin animation */
+    @keyframes professionalSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(3600deg); }
+    }
+
+    .professional-spin {
+      animation: professionalSpin 4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+
+    .shiny-home {
+      background: linear-gradient(135deg, #facc15 0%, #f59e0b 50%, #d97706 100%);
+      border: 2px solid #f59e0b;
+      color: #1f2937;
+      font-weight: 700;
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(250, 204, 21, 0.4), 0 0 20px rgba(245, 158, 11, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      animation: pulseGlow 1.5s infinite alternate;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      letter-spacing: 0.5px;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .shiny-home:hover {
+      transform: scale(1.05) translateY(-2px);
+      box-shadow: 0 6px 24px rgba(250, 204, 21, 0.5), 0 0 30px rgba(245, 158, 11, 0.4), 0 0 40px rgba(217, 119, 6, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+
+    @keyframes pulseGlow {
+      0% {
+        box-shadow: 0 4px 16px rgba(250, 204, 21, 0.4), 0 0 20px rgba(245, 158, 11, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      }
+      100% {
+        box-shadow: 0 6px 24px rgba(250, 204, 21, 0.5), 0 0 30px rgba(245, 158, 11, 0.4), 0 0 40px rgba(217, 119, 6, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      }
+    }
+    
+    /* Enhanced carousel styling */
+    .carousel-container {
+      background: transparent;
+      backdrop-filter: none;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+    }
+    
+    .carousel-content {
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      opacity: 0;
+      transform: translateX(50px) scale(0.9);
+      background: rgba(255, 255, 255, 0.98);
+      padding: 0;
+      overflow: hidden;
+      max-width: 900px;
+      width: 100%;
+    }
+    
+    .carousel-content.loaded {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+    
+    .carousel-content.slide-out-left {
+      opacity: 0;
+      transform: translateX(-80px) scale(0.8);
+    }
+    
+    .carousel-content.slide-out-right {
+      opacity: 0;
+      transform: translateX(80px) scale(0.8);
+    }
+    
+    /* Winners Table in Carousel */
+    .table-title {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      padding: 20px;
+      text-align: center;
+      color: white;
+      font-size: 24px;
+      font-weight: 800;
+      border-radius: 16px 16px 0 0;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    .winners-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .winners-table thead {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    }
+    
+    .winners-table thead th {
+      padding: 14px 12px;
+      text-align: left;
+      color: white;
+      font-weight: 700;
+      font-size: 13px;
+      text-transform: uppercase;
+      border-bottom: 2px solid rgba(255, 215, 0, 0.5);
+    }
+    
+    .winners-table tbody tr {
+      background: white;
+      transition: all 0.3s ease;
+    }
+    
+    .winners-table tbody tr:nth-child(even) {
+      background: rgba(243, 244, 246, 0.6);
+    }
+    
+    .winners-table tbody tr:hover {
+      background: linear-gradient(90deg, rgba(250, 204, 21, 0.2), rgba(245, 158, 11, 0.2));
+      transform: scale(1.01);
+    }
+    
+    .winners-table tbody td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(209, 213, 219, 0.4);
+      font-size: 13px;
+      color: #374151;
+    }
+    
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-weight: 800;
+      font-size: 13px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .rank-1 {
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      color: #78350f;
+      animation: goldShine 2s ease-in-out infinite;
+    }
+    
+    .rank-2 {
+      background: linear-gradient(135deg, #e5e7eb 0%, #9ca3af 100%);
+      color: #374151;
+    }
+    
+    .rank-3 {
+      background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+      color: #78350f;
+    }
+    
+    .rank-default {
+      background: linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%);
+      color: #5b21b6;
+    }
+    
+    @keyframes goldShine {
+      0%, 100% {
+        box-shadow: 0 3px 10px rgba(251, 191, 36, 0.4);
+      }
+      50% {
+        box-shadow: 0 5px 18px rgba(251, 191, 36, 0.8),
+                    0 0 25px rgba(251, 191, 36, 0.5);
+      }
+    }
+    
+    .control-button {
+      background: linear-gradient(135deg, #facc15 0%, #f59e0b 100%);
+      border: 2px solid #f59e0b;
+      color: #1f2937;
+      font-weight: 700;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(250, 204, 21, 0.3);
+      transition: all 0.3s ease;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+    }
+    
+    .control-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(250, 204, 21, 0.4);
+    }
+    
+    .close-button {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      border: 2px solid #1d4ed8;
+      color: white;
+      font-weight: 700;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .close-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    }
+    
+    .dot-indicator {
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+    }
+    
+    .dot-indicator.active {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      transform: scale(1.2);
+    }
+    
+    .dot-indicator:not(.active) {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    /* Confetti animation */
+    @keyframes confettiFall {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+    
+  </style>
+</head>
+<body class="m-0 p-0 overflow-hidden">
+  <div class="full-page">
+    <a href="index.html" class="absolute top-10 left-10 shiny-home" style="z-index: 100;">
+      Home
+    </a>
+
+    <!-- Start Button -->
+    <div id="initialButtonContainer" class="absolute bottom-10 left-1/2 -translate-x-1/2 z-20">
+      <button id="startButton" class="focus:outline-none">
+        <img src="https://raw.githubusercontent.com/dsankush/coro-lucky-draw/main/DB/page1/bt1.jpg" class="w-[220px] h-auto object-contain select-none glow-effect" />
+      </button>
+    </div>
+
+    <!-- Fantastic Spinning Wheel -->
+    <div id="wheelContainer" class="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 hidden">
+      <button id="wheelButton" class="relative">
+        <div id="wheelImage" class="fantastic-wheel">
+          <!-- Wheel Pointer -->
+          <div class="wheel-pointer"></div>
+          
+          <!-- Wheel Segments -->
+          <div class="wheel-segments">
+            <div class="wheel-segment">
+              <div class="wheel-symbol">⭐</div>
+            </div>
+            <div class="wheel-segment">
+              <div class="wheel-symbol">💎</div>
+            </div>
+            <div class="wheel-segment">
+              <div class="wheel-symbol">🏆</div>
+            </div>
+            <div class="wheel-segment">
+              <div class="wheel-symbol">🎁</div>
+            </div>
+            <div class="wheel-segment">
+              <div class="wheel-symbol">💰</div>
+            </div>
+            <div class="wheel-segment">
+              <div class="wheel-symbol">👑</div>
+            </div>
+            <div class="wheel-segment">
+              <div class="wheel-symbol">🎊</div>
+            </div>
+          </div>
+          
+          <!-- Wheel Center -->
+          <div class="wheel-center">SPIN</div>
+        </div>
+      </button>
+    </div>
+
+    <!-- Carousel Viewer -->
+    <div id="carouselContainer" class="fixed inset-0 flex items-center justify-center z-30 hidden bg-transparent">
+      <div class="carousel-container p-6 flex flex-col items-center" style="max-width: 1000px; width: 100%;">
+        <div id="carouselContent" class="carousel-content w-full"></div>
+
+        <!-- Dots Indicator -->
+        <div id="carouselDots" class="flex justify-center mt-4 gap-2"></div>
+
+        <!-- Controls -->
+        <div class="mt-4 flex gap-4">
+          <button id="prevBtn" class="control-button">‹</button>
+          <button id="nextBtn" class="control-button">›</button>
+          <button id="closeCarousel" class="close-button">Close</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    const startButton = document.getElementById("startButton");
+    const initialButtonContainer = document.getElementById("initialButtonContainer");
+    const wheelContainer = document.getElementById("wheelContainer");
+    const wheelButton = document.getElementById("wheelButton");
+    const wheelImage = document.getElementById("wheelImage");
+    const carouselContainer = document.getElementById("carouselContainer");
+    const carouselContent = document.getElementById("carouselContent");
+    const carouselDots = document.getElementById("carouselDots");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const closeCarousel = document.getElementById("closeCarousel");
+
+    let carouselItems = [];
+    let winnersData = [];
+    let currentIndex = 0;
+    let hasSpun = false;
+    
+    // Load winners data from CSV
+    function loadWinnersData() {
+      Papa.parse('w1d.csv', {
+        download: true,
+        header: true,
+        complete: function(results) {
+          winnersData = results.data.filter(row => 
+            row['First Name'] && row['First Name'].trim() !== ''
+          );
+          
+          // Split winners into groups of 10
+          carouselItems = [];
+          for (let i = 0; i < winnersData.length; i += 10) {
+            carouselItems.push(winnersData.slice(i, i + 10));
+          }
+          
+          console.log(`Loaded ${winnersData.length} winners in ${carouselItems.length} tables`);
+        },
+        error: function(error) {
+          console.error('Error loading CSV:', error);
+          carouselItems = [[]]; // Empty table
+        }
+      });
+    }
+    
+    // Load data on page load
+    loadWinnersData();
+    
+    function getRankClass(index) {
+      if (index === 0) return 'rank-1';
+      if (index === 1) return 'rank-2';
+      if (index === 2) return 'rank-3';
+      return 'rank-default';
+    }
+    
+    function createTableHTML(winners, startIndex) {
+      if (winners.length === 0) {
+        return `
+          <div class="table-title">🏆 Lucky Draw Winners 🏆</div>
+          <div style="padding: 40px; text-align: center; color: #6366f1;">
+            Loading winners...
+          </div>
+        `;
+      }
+      
+      const tableRows = winners.map((winner, idx) => {
+        const globalIndex = startIndex + idx;
+        const rankNum = globalIndex + 1;
+        const farmerName = `${winner['First Name']} ${winner['Last Name']}`;
+        const mobile = winner['Phone Number'] || '-';
+        const district = winner['District'] || '-';
+        const headquarter = winner['PT'] || '-';
+        
+        return `
+          <tr>
+            <td style="text-align: center;">
+              <div class="rank-badge ${getRankClass(globalIndex)}">
+                ${rankNum <= 3 ? ['🥇', '🥈', '🥉'][globalIndex] : rankNum}
+              </div>
+            </td>
+            <td style="font-weight: 600;">${farmerName}</td>
+            <td>${mobile}</td>
+            <td>${district}</td>
+            <td style="font-weight: 600; color: #8b5cf6;">${headquarter}</td>
+          </tr>
+        `;
+      }).join('');
+      
+      return `
+        <div class="table-title">🏆 Lucky Draw Winners 🏆</div>
+        <table class="winners-table">
+          <thead>
+            <tr>
+              <th style="width: 80px; text-align: center;">Sr. No.</th>
+              <th>Farmer Name</th>
+              <th>Mobile Number</th>
+              <th>District</th>
+              <th>Headquarter</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tableRows}
+          </tbody>
+        </table>
+      `;
+    }
+    
+    function updateCarousel(index, direction = 'right') {
+      // Add slide out animation
+      carouselContent.classList.add(direction === 'left' ? 'slide-out-left' : 'slide-out-right');
+      
+      setTimeout(() => {
+        const winners = carouselItems[index] || [];
+        const startIndex = index * 10;
+        
+        carouselContent.innerHTML = createTableHTML(winners, startIndex);
+        carouselContent.classList.remove('slide-out-left', 'slide-out-right', 'loaded');
+        
+        // Trigger slide in animation
+        setTimeout(() => {
+          carouselContent.classList.add('loaded');
+        }, 50);
+        
+        renderDots();
+      }, 300);
+    }
+
+    function renderDots() {
+      carouselDots.innerHTML = "";
+      carouselItems.forEach((_, index) => {
+        const dot = document.createElement("span");
+        dot.className = `w-3 h-3 rounded-full cursor-pointer dot-indicator ${
+          index === currentIndex ? "active" : ""
+        }`;
+        dot.addEventListener("click", () => {
+          const direction = index > currentIndex ? 'right' : 'left';
+          currentIndex = index;
+          updateCarousel(currentIndex, direction);
+        });
+        carouselDots.appendChild(dot);
+      });
+    }
+    
+    function createConfettiBurst() {
+      const colors = ['#facc15', '#f59e0b', '#3b82f6', '#dc2626', '#10b981', '#8b5cf6'];
+      for (let i = 0; i < 20; i++) {
+        const confetti = document.createElement('div');
+        confetti.style.cssText = `
+          position: fixed;
+          width: 6px;
+          height: 6px;
+          background: ${colors[Math.floor(Math.random() * colors.length)]};
+          pointer-events: none;
+          z-index: 2000;
+          animation: confettiFall ${2 + Math.random() * 2}s ease-out forwards;
+        `;
+        
+        confetti.style.left = Math.random() * window.innerWidth + 'px';
+        confetti.style.top = '-10px';
+        
+        document.body.appendChild(confetti);
+        
+        setTimeout(() => {
+          if (confetti.parentNode) {
+            confetti.parentNode.removeChild(confetti);
+          }
+        }, 4000);
+      }
+    }
+
+    startButton.addEventListener("click", () => {
+      initialButtonContainer.classList.add("hidden");
+
+      if (hasSpun) {
+        carouselContainer.classList.remove("hidden");
+        updateCarousel(currentIndex);
+        createConfettiBurst();
+      } else {
+        wheelContainer.classList.remove("hidden");
+      }
+    });
+
+    wheelButton.addEventListener("click", () => {
+      if (wheelImage.classList.contains("professional-spin")) return;
+      wheelImage.classList.add("professional-spin");
+
+      setTimeout(() => {
+        wheelImage.classList.remove("professional-spin");
+        wheelContainer.classList.add("hidden");
+        carouselContainer.classList.remove("hidden");
+        updateCarousel(currentIndex);
+        hasSpun = true;
+        createConfettiBurst();
+      }, 4000);
+    });
+
+    prevBtn.addEventListener("click", () => {
+      currentIndex = (currentIndex - 1 + carouselItems.length) % carouselItems.length;
+      updateCarousel(currentIndex, 'left');
+    });
+
+    nextBtn.addEventListener("click", () => {
+      currentIndex = (currentIndex + 1) % carouselItems.length;
+      updateCarousel(currentIndex, 'right');
+    });
+
+    closeCarousel.addEventListener("click", () => {
+      carouselContainer.classList.add("hidden");
+      initialButtonContainer.classList.remove("hidden");
+    });
+  </script>
+</body>
+</html>
