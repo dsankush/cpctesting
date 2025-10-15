@@ -237,116 +237,151 @@
     }
 
 
-    /* Enhanced carousel styling */
-    .carousel-container {
-      background: transparent;
-      backdrop-filter: none;
-      border: none;
-      border-radius: 0;
-      box-shadow: none;
-    }
-    
-    .carousel-image {
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-      transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-      opacity: 0;
-      transform: translateX(50px) scale(0.8) rotate(5deg);
-      filter: blur(2px);
-    }
-    
-    .carousel-image.loaded {
-      opacity: 1;
-      transform: translateX(0) scale(1) rotate(0deg);
-      filter: blur(0px);
-      animation: festiveBounce 0.8s ease-out;
-    }
-    
-    .carousel-image:hover {
-      transform: translateX(0) scale(1.08) rotate(-2deg);
-      box-shadow: 0 20px 50px rgba(255, 215, 0, 0.3);
-      animation: festiveWiggle 0.5s ease-in-out infinite alternate;
-    }
-    
-    .carousel-image.slide-out-left {
-      opacity: 0;
-      transform: translateX(-80px) scale(0.7) rotate(-10deg);
-      filter: blur(3px);
-    }
-    
-    .carousel-image.slide-out-right {
-      opacity: 0;
-      transform: translateX(80px) scale(0.7) rotate(10deg);
-      filter: blur(3px);
-    }
-    
-    @keyframes festiveBounce {
-      0% {
-        transform: translateX(0) scale(0.8) rotate(0deg);
-      }
-      50% {
-        transform: translateX(0) scale(1.1) rotate(2deg);
-      }
-      70% {
-        transform: translateX(0) scale(0.95) rotate(-1deg);
-      }
-      100% {
-        transform: translateX(0) scale(1) rotate(0deg);
-      }
-    }
-    
-    @keyframes festiveWiggle {
-      0% {
-        transform: translateX(0) scale(1.08) rotate(-2deg);
-      }
-      100% {
-        transform: translateX(0) scale(1.08) rotate(2deg);
-      }
-    }
-    
-    .control-button {
-      background: linear-gradient(135deg, #facc15 0%, #f59e0b 100%);
-      border: 2px solid #f59e0b;
-      color: #1f2937;
-      font-weight: 700;
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(250, 204, 21, 0.3);
-      transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-      position: relative;
+    /* Winners Table Styling */
+    .winners-container {
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4),
+                  0 0 0 3px rgba(255, 215, 0, 0.5);
+      animation: tableEntrance 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      max-width: 90vw;
+      max-height: 85vh;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
     
-    .control-button:hover {
-      transform: translateY(-3px) scale(1.05);
-      box-shadow: 0 8px 25px rgba(250, 204, 21, 0.5);
-      animation: festiveButtonPulse 0.6s ease-in-out infinite alternate;
-    }
-    
-    .control-button:active {
-      transform: translateY(-1px) scale(0.98);
-      animation: festiveButtonClick 0.2s ease-out;
-    }
-    
-    @keyframes festiveButtonPulse {
+    @keyframes tableEntrance {
       0% {
-        box-shadow: 0 8px 25px rgba(250, 204, 21, 0.5);
+        opacity: 0;
+        transform: scale(0.8) translateY(50px);
       }
       100% {
-        box-shadow: 0 8px 25px rgba(250, 204, 21, 0.8), 0 0 20px rgba(255, 215, 0, 0.6);
+        opacity: 1;
+        transform: scale(1) translateY(0);
       }
     }
     
-    @keyframes festiveButtonClick {
+    .table-header {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      padding: 24px;
+      border-radius: 24px 24px 0 0;
+      text-align: center;
+    }
+    
+    .table-title {
+      font-size: 32px;
+      font-weight: 900;
+      color: white;
+      text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      margin: 0;
+    }
+    
+    .table-wrapper {
+      overflow-y: auto;
+      overflow-x: auto;
+      flex: 1;
+      padding: 0;
+    }
+    
+    .winners-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .winners-table thead {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    
+    .winners-table thead th {
+      padding: 16px;
+      text-align: left;
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 3px solid rgba(255, 215, 0, 0.6);
+    }
+    
+    .winners-table tbody tr {
+      background: white;
+      transition: all 0.3s ease;
+      animation: rowSlideIn 0.5s ease-out backwards;
+    }
+    
+    @keyframes rowSlideIn {
       0% {
-        transform: translateY(-1px) scale(0.98);
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .winners-table tbody tr:nth-child(even) {
+      background: rgba(243, 244, 246, 0.5);
+    }
+    
+    .winners-table tbody tr:hover {
+      background: linear-gradient(90deg, rgba(250, 204, 21, 0.25), rgba(245, 158, 11, 0.25));
+      transform: scale(1.01);
+      box-shadow: 0 4px 15px rgba(250, 204, 21, 0.4);
+    }
+    
+    .winners-table tbody td {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(209, 213, 219, 0.4);
+      font-size: 14px;
+      color: #374151;
+    }
+    
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-weight: 800;
+      font-size: 14px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .rank-1 {
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      color: #78350f;
+      animation: goldShine 2s ease-in-out infinite;
+    }
+    
+    .rank-2 {
+      background: linear-gradient(135deg, #e5e7eb 0%, #9ca3af 100%);
+      color: #374151;
+    }
+    
+    .rank-3 {
+      background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+      color: #78350f;
+    }
+    
+    .rank-default {
+      background: linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%);
+      color: #5b21b6;
+    }
+    
+    @keyframes goldShine {
+      0%, 100% {
+        box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
       }
       50% {
-        transform: translateY(-1px) scale(1.02);
-      }
-      100% {
-        transform: translateY(-1px) scale(0.98);
+        box-shadow: 0 6px 20px rgba(251, 191, 36, 0.9),
+                    0 0 30px rgba(251, 191, 36, 0.6);
       }
     }
     
@@ -359,146 +394,14 @@
       border-radius: 8px;
       box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
       transition: all 0.3s ease;
+      cursor: pointer;
+      border: none;
     }
     
     .close-button:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
-    }
-    
-    .dot-indicator {
-      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-      transform: scale(0.8);
-      opacity: 0.6;
-      position: relative;
-    }
-    
-    .dot-indicator.active {
-      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-      transform: scale(1.4);
-      opacity: 1;
-      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
-      animation: festiveDotPulse 1s ease-in-out infinite alternate;
-    }
-    
-    .dot-indicator:not(.active) {
-      background: rgba(255, 255, 255, 0.3);
-    }
-    
-    .dot-indicator:hover {
-      transform: scale(1.2);
-      opacity: 0.9;
-      animation: festiveDotBounce 0.3s ease-in-out;
-    }
-    
-    @keyframes festiveDotPulse {
-      0% {
-        transform: scale(1.4);
-        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
-      }
-      100% {
-        transform: scale(1.5);
-        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.8), 0 0 15px rgba(59, 130, 246, 0.4);
-      }
-    }
-    
-    @keyframes festiveDotBounce {
-      0% {
-        transform: scale(1.2);
-      }
-      50% {
-        transform: scale(1.4);
-      }
-      100% {
-        transform: scale(1.2);
-      }
-    }
-    
-    /* Carousel container animations */
-    .carousel-container {
-      animation: festiveCarouselEntry 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-    
-    @keyframes festiveCarouselEntry {
-      0% {
-        opacity: 0;
-        transform: scale(0.8) rotate(-5deg);
-        filter: blur(5px);
-      }
-      50% {
-        opacity: 0.8;
-        transform: scale(1.05) rotate(2deg);
-        filter: blur(1px);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1) rotate(0deg);
-        filter: blur(0px);
-      }
-    }
-    
-    /* Festive confetti effect */
-    .carousel-container::before {
-      content: '';
-      position: absolute;
-      top: -10px;
-      left: -10px;
-      right: -10px;
-      bottom: -10px;
-      background: linear-gradient(45deg, 
-        transparent 30%, 
-        rgba(255, 215, 0, 0.1) 50%, 
-        transparent 70%);
-      animation: festiveShimmer 3s ease-in-out infinite;
-      pointer-events: none;
-      z-index: -1;
-    }
-    
-    @keyframes festiveShimmer {
-      0%, 100% {
-        transform: translateX(-100%) rotate(45deg);
-      }
-      50% {
-        transform: translateX(100%) rotate(45deg);
-      }
-    }
-    
-    /* Button animations */
-    .control-button, .close-button {
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .control-button::before, .close-button::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-      transition: left 0.6s ease;
-    }
-    
-    .control-button:hover::before, .close-button:hover::before {
-      left: 100%;
-    }
-    
-    /* Festive particle animation */
-    @keyframes festiveParticle {
-      0% {
-        transform: scale(0) rotate(0deg);
-        opacity: 1;
-      }
-      50% {
-        transform: scale(1.2) rotate(180deg);
-        opacity: 0.8;
-      }
-      100% {
-        transform: scale(0.5) rotate(360deg) translateY(-100px);
-        opacity: 0;
-      }
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+      background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
     }
     
     /* Festive wheel celebration */
@@ -533,6 +436,16 @@
       100% {
         transform: translateY(100vh) rotate(720deg);
         opacity: 0;
+      }
+    }
+    
+    /* Loading effect */
+    @keyframes loadingPulse {
+      0%, 100% {
+        opacity: 0.5;
+      }
+      50% {
+        opacity: 1;
       }
     }
   </style>
@@ -590,22 +503,40 @@
       </button>
     </div>
 
-    <!-- Carousel Viewer -->
-    <div id="carouselContainer" class="fixed inset-0 flex items-center justify-center z-30 hidden bg-transparent">
-      <div class="max-w-screen-lg w-full carousel-container p-6 flex flex-col items-center">
-        <div
-          id="carouselImage"
-          class="w-full max-h-[85vh] carousel-image flex items-center justify-center"
-        ></div>
-
-        <!-- Dots Indicator -->
-        <div id="carouselDots" class="flex justify-center mt-4 gap-2"></div>
-
-        <!-- Controls -->
-        <div class="mt-4 flex gap-4">
-          <button id="prevBtn" class="control-button">‹</button>
-          <button id="nextBtn" class="control-button">›</button>
-          <button id="closeCarousel" class="close-button">Close</button>
+    <!-- Winners Table Viewer -->
+    <div id="winnersTableContainer" class="fixed inset-0 flex items-center justify-center z-30 hidden bg-transparent">
+      <div class="winners-container">
+        <div class="table-header">
+          <h2 class="table-title">🏆 Lucky Draw Winners 🏆</h2>
+          <p style="color: rgba(255, 255, 255, 0.9); margin-top: 8px; font-size: 16px;">🎉 Congratulations to all our winners! 🎉</p>
+        </div>
+        
+        <div class="table-wrapper">
+          <table class="winners-table">
+            <thead>
+              <tr>
+                <th>Sr. No.</th>
+                <th>Farmer Name</th>
+                <th>Mobile Number</th>
+                <th>District</th>
+                <th>Headquarter</th>
+              </tr>
+            </thead>
+            <tbody id="winnersTableBody">
+              <tr>
+                <td colspan="5" style="text-align: center; padding: 40px; font-size: 18px; color: #6366f1;">
+                  🎰 Loading winners...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Close Button -->
+        <div style="padding: 20px; text-align: center; border-top: 2px solid rgba(99, 102, 241, 0.2);">
+          <button id="closeWinnersTable" class="close-button" style="padding: 12px 32px; font-size: 16px;">
+            Close
+          </button>
         </div>
       </div>
     </div>
@@ -613,127 +544,94 @@
   </div>
 
   <!-- JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
     const startButton = document.getElementById("startButton");
     const initialButtonContainer = document.getElementById("initialButtonContainer");
     const wheelContainer = document.getElementById("wheelContainer");
     const wheelButton = document.getElementById("wheelButton");
     const wheelImage = document.getElementById("wheelImage");
-    const carouselContainer = document.getElementById("carouselContainer");
-    const carouselImage = document.getElementById("carouselImage");
-    const carouselDots = document.getElementById("carouselDots");
-    const prevBtn = document.getElementById("prevBtn");
-    const nextBtn = document.getElementById("nextBtn");
-    const closeCarousel = document.getElementById("closeCarousel");
+    const winnersTableContainer = document.getElementById("winnersTableContainer");
+    const winnersTableBody = document.getElementById("winnersTableBody");
+    const closeWinnersTable = document.getElementById("closeWinnersTable");
     const fantasticWheel = document.getElementById("wheelImage");
 
-    const carouselItems = [
-      { emoji: '🏆', title: 'Grand Prize', subtitle: '1st Place Winner', color: 'from-yellow-400 to-yellow-600' },
-      { emoji: '💎', title: 'Diamond Prize', subtitle: '2nd Place Winner', color: 'from-blue-400 to-blue-600' },
-      { emoji: '👑', title: 'Royal Prize', subtitle: '3rd Place Winner', color: 'from-purple-400 to-purple-600' },
-      { emoji: '🎁', title: 'Special Prize', subtitle: 'Bonus Winner', color: 'from-pink-400 to-pink-600' }
-    ];
-    let currentIndex = 0;
     let hasSpun = false;
-    let isFirstCarouselEntry = true;
+    let winnersData = [];
 
-    function updateCarousel(index, direction = 'right', isInitialEntry = false) {
-      // Add slide out animation
-      carouselImage.classList.add(direction === 'left' ? 'slide-out-left' : 'slide-out-right');
-      
-      // Only add festive filter on initial entry
-      if (isInitialEntry) {
-        carouselImage.style.filter = 'hue-rotate(20deg) saturate(1.2)';
-      }
-      
-      setTimeout(() => {
-        const item = carouselItems[index];
-        carouselImage.innerHTML = `
-          <div class="bg-gradient-to-br ${item.color} rounded-3xl p-16 shadow-2xl border-8 border-white min-h-[400px] flex flex-col items-center justify-center">
-            <div class="text-9xl mb-8">${item.emoji}</div>
-            <h2 class="text-5xl font-bold text-white mb-4 text-shadow">${item.title}</h2>
-            <p class="text-2xl text-white/90">${item.subtitle}</p>
-          </div>
-        `;
-        carouselImage.classList.remove('slide-out-left', 'slide-out-right', 'loaded');
-        carouselImage.style.filter = '';
-        
-        // Trigger slide in animation
-        setTimeout(() => {
-          carouselImage.classList.add('loaded');
-          // Only add celebration effect on first entry
-          if (isInitialEntry && isFirstCarouselEntry) {
-            createCelebrationEffect();
-            isFirstCarouselEntry = false;
-          }
-        }, 50);
-        
-        renderDots();
-      }, 300);
-    }
-    
-    function createCelebrationEffect() {
-      // Create floating particles effect
-      for (let i = 0; i < 6; i++) {
-        const particle = document.createElement('div');
-        particle.style.cssText = `
-          position: absolute;
-          width: 8px;
-          height: 8px;
-          background: linear-gradient(45deg, #facc15, #f59e0b);
-          border-radius: 50%;
-          pointer-events: none;
-          z-index: 1000;
-          animation: festiveParticle 1.5s ease-out forwards;
-        `;
-        
-        // Random position around the image
-        const angle = (i / 6) * Math.PI * 2;
-        const radius = 150;
-        const x = Math.cos(angle) * radius + 200;
-        const y = Math.sin(angle) * radius + 150;
-        
-        particle.style.left = x + 'px';
-        particle.style.top = y + 'px';
-        
-        carouselContainer.appendChild(particle);
-        
-        // Remove particle after animation
-        setTimeout(() => {
-          if (particle.parentNode) {
-            particle.parentNode.removeChild(particle);
-          }
-        }, 1500);
-      }
-    }
-
-    function renderDots() {
-      carouselDots.innerHTML = "";
-      carouselItems.forEach((_, index) => {
-        const dot = document.createElement("span");
-        dot.className = `w-3 h-3 rounded-full cursor-pointer dot-indicator ${
-          index === currentIndex ? "active" : ""
-        }`;
-        dot.addEventListener("click", () => {
-          const direction = index > currentIndex ? 'right' : 'left';
-          currentIndex = index;
-          updateCarousel(currentIndex, direction);
-        });
-        carouselDots.appendChild(dot);
+    // Load winners data from CSV
+    function loadWinnersData() {
+      Papa.parse('data.csv', {
+        download: true,
+        header: true,
+        complete: function(results) {
+          winnersData = results.data.filter(row => 
+            row['First Name'] && row['First Name'].trim() !== ''
+          );
+          populateWinnersTable();
+        },
+        error: function(error) {
+          winnersTableBody.innerHTML = `
+            <tr>
+              <td colspan="5" style="text-align: center; padding: 40px; color: #dc2626;">
+                ❌ Error loading winners data
+              </td>
+            </tr>
+          `;
+        }
       });
+    }
+
+    function getRankClass(index) {
+      if (index === 0) return 'rank-1';
+      if (index === 1) return 'rank-2';
+      if (index === 2) return 'rank-3';
+      return 'rank-default';
+    }
+
+    function populateWinnersTable() {
+      if (winnersData.length === 0) {
+        winnersTableBody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 40px;">
+              No winners data available
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      winnersTableBody.innerHTML = winnersData.map((winner, index) => {
+        const rankNum = index + 1;
+        const farmerName = `${winner['First Name']} ${winner['Last Name']}`;
+        const mobile = winner['Phone Number'] || '-';
+        const district = winner['District'] || '-';
+        const headquarter = winner['PT'] || '-';
+        
+        return `
+          <tr style="animation-delay: ${(index % 50) * 0.02}s">
+            <td>
+              <div class="rank-badge ${getRankClass(index)}">
+                ${rankNum <= 3 ? ['🥇', '🥈', '🥉'][index] : rankNum}
+              </div>
+            </td>
+            <td style="font-weight: 600;">${farmerName}</td>
+            <td>${mobile}</td>
+            <td>${district}</td>
+            <td style="font-weight: 600; color: #8b5cf6;">${headquarter}</td>
+          </tr>
+        `;
+      }).join('');
     }
 
     startButton.addEventListener("click", () => {
       initialButtonContainer.classList.add("hidden");
 
       if (hasSpun) {
-        carouselContainer.classList.remove("hidden");
-        updateCarousel(currentIndex, 'right', true); // Mark as initial entry
-        // Add festive celebration effect only on entry
+        winnersTableContainer.classList.remove("hidden");
         createConfettiBurst();
       } else {
         wheelContainer.classList.remove("hidden");
-        // Add festive celebration effect to wheel
         fantasticWheel.classList.add("celebrating");
         createConfettiBurst();
       }
@@ -775,24 +673,14 @@
       setTimeout(() => {
         wheelImage.classList.remove("professional-spin");
         wheelContainer.classList.add("hidden");
-        carouselContainer.classList.remove("hidden");
-        updateCarousel(currentIndex, 'right', true); // Mark as initial entry
+        winnersTableContainer.classList.remove("hidden");
+        loadWinnersData();
         hasSpun = true;
       }, 4000);
     });
 
-    prevBtn.addEventListener("click", () => {
-      currentIndex = (currentIndex - 1 + carouselItems.length) % carouselItems.length;
-      updateCarousel(currentIndex, 'left');
-    });
-
-    nextBtn.addEventListener("click", () => {
-      currentIndex = (currentIndex + 1) % carouselItems.length;
-      updateCarousel(currentIndex, 'right');
-    });
-
-    closeCarousel.addEventListener("click", () => {
-      carouselContainer.classList.add("hidden");
+    closeWinnersTable.addEventListener("click", () => {
+      winnersTableContainer.classList.add("hidden");
       initialButtonContainer.classList.remove("hidden");
     });
   </script>
