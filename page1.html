@@ -267,21 +267,6 @@
       overflow: hidden;
       max-width: 850px;
       width: 100%;
-      max-height: 65vh;
-      overflow-y: auto;
-    }
-    
-    .carousel-content::-webkit-scrollbar {
-      width: 8px;
-    }
-    
-    .carousel-content::-webkit-scrollbar-track {
-      background: #f1f5f9;
-    }
-    
-    .carousel-content::-webkit-scrollbar-thumb {
-      background: linear-gradient(135deg, #fbbf24, #f59e0b);
-      border-radius: 10px;
     }
     
     .carousel-content.loaded {
@@ -302,10 +287,10 @@
     /* Winners Table in Carousel - QUIRKY LUCKY DRAW THEME */
     .table-title {
       background: linear-gradient(135deg, #ec4899 0%, #f97316 50%, #eab308 100%);
-      padding: 20px;
+      padding: 16px;
       text-align: center;
       color: white;
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 900;
       border-radius: 12px 12px 0 0;
       text-shadow: 
@@ -352,11 +337,11 @@
     }
     
     .winners-table thead th {
-      padding: 14px 12px;
+      padding: 10px;
       text-align: left;
       color: #fff;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 13px;
       text-transform: uppercase;
       border-bottom: 3px solid #fbbf24;
       letter-spacing: 0.5px;
@@ -381,9 +366,9 @@
     }
     
     .winners-table tbody td {
-      padding: 12px;
+      padding: 8px 10px;
       border-bottom: 1px solid rgba(251, 191, 36, 0.2);
-      font-size: 15px;
+      font-size: 14px;
       color: #1f2937;
       font-weight: 500;
     }
@@ -407,62 +392,26 @@
       }
     }
     
-    .rank-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
+    /* Serial number styling */
+    .sr-number {
       font-weight: 800;
-      font-size: 16px;
-      border: 3px solid;
-      transform: rotate(-10deg);
-      transition: transform 0.3s ease;
+      font-size: 18px;
+      color: #6366f1;
     }
     
-    .rank-badge:hover {
-      transform: rotate(0deg) scale(1.1);
+    .sr-number.top-1 {
+      color: #eab308;
+      font-size: 20px;
     }
     
-    .rank-1 {
-      background: linear-gradient(135deg, #ffd700 0%, #fbbf24 100%);
-      color: #78350f;
-      border-color: #eab308;
-      box-shadow: 0 4px 15px rgba(251, 191, 36, 0.5);
-      animation: badgeBounce 2s ease-in-out infinite;
+    .sr-number.top-2 {
+      color: #64748b;
+      font-size: 20px;
     }
     
-    .rank-2 {
-      background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
-      color: #1e293b;
-      border-color: #64748b;
-      box-shadow: 0 4px 15px rgba(100, 116, 139, 0.5);
-      animation: badgeBounce 2s ease-in-out infinite 0.2s;
-    }
-    
-    .rank-3 {
-      background: linear-gradient(135deg, #fdba74 0%, #fb923c 100%);
-      color: #7c2d12;
-      border-color: #f97316;
-      box-shadow: 0 4px 15px rgba(249, 115, 22, 0.5);
-      animation: badgeBounce 2s ease-in-out infinite 0.4s;
-    }
-    
-    .rank-default {
-      background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
-      color: white;
-      border-color: #7c3aed;
-      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
-    }
-    
-    @keyframes badgeBounce {
-      0%, 100% {
-        transform: rotate(-10deg) translateY(0);
-      }
-      50% {
-        transform: rotate(-10deg) translateY(-5px);
-      }
+    .sr-number.top-3 {
+      color: #f97316;
+      font-size: 20px;
     }
     
     
@@ -687,13 +636,6 @@
     // Load data on page load
     loadWinnersData();
     
-    function getRankClass(index) {
-      if (index === 0) return 'rank-1';
-      if (index === 1) return 'rank-2';
-      if (index === 2) return 'rank-3';
-      return 'rank-default';
-    }
-    
     function createTableHTML(winners, startIndex) {
       if (winners.length === 0) {
         return `
@@ -712,12 +654,13 @@
         const district = winner['District'] || '-';
         const headquarter = winner['Headquater'] || '-';
         
+        const srClass = globalIndex === 0 ? 'top-1' : globalIndex === 1 ? 'top-2' : globalIndex === 2 ? 'top-3' : '';
+        const emoji = globalIndex === 0 ? '🥇' : globalIndex === 1 ? '🥈' : globalIndex === 2 ? '🥉' : '';
+        
         return `
           <tr>
             <td style="text-align: center;">
-              <div class="rank-badge ${getRankClass(globalIndex)}">
-                ${rankNum <= 3 ? ['🥇', '🥈', '🥉'][globalIndex] : rankNum}
-              </div>
+              <span class="sr-number ${srClass}">${emoji} ${rankNum}</span>
             </td>
             <td>${farmerName}</td>
             <td>${mobile}</td>
@@ -732,11 +675,11 @@
         <table class="winners-table">
           <thead>
             <tr>
-              <th style="width: 90px; text-align: center;">🎯 SR. NO.</th>
+              <th style="width: 80px; text-align: center;">🎯 NO.</th>
               <th style="width: 28%;">👨‍🌾 FARMER NAME</th>
-              <th style="width: 22%;">📱 MOBILE</th>
+              <th style="width: 21%;">📱 MOBILE</th>
               <th style="width: 20%;">🏙️ DISTRICT</th>
-              <th style="width: 20%;">🏢 HQ</th>
+              <th style="width: 21%;">🏢 HEADQUARTER</th>
             </tr>
           </thead>
           <tbody>
