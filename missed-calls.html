@@ -744,10 +744,17 @@
         console.log('📅 Date Filter in Cascading:', { dateFrom, dateTo, totalRows: baseData.length });
         
         baseData = baseData.filter(row => {
-          const rowDate = row['Date']; // Using "Date" column
+          // Try "Date Processed" first (format: "10-Sep-2025")
+          let rowDate = parseDateProcessed(row['Date Processed']);
+          
+          // Fallback to "Date" column (format: "10-09-2025 13:25")
+          if(!rowDate) {
+            rowDate = parseDate(row['Date']);
+          }
+          
           if(!rowDate) return false;
           
-          // Ensure date is in YYYY-MM-DD format for comparison
+          // Compare YYYY-MM-DD strings
           const isInRange = rowDate >= dateFrom && rowDate <= dateTo;
           return isInRange;
         });
@@ -894,9 +901,16 @@
         // Zone filter
         if(zone && row.ZONE !== zone) return false;
         
-        // Date range filter (using "Date" column)
+        // Date range filter (using "Date Processed" column)
         if(dateFrom && dateTo){
-          const rowDate = row['Date'];
+          // Try "Date Processed" first (format: "10-Sep-2025")
+          let rowDate = parseDateProcessed(row['Date Processed']);
+          
+          // Fallback to "Date" column (format: "10-09-2025 13:25")
+          if(!rowDate) {
+            rowDate = parseDate(row['Date']);
+          }
+          
           if(!rowDate) return false;
           
           // Compare YYYY-MM-DD strings directly
@@ -922,6 +936,47 @@
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
       const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    // Parse date from "Date Processed" column (format: "10-Sep-2025")
+    function parseDateProcessed(dateStr){
+      if(!dateStr) return null;
+      
+      // Format: "10-Sep-2025" or "10-Sep-25"
+      const parts = dateStr.trim().split('-');
+      if(parts.length !== 3) return null;
+      
+      const day = parts[0].padStart(2, '0');
+      const monthStr = parts[1];
+      const year = parts[2].length === 2 ? '20' + parts[2] : parts[2];
+      
+      const monthMap = {
+        'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
+        'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
+        'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
+      };
+      
+      const month = monthMap[monthStr];
+      if(!month) return null;
+      
+      return `${year}-${month}-${day}`;
+    }
+
+    // Parse date from "Date" column (format: "10-09-2025 13:25")
+    function parseDate(dateStr){
+      if(!dateStr) return null;
+      
+      // Format: "10-09-2025 13:25" or "10-09-2025"
+      const datePart = dateStr.trim().split(' ')[0];
+      const parts = datePart.split('-');
+      
+      if(parts.length !== 3) return null;
+      
+      const day = parts[0].padStart(2, '0');
+      const month = parts[1].padStart(2, '0');
+      const year = parts[2];
+      
       return `${year}-${month}-${day}`;
     }
 
@@ -954,7 +1009,14 @@
           if(district && row['Division/PT District'] !== district) return false;
           if(zone && row.ZONE !== zone) return false;
           if(dateFrom && dateTo){
-            const rowDate = row['Date'];
+            // Try "Date Processed" first (format: "10-Sep-2025")
+            let rowDate = parseDateProcessed(row['Date Processed']);
+            
+            // Fallback to "Date" column (format: "10-09-2025 13:25")
+            if(!rowDate) {
+              rowDate = parseDate(row['Date']);
+            }
+            
             if(!rowDate || rowDate < dateFrom || rowDate > dateTo) return false;
           }
           
