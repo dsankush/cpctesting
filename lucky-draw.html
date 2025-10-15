@@ -14,15 +14,19 @@
     .full-page {
       width: 100vw;
       height: 100vh;
-      background:
-        url("b2.jpg") top center / 100% 50% no-repeat,
-        url("b1.jpg") bottom center / 100% 50% no-repeat;
+      background: linear-gradient(
+        180deg,
+        #1a0033 0%,
+        #2d0a4e 25%,
+        #4a148c 50%,
+        #6a1b9a 75%,
+        #8e24aa 100%
+      );
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
       overflow: hidden;
-      background-attachment: fixed;
     }
     
     /* Professional overlay for better contrast */
@@ -542,7 +546,9 @@
     <!-- Start Button -->
     <div id="initialButtonContainer" class="absolute bottom-10 left-1/2 -translate-x-1/2 z-20">
       <button id="startButton" class="focus:outline-none">
-        <img src="bt1.jpg" class="w-[220px] h-auto object-contain select-none glow-effect" />
+        <div class="glow-effect px-16 py-8 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 rounded-2xl text-4xl font-bold text-gray-900 shadow-2xl border-4 border-yellow-300">
+          🎉 START 🎉
+        </div>
       </button>
     </div>
 
@@ -587,12 +593,10 @@
     <!-- Carousel Viewer -->
     <div id="carouselContainer" class="fixed inset-0 flex items-center justify-center z-30 hidden bg-transparent">
       <div class="max-w-screen-lg w-full carousel-container p-6 flex flex-col items-center">
-        <img
+        <div
           id="carouselImage"
-          src=""
-          alt="Carousel Image"
-          class="w-full max-h-[85vh] object-contain carousel-image"
-        />
+          class="w-full max-h-[85vh] carousel-image flex items-center justify-center"
+        ></div>
 
         <!-- Dots Indicator -->
         <div id="carouselDots" class="flex justify-center mt-4 gap-2"></div>
@@ -623,7 +627,12 @@
     const closeCarousel = document.getElementById("closeCarousel");
     const fantasticWheel = document.getElementById("wheelImage");
 
-    const carouselItems = ["w1.jpg", "w2.jpg", "w3.jpg", "w4.jpg"];
+    const carouselItems = [
+      { emoji: '🏆', title: 'Grand Prize', subtitle: '1st Place Winner', color: 'from-yellow-400 to-yellow-600' },
+      { emoji: '💎', title: 'Diamond Prize', subtitle: '2nd Place Winner', color: 'from-blue-400 to-blue-600' },
+      { emoji: '👑', title: 'Royal Prize', subtitle: '3rd Place Winner', color: 'from-purple-400 to-purple-600' },
+      { emoji: '🎁', title: 'Special Prize', subtitle: 'Bonus Winner', color: 'from-pink-400 to-pink-600' }
+    ];
     let currentIndex = 0;
     let hasSpun = false;
     let isFirstCarouselEntry = true;
@@ -638,7 +647,14 @@
       }
       
       setTimeout(() => {
-        carouselImage.src = carouselItems[index];
+        const item = carouselItems[index];
+        carouselImage.innerHTML = `
+          <div class="bg-gradient-to-br ${item.color} rounded-3xl p-16 shadow-2xl border-8 border-white min-h-[400px] flex flex-col items-center justify-center">
+            <div class="text-9xl mb-8">${item.emoji}</div>
+            <h2 class="text-5xl font-bold text-white mb-4 text-shadow">${item.title}</h2>
+            <p class="text-2xl text-white/90">${item.subtitle}</p>
+          </div>
+        `;
         carouselImage.classList.remove('slide-out-left', 'slide-out-right', 'loaded');
         carouselImage.style.filter = '';
         
