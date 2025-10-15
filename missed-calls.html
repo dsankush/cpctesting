@@ -741,10 +741,18 @@
         const dateFrom = formatDateYYYYMMDD(dates[0]);
         const dateTo = formatDateYYYYMMDD(dates[1]);
         
+        console.log('📅 Date Filter in Cascading:', { dateFrom, dateTo, totalRows: baseData.length });
+        
         baseData = baseData.filter(row => {
-          const rowDate = row['Date Processed'];
-          return rowDate && rowDate >= dateFrom && rowDate <= dateTo;
+          const rowDate = row['Date']; // Using "Date" column
+          if(!rowDate) return false;
+          
+          // Ensure date is in YYYY-MM-DD format for comparison
+          const isInRange = rowDate >= dateFrom && rowDate <= dateTo;
+          return isInRange;
         });
+        
+        console.log('📅 After Date Filter:', { rowsRemaining: baseData.length });
       }
 
       // For each filter, get available options based on other selected filters
@@ -859,7 +867,16 @@
         dateTo = formatDateYYYYMMDD(dates[1]);
       }
 
-      console.log('🔍 Auto-applying filters:', { digitrack, state, hq, district, zone, dateFrom, dateTo });
+      console.log('🔍 Auto-applying filters:', { 
+        digitrack, state, hq, district, zone, dateFrom, dateTo,
+        totalData: MC_DATA.length 
+      });
+
+      // Debug: Check date values in data
+      if(dateFrom && dateTo && MC_DATA.length > 0){
+        const sampleDates = MC_DATA.slice(0, 5).map(r => r['Date']);
+        console.log('📅 Sample dates from data:', sampleDates);
+      }
 
       FILTERED_DATA = MC_DATA.filter(row => {
         // Digitrack filter
@@ -877,9 +894,9 @@
         // Zone filter
         if(zone && row.ZONE !== zone) return false;
         
-        // Date range filter
+        // Date range filter (using "Date" column)
         if(dateFrom && dateTo){
-          const rowDate = row['Date Processed'];
+          const rowDate = row['Date'];
           if(!rowDate) return false;
           
           // Compare YYYY-MM-DD strings directly
@@ -937,7 +954,7 @@
           if(district && row['Division/PT District'] !== district) return false;
           if(zone && row.ZONE !== zone) return false;
           if(dateFrom && dateTo){
-            const rowDate = row['Date Processed'];
+            const rowDate = row['Date'];
             if(!rowDate || rowDate < dateFrom || rowDate > dateTo) return false;
           }
           
@@ -1246,17 +1263,29 @@
       dateFormat: "Y-m-d",
       maxDate: "today",
       onChange: function(selectedDates, dateStr, instance) {
-        console.log('📅 Date range selected:', dateStr);
+        console.log('📅 Flatpickr onChange:', { 
+          selectedDates: selectedDates.length, 
+          dateStr,
+          formatted: selectedDates.map(d => formatDateYYYYMMDD(d))
+        });
+        
         // Auto-apply when both dates are selected
         if(selectedDates.length === 2){
+          console.log('📅 Auto-applying date filter...');
           applyFilters();
         }
       },
       onClose: function(selectedDates, dateStr, instance) {
+        console.log('📅 Flatpickr onClose:', { selectedDates: selectedDates.length });
+        
         // Also apply when calendar is closed (in case user selected range and clicked away)
         if(selectedDates.length === 2){
+          console.log('📅 Auto-applying on close...');
           applyFilters();
         }
+      },
+      onReady: function(selectedDates, dateStr, instance) {
+        console.log('📅 Flatpickr ready!');
       }
     });
 
