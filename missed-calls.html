@@ -626,6 +626,15 @@
           </select>
         </div>
         <div class="filter-group">
+          <label>
+            <span>👤 Name (PT)</span>
+            <span class="filter-count" id="nameCount">0</span>
+          </label>
+          <select id="filterName">
+            <option value="">All PTs</option>
+          </select>
+        </div>
+        <div class="filter-group">
           <label>📅 Date Range</label>
           <input type="text" id="filterDateRange" placeholder="Click to select date range" readonly style="cursor:pointer;">
         </div>
@@ -801,13 +810,24 @@
       if(currentFilters.state) zoneData = zoneData.filter(r => r.State === currentFilters.state);
       if(currentFilters.hq) zoneData = zoneData.filter(r => r.HQ === currentFilters.hq);
       if(currentFilters.district) zoneData = zoneData.filter(r => r['Division/PT District'] === currentFilters.district);
+      if(currentFilters.name) zoneData = zoneData.filter(r => r.Name === currentFilters.name);
       const zones = [...new Set(zoneData.map(r => r.ZONE).filter(Boolean))].sort();
+
+      // Name (PT) options
+      let nameData = baseData;
+      if(currentFilters.digitrack) nameData = nameData.filter(r => r['Digitrack No'] === currentFilters.digitrack);
+      if(currentFilters.state) nameData = nameData.filter(r => r.State === currentFilters.state);
+      if(currentFilters.hq) nameData = nameData.filter(r => r.HQ === currentFilters.hq);
+      if(currentFilters.district) nameData = nameData.filter(r => r['Division/PT District'] === currentFilters.district);
+      if(currentFilters.zone) nameData = nameData.filter(r => r.ZONE === currentFilters.zone);
+      const names = [...new Set(nameData.map(r => r.Name).filter(Boolean))].sort();
       
       populateSelect('filterDigitrack', digitracks, preserveFilters ? currentFilters.digitrack : '');
       populateSelect('filterState', states, preserveFilters ? currentFilters.state : '');
       populateSelect('filterHQ', hqs, preserveFilters ? currentFilters.hq : '');
       populateSelect('filterDistrict', districts, preserveFilters ? currentFilters.district : '');
       populateSelect('filterZone', zones, preserveFilters ? currentFilters.zone : '');
+      populateSelect('filterName', names, preserveFilters ? currentFilters.name : '');
     }
 
     function populateSelect(id, options, valueToSet){
@@ -823,6 +843,8 @@
         select.innerHTML = '<option value="">All Districts</option>';
       } else if(id === 'filterZone'){
         select.innerHTML = '<option value="">All Zones</option>';
+      } else if(id === 'filterName'){
+        select.innerHTML = '<option value="">All PTs</option>';
       } else {
         select.innerHTML = '<option value="">All</option>';
       }
@@ -840,7 +862,8 @@
         'filterState': 'stateCount',
         'filterHQ': 'hqCount',
         'filterDistrict': 'districtCount',
-        'filterZone': 'zoneCount'
+        'filterZone': 'zoneCount',
+        'filterName': 'nameCount'
       };
       
       if(countMap[id]){
@@ -864,6 +887,7 @@
       const hq = document.getElementById('filterHQ').value;
       const district = document.getElementById('filterDistrict').value;
       const zone = document.getElementById('filterZone').value;
+      const name = document.getElementById('filterName').value;
       
       // Get date range from flatpickr
       let dateFrom = null;
@@ -875,7 +899,7 @@
       }
 
       console.log('🔍 Auto-applying filters:', { 
-        digitrack, state, hq, district, zone, dateFrom, dateTo,
+        digitrack, state, hq, district, zone, name, dateFrom, dateTo,
         totalData: MC_DATA.length 
       });
 
@@ -900,6 +924,9 @@
         
         // Zone filter
         if(zone && row.ZONE !== zone) return false;
+        
+        // Name (PT) filter
+        if(name && row.Name !== name) return false;
         
         // Date range filter (using "Date Processed" column)
         if(dateFrom && dateTo){
@@ -993,6 +1020,7 @@
         const hq = document.getElementById('filterHQ').value;
         const district = document.getElementById('filterDistrict').value;
         const zone = document.getElementById('filterZone').value;
+        const name = document.getElementById('filterName').value;
         
         let dateFrom = null;
         let dateTo = null;
@@ -1008,6 +1036,7 @@
           if(hq && row.HQ !== hq) return false;
           if(district && row['Division/PT District'] !== district) return false;
           if(zone && row.ZONE !== zone) return false;
+          if(name && row.Name !== name) return false;
           if(dateFrom && dateTo){
             // Try "Date Processed" first (format: "10-Sep-2025")
             let rowDate = parseDateProcessed(row['Date Processed']);
@@ -1040,6 +1069,7 @@
       document.getElementById('filterHQ').value = '';
       document.getElementById('filterDistrict').value = '';
       document.getElementById('filterZone').value = '';
+      document.getElementById('filterName').value = '';
       document.getElementById('filterDateRange').value = '';
       document.getElementById('universalSearch').value = '';
       
@@ -1358,6 +1388,7 @@
       document.getElementById('filterHQ').onchange = applyFilters;
       document.getElementById('filterDistrict').onchange = applyFilters;
       document.getElementById('filterZone').onchange = applyFilters;
+      document.getElementById('filterName').onchange = applyFilters;
       
       // Universal search with auto-search
       document.getElementById('universalSearch').oninput = universalSearch;
