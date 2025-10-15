@@ -538,8 +538,11 @@
         header: true,
         complete: function(results) {
           console.log('CSV loaded, raw data:', results.data.length, 'rows');
+          console.log('Column names:', results.meta.fields);
+          console.log('First row sample:', results.data[0]);
+          
           winnersData = results.data.filter(row => 
-            row['First Name'] && row['First Name'].trim() !== ''
+            row['Farmer Name'] && row['Farmer Name'].trim() !== ''
           );
           
           console.log('Filtered winners:', winnersData.length);
@@ -587,10 +590,10 @@
       const tableRows = winners.map((winner, idx) => {
         const globalIndex = startIndex + idx;
         const rankNum = globalIndex + 1;
-        const farmerName = `${winner['First Name']} ${winner['Last Name']}`;
-        const mobile = winner['Phone Number'] || '-';
+        const farmerName = winner['Farmer Name'] || '-';
+        const mobile = winner['Mobile Number'] || '-';
         const district = winner['District'] || '-';
-        const headquarter = winner['PT'] || '-';
+        const headquarter = winner['Headquater'] || '-';
         
         return `
           <tr>
