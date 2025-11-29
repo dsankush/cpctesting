@@ -14,15 +14,19 @@
     .full-page {
       width: 100vw;
       height: 100vh;
-      background:
-        url("b2.jpg") top center / 100% 50% no-repeat,
-        url("b1.jpg") bottom center / 100% 50% no-repeat;
+      background: linear-gradient(
+        180deg,
+        #1a0033 0%,
+        #2d0a4e 25%,
+        #4a148c 50%,
+        #6a1b9a 75%,
+        #8e24aa 100%
+      );
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
       overflow: hidden;
-      background-attachment: fixed;
     }
     
     /* Professional overlay for better contrast */
@@ -300,6 +304,30 @@
       }
     }
     
+    @keyframes festiveBounce {
+      0% {
+        transform: translateX(0) scale(0.8) rotate(0deg);
+      }
+      50% {
+        transform: translateX(0) scale(1.1) rotate(2deg);
+      }
+      70% {
+        transform: translateX(0) scale(0.95) rotate(-1deg);
+      }
+      100% {
+        transform: translateX(0) scale(1) rotate(0deg);
+      }
+    }
+    
+    @keyframes festiveWiggle {
+      0% {
+        transform: translateX(0) scale(1.08) rotate(-2deg);
+      }
+      100% {
+        transform: translateX(0) scale(1.08) rotate(2deg);
+      }
+    }
+    
     .control-button {
       background: linear-gradient(135deg, #facc15 0%, #f59e0b 100%);
       border: 2px solid #f59e0b;
@@ -542,7 +570,9 @@
     <!-- Start Button -->
     <div id="initialButtonContainer" class="absolute bottom-10 left-1/2 -translate-x-1/2 z-20">
       <button id="startButton" class="focus:outline-none">
-        <img src="bt1.jpg" class="w-[220px] h-auto object-contain select-none glow-effect" />
+        <div class="glow-effect px-16 py-8 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 rounded-2xl text-4xl font-bold text-gray-900 shadow-2xl border-4 border-yellow-300">
+          🎉 START 🎉
+        </div>
       </button>
     </div>
 
@@ -586,11 +616,11 @@
 
     <!-- Carousel Viewer -->
     <div id="carouselContainer" class="fixed inset-0 flex items-center justify-center z-30 hidden bg-transparent">
-      <div class="max-w-screen-lg w-full carousel-container p-6 flex flex-col items-center">
+      <div class="max-w-4xl w-full carousel-container p-6 flex flex-col items-center">
         <img
           id="carouselImage"
           src=""
-          alt="Carousel Image"
+          alt="Prize Card"
           class="w-full max-h-[85vh] object-contain carousel-image"
         />
 
@@ -623,11 +653,18 @@
     const closeCarousel = document.getElementById("closeCarousel");
     const fantasticWheel = document.getElementById("wheelImage");
 
-    const carouselItems = ["w1.jpg", "w2.jpg", "w3.jpg", "w4.jpg"];
+    const carouselItems = [
+      "https://raw.githubusercontent.com/dsankush/coro-lucky-draw/main/DB/entry/w1.jpg",
+      "https://raw.githubusercontent.com/dsankush/coro-lucky-draw/main/DB/entry/w2.jpg",
+      "https://raw.githubusercontent.com/dsankush/coro-lucky-draw/main/DB/entry/w3.jpg",
+      "https://raw.githubusercontent.com/dsankush/coro-lucky-draw/main/DB/entry/w4.jpg",
+      "https://raw.githubusercontent.com/dsankush/coro-lucky-draw/main/DB/entry/w5.jpg",
+      "https://raw.githubusercontent.com/dsankush/coro-lucky-draw/main/DB/entry/w6.jpg"
+    ];
     let currentIndex = 0;
     let hasSpun = false;
     let isFirstCarouselEntry = true;
-
+    
     function updateCarousel(index, direction = 'right', isInitialEntry = false) {
       // Add slide out animation
       carouselImage.classList.add(direction === 'left' ? 'slide-out-left' : 'slide-out-right');
@@ -777,7 +814,13 @@
 
     closeCarousel.addEventListener("click", () => {
       carouselContainer.classList.add("hidden");
-      initialButtonContainer.classList.remove("hidden");
+      if (hasSpun) {
+        // If already spun, go back to start button
+        initialButtonContainer.classList.remove("hidden");
+      } else {
+        // If not spun yet, shouldn't happen but show start
+        initialButtonContainer.classList.remove("hidden");
+      }
     });
   </script>
 </body>
